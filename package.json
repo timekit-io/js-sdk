@@ -1,0 +1,15 @@
+{
+    "name": "timekit-js-sdk",
+    "version": "1.0.0",
+    "description": "JavaScript SDK for the Timekit API",
+    "main": "lib/timekit.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/timekit/js-sdk.git"
+    },
+    "keywords": [
+        "Timekit"
+    ],
+    "author": "Timekit Inc.",
+    "license": "MIT"
+}
