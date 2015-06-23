@@ -1,7 +1,7 @@
 {
   "name": "timekit-js-sdk",
   "version": "1.0.0",
-  "main": "lib/timekit.js",
+  "main": "dist/timekit.js",
   "ignore": [
     "**/.*",
     "node_modules"
