@@ -6,7 +6,7 @@ module.exports = {
     output: {
         path: "./dist",
         filename: "timekit.js",
-        libraryTarget: "var",
-        library: "Timekit"
+        libraryTarget: "umd",
+        library: "timekit"
     }
 };

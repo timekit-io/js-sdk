@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style type="text/css">
+          body {
+            font-family: helvetica, verdana, arial, sans-serif;
+            color: #383838;
+            margin: 30px;
+          }
+          code {
+            font-family: monospace;
+          }
+        </style>
+    </head>
+    <body>
+        <h1>Timekit JS SDK vanilla example</h1>
+        <p>This is the most minimal boilerplate demo of timekit.js used in the browser. Fire up your console (CMD+ALT+I) and use the SDK by hitting methods on the "timekit" global variable, e.g.</p>
+        <code>
+          timekit.configure({<br />
+            &nbsp;&nbsp;app: 'myNewApp',<br />
+            &nbsp;&nbsp;inputTimestampFormat: 'l h:i a Y-m-d'<br />
+          });
+        </code><br /><br />
+        <code>
+          timekit.auth('some_user@gmail.com', 'somepassword').then(function(response) {<br />
+            &nbsp;&nbsp;console.log(response);<br />
+          });
+        </code><br /><br />
+        <code>
+          timekit.findTime(['some_user@gmail.com', 'some_other_user@gmail.com'], '3 days', '30 minutes').then(function(response) {<br />
+            &nbsp;&nbsp;console.log(response);<br />
+          });
+        </code>
+        <script src="../../dist/timekit.min.js"></script>
+    </body>
+</html>
