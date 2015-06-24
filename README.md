@@ -4,9 +4,12 @@
 
 Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [developers.timekit.io](http://developers.timekit.io).
 
+Visit [timekit.io](http://timekit.io) to learn more and don't hesitate to contact Lasse Boisen Andersen ([la@timekit.io](mailto:la@timekit.io) or create an Issue) for questions. PR's are more than welcome!
+
 Features:
 - Returns ES-6/A+ style promises
 - Works in both node.js and in the browser (>=IE8 and evergreen)
+- Supports custom timestamp formats and timezones
 
 *TODO:* Implement last 50% of endpoints
 
@@ -72,6 +75,11 @@ timekit.setUser(
     apiToken    // [String] access token retrieved from API
 );
 
+timekit.auth(
+    email,      // [String] email of the user
+    password    // [String] password of the user
+);
+
 timekit.findTime(
     emails,     // [Array] list of emails as strings for users
     future,     // [String] max time into the future, written as "3 months"
@@ -120,13 +128,12 @@ webpack
 webpack --config webpack.config.min.js 
 ```
 
+*TODO:* make standalone version without dependencies bundled
+
 ## Running tests
 
 We use [jasmine](http://jasmine.github.io) + [karma](http://karma-runner.github.io/) for unit testing, that works together with webpack.
-
 Please note that most tests will fail if run against the live API url, as users won't be present.
-
-*TODO:* mock API responses for independent tests
 
 To run the test suite, simply do:
 ```bash
@@ -135,3 +142,5 @@ npm install
 # start karma and run once
 karma start
 ```
+
+*TODO:* mock API responses for independent tests
