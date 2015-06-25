@@ -358,8 +358,6 @@ describe('API endpoints with auth', function() {
       timezone: fixtures.updateUser.timezone,
     }).then(function(response) {
       expect(response.status).toBe(204);
-      expect(response.data).toBeDefined();
-      expect(typeof response.data.data.email).toBe('string');
       done();
     });
 
