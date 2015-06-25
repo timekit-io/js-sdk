@@ -277,13 +277,75 @@ function Timekit() {
   TK.getAvailability = function(start, end, email) {
 
     return makeRequest({
-      url: '/events',
+      url: '/events/availability',
       method: 'get',
       params: {
         start: start,
         end: end,
         email: email
       }
+    });
+
+  };
+
+  /**
+   * Get a user's meetings
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getMeetings = function() {
+
+    return makeRequest({
+      url: '/meetings',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get a user's specific meeting
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getMeeting = function(token) {
+
+    return makeRequest({
+      url: '/meetings/' + token,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get a user's specific meeting
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createMeeting = function(what, where, suggestions) {
+
+    return makeRequest({
+      url: '/meetings',
+      method: 'post',
+      data: {
+        what: what,
+        where: where,
+        suggestions: suggestions
+      }
+    });
+
+  };
+
+  /**
+   * Get a user's specific meeting
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateMeeting = function(token, data) {
+
+    return makeRequest({
+      url: '/meetings/' + token,
+      method: 'put',
+      data: data
     });
 
   };

@@ -16,7 +16,26 @@ var fixtures = {
   findTimeLength: '30 minutes',
   eventsStart:    moment().format(),
   eventsEnd:      moment().add(3,'weeks').format(),
-  availabilityEmail: 'timebirdnyc@gmail.com'
+  availabilityEmail: 'timebirdnyc@gmail.com',
+  meetingToken:   '7zdMNR48cJTjIRhz',
+  newMeeting: {
+    what:         'test title',
+    where:        'test location',
+    suggestions: [
+      {
+        start:    '2015-09-22T14:30:00.000Z',
+        end:      '2015-09-22T16:00:00.000Z'
+      },
+      {
+        start:    '2015-09-23T09:15:00.000Z',
+        end:      '2015-09-23T09:45:00.000Z'
+      }
+    ]
+  },
+  updateMeetingData: {
+    what:         'new test title',
+    where:        'new test location'
+  }
 }
 
 /**
@@ -73,7 +92,7 @@ describe('API endpoints without auth', function() {
  */
 describe('API endpoints with auth', function() {
 
-  beforeEach(function(done) {
+  beforeEach(function() {
 
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
@@ -82,10 +101,7 @@ describe('API endpoints with auth', function() {
       apiBaseUrl: fixtures.apiBaseUrl
     });
 
-    timekit.auth(fixtures.userEmail, fixtures.userPassword)
-    .then(function(response) {
-      done();
-    });
+    timekit.setUser(fixtures.userEmail, fixtures.userPassword);
 
   });
 
@@ -136,6 +152,7 @@ describe('API endpoints with auth', function() {
   it('should be able to call [GET] /calendars', function(done) {
 
     timekit.getCalendars().then(function(response) {
+      expect(response.status).toBe(200);
       expect(response.data).toBeDefined();
       expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
       done();
@@ -146,6 +163,7 @@ describe('API endpoints with auth', function() {
   it('should be able to call [GET] /calendar/:token', function(done) {
 
     timekit.getCalendar(fixtures.calendarToken).then(function(response) {
+      expect(response.status).toBe(200);
       expect(response.data).toBeDefined();
       expect(typeof response.data.data.name).toBe('string');
       done();
@@ -156,6 +174,7 @@ describe('API endpoints with auth', function() {
   it('should be able to call [GET] /contacts', function(done) {
 
     timekit.getContacts().then(function(response) {
+      expect(response.status).toBe(200);
       expect(response.data).toBeDefined();
       expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
       done();
@@ -169,6 +188,7 @@ describe('API endpoints with auth', function() {
       fixtures.eventsStart,
       fixtures.eventsEnd
     ).then(function(response) {
+      expect(response.status).toBe(200);
       expect(response.data).toBeDefined();
       expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
       done();
@@ -183,8 +203,58 @@ describe('API endpoints with auth', function() {
       fixtures.eventsEnd,
       fixtures.availabilityEmail
     ).then(function(response) {
+      expect(response.status).toBe(200);
       expect(response.data).toBeDefined();
       expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+      done();
+    });
+
+  });
+
+  it('should be able to call [GET] /meetings', function(done) {
+
+    timekit.getMeetings().then(function(response) {
+      expect(response.status).toBe(200);
+      expect(response.data).toBeDefined();
+      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+      done();
+    });
+
+  });
+
+  it('should be able to call [GET] /meetings/:token', function(done) {
+
+    timekit.getMeeting(fixtures.meetingToken).then(function(response) {
+      expect(response.status).toBe(200);
+      expect(response.data).toBeDefined();
+      expect(typeof response.data.data.what).toBe('string');
+      done();
+    });
+
+  });
+
+  it('should be able to call [POST] /meetings', function(done) {
+
+    timekit.createMeeting(
+      fixtures.newMeeting.what,
+      fixtures.newMeeting.where,
+      fixtures.newMeeting.suggestions
+    ).then(function(response) {
+      expect(response.status).toBe(201);
+      expect(response.data).toBeDefined();
+      expect(typeof response.data.data.what).toBe('string');
+      done();
+    });
+
+  });
+
+  it('should be able to call [PUT] /meetings/:token', function(done) {
+
+    timekit.updateMeeting(
+      fixtures.meetingToken,
+      fixtures.updateMeetingData
+    ).then(function(response) {
+      expect(response.status).toBe(204);
       done();
     });
 
