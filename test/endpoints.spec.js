@@ -2,6 +2,7 @@
 
 var moment = require('moment');
 var timekit = require('../src/timekit');
+var utils = require('./helpers/utils');
 
 var fixtures = {
   app:            'timebird',
@@ -36,6 +37,25 @@ var fixtures = {
   updateMeetingData: {
     what:         'new test title',
     where:        'new test location'
+  },
+  meetingAvailability: {
+    suggestionId: '1',
+    available:    true
+  },
+  inviteToMeetingEmails: [
+    'some_test_user@timekit.io',
+    'some_other_test_user@timekit.io'
+  ],
+  newUser: {
+    firstName:    'John',
+    lastName:     'Doe',
+    email:        utils.emailGenerator(),
+    password:     'password',
+    timezone:     'Europe/Copenhagen'
+  },
+  updateUser: {
+    first_name:   'Jane',
+    timezone:     'Europe/Berlin'
   }
 }
 
@@ -95,7 +115,7 @@ describe('API endpoints with auth', function() {
 
   beforeEach(function() {
 
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
     timekit.configure({
       app: fixtures.app,
@@ -130,25 +150,25 @@ describe('API endpoints with auth', function() {
 
   });
 
-  it('should be able to call [GET] /accounts/google/calendars endpoint', function(done) {
+  // it('should be able to call [GET] /accounts/google/calendars endpoint', function(done) {
 
-    timekit.getAccountGoogleCalendars().then(function(response) {
-      expect(response.data).toBeDefined();
-      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
-      done();
-    });
+  //   timekit.getAccountGoogleCalendars().then(function(response) {
+  //     expect(response.data).toBeDefined();
+  //     expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+  //     done();
+  //   });
 
-  });
+  // });
 
-  it('should be able to call [GET] /accounts/sync endpoint', function(done) {
+  // it('should be able to call [GET] /accounts/sync endpoint', function(done) {
 
-    timekit.accountSync().then(function(response) {
-      expect(response.data).toBeDefined();
-      expect(typeof response.data.count).toBe('number');
-      done();
-    });
+  //   timekit.accountSync().then(function(response) {
+  //     expect(response.data).toBeDefined();
+  //     expect(typeof response.data.count).toBe('number');
+  //     done();
+  //   });
 
-  });
+  // });
 
   it('should be able to call [GET] /calendars', function(done) {
 
@@ -256,6 +276,90 @@ describe('API endpoints with auth', function() {
       fixtures.updateMeetingData
     ).then(function(response) {
       expect(response.status).toBe(204);
+      done();
+    });
+
+  });
+
+  it('should be able to call [POST] /meetings/availability', function(done) {
+
+    timekit.setMeetingAvailability(
+      fixtures.meetingAvailability.suggestionId,
+      fixtures.meetingAvailability.available
+    ).then(function(response) {
+      expect(response.status).toBe(204);
+      done();
+    });
+
+  });
+
+  // it('should be able to call [POST] /meetings/book', function(done) {
+
+  //   timekit.createMeeting(
+  //     fixtures.newMeeting.what,
+  //     fixtures.newMeeting.where,
+  //     fixtures.newMeeting.suggestions
+  //   ).then(function(response) {
+  //     var suggestionId = response.data.data.suggestions[0].id;
+  //     return timekit.bookMeeting(
+  //       suggestionId
+  //     )
+  //   }).then(function(response) {
+  //     expect(response.status).toBe(204);
+  //     done();
+  //   });;
+
+  // });
+
+  // it('should be able to call [POST] /meetings/:token/invite', function(done) {
+
+  //   timekit.inviteToMeeting(
+  //     fixtures.meetingToken,
+  //     fixtures.inviteToMeetingEmails
+  //   ).then(function(response) {
+  //     expect(response.status).toBe(204);
+  //     done();
+  //   });
+
+  // });
+
+  it('should be able to call [POST] /users', function(done) {
+
+    timekit.createUser(
+      fixtures.newUser.firstName,
+      fixtures.newUser.lastName,
+      fixtures.newUser.email,
+      fixtures.newUser.password,
+      fixtures.newUser.timezone
+    ).then(function(response) {
+      expect(response.status).toBe(201);
+      expect(response.data).toBeDefined();
+      expect(typeof response.data.data.email).toBe('string');
+      done();
+    });
+
+  });
+
+  it('should be able to call [GET] /users/me', function(done) {
+
+    timekit.getUserInfo().then(function(response) {
+      expect(response.status).toBe(200);
+      expect(response.data).toBeDefined();
+      expect(typeof response.data.data.email).toBe('string');
+      done();
+    });
+
+  });
+
+  it('should be able to call [PUT] /users/me', function(done) {
+
+    timekit.updateUser({
+      first_name: fixtures.updateUser.firstName,
+      timezone: fixtures.updateUser.timezone,
+    }).then(function(response) {
+      expect(response.status).toBe(204);
+      expect(response.data).toBeDefined();
+      expect(typeof response.data.data.email).toBe('string');
       done();
     });
 

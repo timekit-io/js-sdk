@@ -371,6 +371,108 @@ function Timekit() {
 
   };
 
+  /**
+   * Set availability (true/faalse) on a meeting's suggestion
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.setMeetingAvailability = function(suggestionId, available) {
+
+    return makeRequest({
+      url: '/meetings/availability',
+      method: 'post',
+      data: {
+        suggestion_id: suggestionId,
+        available: available
+      }
+    });
+
+  };
+
+  /**
+   * Book/finalize the meeting, sending out meeting invites to all participants
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.bookMeeting = function(suggestionId) {
+
+    return makeRequest({
+      url: '/meetings/book',
+      method: 'post',
+      data: {
+        suggestion_id: suggestionId
+      }
+    });
+
+  };
+
+  /**
+   * Invite users/emails to a meeting, sending out invite emails to the supplied addresses
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.inviteToMeeting = function(token, emails) {
+
+    return makeRequest({
+      url: '/meetings/' + token + '/invite',
+      method: 'post',
+      data: {
+        emails: emails
+      }
+    });
+
+  };
+
+  /**
+   * Create a new user with the given properties
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createUser = function(firstName, lastName, email, password, timezone) {
+
+    return makeRequest({
+      url: '/users',
+      method: 'post',
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        password: password,
+        timezone: timezone
+      }
+    });
+
+  };
+
+  /**
+   * Fetch current user data from server
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getUserInfo = function() {
+
+    return makeRequest({
+      url: '/users/me',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Fetch current user data from server
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateUser = function(data) {
+
+    return makeRequest({
+      url: '/users/me',
+      method: 'put',
+      data: data
+    });
+
+  };
+
   return TK;
 
 }

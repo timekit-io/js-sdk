@@ -11,7 +11,8 @@ Features:
 - Works in both node.js and in the browser (>=IE8 and evergreen)
 - Supports custom timestamp formats and timezones
 
-*TODO:* Implement last 50% of endpoints
+*TODO:* Implement user properties endpoints
+*TODO:* Support for dynamic includes
 
 ## Dependencies
 
@@ -24,7 +25,7 @@ The following libraries are bundled together with the SDK:
 
 Comes in two flavours: minified and plain. See `/dist` folder.
 
-*TODO:* add to bower and npm
+*TODO:* Add to bower and npm
 
 ## Usage/module loading
 
@@ -116,6 +117,8 @@ timekit.getAvailability(
 );
 ```
 
+*TODO:* Add documentation for the remaining endpoints
+
 ## Building from source
 
 We use [webpack](http://webpack.github.io) for packaging the library as a module. To build the source files in `/src` to `/dist`, run:
@@ -128,7 +131,7 @@ webpack
 webpack --config webpack.config.min.js 
 ```
 
-*TODO:* make standalone version without dependencies bundled
+*TODO:* Make standalone version without dependencies bundled
 
 ## Running tests
 
@@ -143,4 +146,4 @@ npm install
 karma start
 ```
 
-*TODO:* mock API responses for independent tests
+*TODO:* Mock API responses for independent tests
