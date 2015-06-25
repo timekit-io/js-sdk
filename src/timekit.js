@@ -98,13 +98,34 @@ function Timekit() {
     return config;
   };
 
+  /**
+   * Returns the current config
+   * @type {Function}
+   * @return {Object}
+   */
   TK.getConfig = function() {
     return config;
   };
 
+  /**
+   * Set the active user manuallt (happens automatically on timekit.auth())
+   * @type {Function}
+   */
   TK.setUser = function(email, apiToken) {
     if (email){ userEmail = email; }
     if (apiToken) { userApiToken = apiToken; }
+  };
+
+  /**
+   * Returns the current active user
+   * @type {Function}
+   * @return {Object}
+   */
+  TK.getUser = function() {
+    return {
+      email: userEmail,
+      apiToken: userApiToken
+    };
   };
 
   /**

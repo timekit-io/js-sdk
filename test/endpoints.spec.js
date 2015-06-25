@@ -10,6 +10,7 @@ var fixtures = {
   userEmail:      'timebirdcph@gmail.com',
   userInvalidEmail: 'invaliduser@gmail.com',
   userPassword:   'password',
+  userApiToken:   'password',
   findTimeEmail1: 'timebirdcph@gmail.com',
   findTimeEmail2: 'timebirdnyc@gmail.com',
   findTimeFuture: '3 days',
@@ -101,7 +102,7 @@ describe('API endpoints with auth', function() {
       apiBaseUrl: fixtures.apiBaseUrl
     });
 
-    timekit.setUser(fixtures.userEmail, fixtures.userPassword);
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
 
   });
 
