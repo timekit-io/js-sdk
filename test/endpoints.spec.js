@@ -5,7 +5,7 @@ var timekit = require('../src/timekit.js');
 var utils = require('./helpers/utils');
 
 var fixtures = {
-  app:            'timebird',
+  app:            'demo',
   apiBaseUrl:     'http://api-localhost.timekit.io/',
   calendarToken:  '1e396a70-1919-11e5-a165-080027c7e7dd',
   userEmail:      'timebirdcph@gmail.com',

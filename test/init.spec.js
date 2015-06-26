@@ -3,7 +3,7 @@
 var timekit = require('../src/timekit.js');
 
 var fixtures = {
-  app:            'timebird',
+  app:            'demo',
   apiBaseUrl:     'http://api-localhost.timekit.io/',
   inputTimestampFormat: 'Y-m-d H:i',
   userEmail:      'timebirdcph@gmail.com',

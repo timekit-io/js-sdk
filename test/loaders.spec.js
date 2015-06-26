@@ -1,7 +1,7 @@
 'use strict';
 
 var fixtures = {
-  app:            'timebird',
+  app:            'demo',
   apiBaseUrl:     'http://api-localhost.timekit.io/',
   userEmail:      'timebirdcph@gmail.com',
   userPassword:   'password'
