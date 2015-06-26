@@ -473,6 +473,49 @@ function Timekit() {
 
   };
 
+  /**
+   * Get a user property by key
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getUserProperties = function() {
+
+    return makeRequest({
+      url: '/properties',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get a user property by key
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getUserProperty = function(key) {
+
+    return makeRequest({
+      url: '/properties/' + key,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Set or update user properties
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.setUserProperties = function(data) {
+
+    return makeRequest({
+      url: '/properties',
+      method: 'put',
+      data: data
+    });
+
+  };
+
   return TK;
 
 }

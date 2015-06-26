@@ -11,7 +11,6 @@ Features:
 - Works in both node.js and in the browser (>=IE8 and evergreen)
 - Supports custom timestamp formats and timezones
 
-*TODO:* Implement user properties endpoints
 *TODO:* Support for dynamic includes
 
 ## Dependencies

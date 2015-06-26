@@ -56,6 +56,11 @@ var fixtures = {
   updateUser: {
     first_name:   'Jane',
     timezone:     'Europe/Berlin'
+  },
+  getUserPropertyKey: 'timebirdcphgmailcom-google-next-sync-token',
+  setUserProperties: {
+    testKey1:      'testValue1',
+    testKey2:      'testValue2'
   }
 }
 
@@ -357,6 +362,37 @@ describe('API endpoints with auth', function() {
       first_name: fixtures.updateUser.firstName,
       timezone: fixtures.updateUser.timezone,
     }).then(function(response) {
+      expect(response.status).toBe(204);
+      done();
+    });
+
+  });
+
+  it('should be able to call [GET] /properties', function(done) {
+
+    timekit.getUserProperties().then(function(response) {
+      expect(response.status).toBe(200);
+      expect(response.data).toBeDefined();
+      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+      done();
+    });
+
+  });
+
+  it('should be able to call [GET] /properties/:key', function(done) {
+
+    timekit.getUserProperty(fixtures.getUserPropertyKey).then(function(response) {
+      expect(response.status).toBe(200);
+      expect(response.data).toBeDefined();
+      expect(typeof response.data.data.value).toBe('string');
+      done();
+    });
+
+  });
+
+  it('should be able to call [PUT] /properties', function(done) {
+
+    timekit.setUserProperties(fixtures.setUserProperties).then(function(response) {
       expect(response.status).toBe(204);
       done();
     });
