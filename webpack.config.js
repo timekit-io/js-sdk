@@ -1,5 +1,7 @@
 'use strict';
 
+var webpack = require("webpack");
+
 module.exports = {
     entry: "./src/timekit.js",
     devtool: "source-map",
@@ -9,8 +11,7 @@ module.exports = {
         libraryTarget: "umd",
         library: "timekit"
     },
-    externals: [
-      'axios',
-      'base64'
+    plugins: [
+        new webpack.IgnorePlugin(/vertx/)
     ]
 };

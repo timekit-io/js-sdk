@@ -1,11 +1,18 @@
 'use strict';
 
-var timekit = require('../../dist/timekit.js');
+var timekit = require('../../src/timekit.js');
 
 console.log('timekit.js loaded!');
 
 timekit.configure({
-  app: 'timebird',
-  inputTimestampFormat: 'l h:i a Y-m-d',
-  apiBaseUrl:     'http://api-localhost.timekit.io/'
+  app: 'demo',
+  inputTimestampFormat: 'l h:i a Y-m-d'
+});
+
+timekit.auth('doc.brown@timekit.io', 'DeLorean').then(function(response) {
+  console.log('user authenticated!');
+  console.log(response);
+}).catch(function(response) {
+  console.log('an error occured!');
+  console.log(response);
 });

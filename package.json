@@ -2,7 +2,7 @@
   "name": "timekit-js-sdk",
   "version": "0.0.2",
   "description": "JavaScript SDK for the Timekit API",
-  "main": "dist/timekit.js",
+  "main": "src/timekit.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/timekit/js-sdk.git"
@@ -15,7 +15,6 @@
   "devDependencies": {
     "jasmine": "^2.3.1",
     "jasmine-core": "^2.3.4",
-    "jasmine-jquery": "^2.1.0",
     "karma": "^0.12.36",
     "karma-chrome-launcher": "^0.1.12",
     "karma-coverage": "^0.4.2",
