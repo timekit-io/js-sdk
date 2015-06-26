@@ -44,10 +44,11 @@ var timekit = require('timekit');
 console.log(timekit);
 
 ```
+*Note: use src/timekit.js directly in node.js for now, dist/timekit.js wont work*
 
 **As a global variable (old-school)**
 ```html
-<script src="timekit.min.js"></script>
+<script src="timekit.js"></script>
 <script>
     console.log(timekit);
 </script>
