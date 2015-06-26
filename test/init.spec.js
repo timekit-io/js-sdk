@@ -1,6 +1,6 @@
 'use strict';
 
-var timekit = require('../src/timekit');
+var timekit = require('../src/timekit.js');
 
 var fixtures = {
   app:            'timebird',

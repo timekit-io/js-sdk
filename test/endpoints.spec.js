@@ -1,7 +1,7 @@
 'use strict';
 
 var moment = require('moment');
-var timekit = require('../src/timekit');
+var timekit = require('../src/timekit.js');
 var utils = require('./helpers/utils');
 
 var fixtures = {

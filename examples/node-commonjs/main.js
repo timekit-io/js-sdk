@@ -1,11 +1,11 @@
 'use strict';
 
-var timekit = require('../../dist/timekit.min.js');
+var timekit = require('../../dist/timekit.js');
 
 console.log('timekit.js loaded!');
-console.log(timekit);
 
 timekit.configure({
-  app: 'myNewApp',
-  inputTimestampFormat: 'l h:i a Y-m-d'
+  app: 'timebird',
+  inputTimestampFormat: 'l h:i a Y-m-d',
+  apiBaseUrl:     'http://api-localhost.timekit.io/'
 });

@@ -1,6 +1,6 @@
 {
   "name": "timekit-js-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "JavaScript SDK for the Timekit API",
   "main": "dist/timekit.js",
   "repository": {
@@ -15,10 +15,12 @@
   "devDependencies": {
     "jasmine": "^2.3.1",
     "jasmine-core": "^2.3.4",
+    "jasmine-jquery": "^2.1.0",
     "karma": "^0.12.36",
     "karma-chrome-launcher": "^0.1.12",
     "karma-coverage": "^0.4.2",
     "karma-jasmine": "^0.3.5",
+    "karma-jasmine-jquery": "^0.1.1",
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-sourcemap-loader": "^0.3.5",
     "karma-spec-reporter": "0.0.19",

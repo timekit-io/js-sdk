@@ -8,5 +8,9 @@ module.exports = {
         filename: "timekit.js",
         libraryTarget: "umd",
         library: "timekit"
-    }
+    },
+    externals: [
+      'axios',
+      'base64'
+    ]
 };
