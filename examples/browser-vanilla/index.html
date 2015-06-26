@@ -22,20 +22,25 @@
         <p>This is the most minimal boilerplate demo of timekit.js used in the browser. Fire up your console (CMD+ALT+I) and use the SDK by hitting methods on the "timekit" global variable, e.g.</p>
         <code>
           timekit.configure({<br />
-            &nbsp;&nbsp;app: 'myNewApp',<br />
+            &nbsp;&nbsp;app: 'demo',<br />
             &nbsp;&nbsp;inputTimestampFormat: 'l h:i a Y-m-d'<br />
           });
         </code><br /><br />
         <code>
-          timekit.auth('some_user@gmail.com', 'somepassword').then(function(response) {<br />
+          timekit.auth('doc.brown@timekit.io', 'DeLorean').then(function(response) {<br />
+            &nbsp;&nbsp;console.log('user authenticated!');<br />
+            &nbsp;&nbsp;console.log(response);<br />
+          }).catch(function(response) {
+            &nbsp;&nbsp;console.log('an error occured!');<br />
             &nbsp;&nbsp;console.log(response);<br />
           });
         </code><br /><br />
         <code>
-          timekit.findTime(['some_user@gmail.com', 'some_other_user@gmail.com'], '3 days', '30 minutes').then(function(response) {<br />
+          timekit.findTime(['doc.brown@timekit.io', 'marty.mcfly@timekit.io'], '3 days', '30 minutes').then(function(response) {<br />
+            &nbsp;&nbsp;console.log('find time OK, heres the result:');<br />
             &nbsp;&nbsp;console.log(response);<br />
           });
         </code>
-        <script src="../../dist/timekit.min.js"></script>
+        <script src="../../dist/timekit.js"></script>
     </body>
 </html>

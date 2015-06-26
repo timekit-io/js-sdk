@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 */
 	var axios = __webpack_require__(1);
-	var base64 = __webpack_require__(21);
+	var base64 = __webpack_require__(20);
 	
 	function Timekit() {
 	
@@ -154,13 +154,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return config;
 	  };
 	
+	  /**
+	   * Returns the current config
+	   * @type {Function}
+	   * @return {Object}
+	   */
 	  TK.getConfig = function() {
 	    return config;
 	  };
 	
+	  /**
+	   * Set the active user manuallt (happens automatically on timekit.auth())
+	   * @type {Function}
+	   */
 	  TK.setUser = function(email, apiToken) {
 	    if (email){ userEmail = email; }
 	    if (apiToken) { userApiToken = apiToken; }
+	  };
+	
+	  /**
+	   * Returns the current active user
+	   * @type {Function}
+	   * @return {Object}
+	   */
+	  TK.getUser = function() {
+	    return {
+	      email: userEmail,
+	      apiToken: userApiToken
+	    };
 	  };
 	
 	  /**
@@ -333,13 +354,220 @@ return /******/ (function(modules) { // webpackBootstrap
 	  TK.getAvailability = function(start, end, email) {
 	
 	    return makeRequest({
-	      url: '/events',
+	      url: '/events/availability',
 	      method: 'get',
 	      params: {
 	        start: start,
 	        end: end,
 	        email: email
 	      }
+	    });
+	
+	  };
+	
+	  /**
+	   * Get a user's meetings
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getMeetings = function() {
+	
+	    return makeRequest({
+	      url: '/meetings',
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get a user's specific meeting
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getMeeting = function(token) {
+	
+	    return makeRequest({
+	      url: '/meetings/' + token,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get a user's specific meeting
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.createMeeting = function(what, where, suggestions) {
+	
+	    return makeRequest({
+	      url: '/meetings',
+	      method: 'post',
+	      data: {
+	        what: what,
+	        where: where,
+	        suggestions: suggestions
+	      }
+	    });
+	
+	  };
+	
+	  /**
+	   * Get a user's specific meeting
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.updateMeeting = function(token, data) {
+	
+	    return makeRequest({
+	      url: '/meetings/' + token,
+	      method: 'put',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Set availability (true/faalse) on a meeting's suggestion
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.setMeetingAvailability = function(suggestionId, available) {
+	
+	    return makeRequest({
+	      url: '/meetings/availability',
+	      method: 'post',
+	      data: {
+	        suggestion_id: suggestionId,
+	        available: available
+	      }
+	    });
+	
+	  };
+	
+	  /**
+	   * Book/finalize the meeting, sending out meeting invites to all participants
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.bookMeeting = function(suggestionId) {
+	
+	    return makeRequest({
+	      url: '/meetings/book',
+	      method: 'post',
+	      data: {
+	        suggestion_id: suggestionId
+	      }
+	    });
+	
+	  };
+	
+	  /**
+	   * Invite users/emails to a meeting, sending out invite emails to the supplied addresses
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.inviteToMeeting = function(token, emails) {
+	
+	    return makeRequest({
+	      url: '/meetings/' + token + '/invite',
+	      method: 'post',
+	      data: {
+	        emails: emails
+	      }
+	    });
+	
+	  };
+	
+	  /**
+	   * Create a new user with the given properties
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.createUser = function(firstName, lastName, email, password, timezone) {
+	
+	    return makeRequest({
+	      url: '/users',
+	      method: 'post',
+	      data: {
+	        first_name: firstName,
+	        last_name: lastName,
+	        email: email,
+	        password: password,
+	        timezone: timezone
+	      }
+	    });
+	
+	  };
+	
+	  /**
+	   * Fetch current user data from server
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getUserInfo = function() {
+	
+	    return makeRequest({
+	      url: '/users/me',
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Fetch current user data from server
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.updateUser = function(data) {
+	
+	    return makeRequest({
+	      url: '/users/me',
+	      method: 'put',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Get a user property by key
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getUserProperties = function() {
+	
+	    return makeRequest({
+	      url: '/properties',
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get a user property by key
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getUserProperty = function(key) {
+	
+	    return makeRequest({
+	      url: '/properties/' + key,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Set or update user properties
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.setUserProperties = function(data) {
+	
+	    return makeRequest({
+	      url: '/properties',
+	      method: 'put',
+	      data: data
 	    });
 	
 	  };
@@ -436,7 +664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	axios.all = function (promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(20);
+	axios.spread = __webpack_require__(19);
 	
 	// Expose interceptors
 	axios.interceptors = {
@@ -1446,7 +1674,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function lib$es6$promise$asap$$attemptVertex() {
 	      try {
 	        var r = require;
-	        var vertx = __webpack_require__(18);
+	        var vertx = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"vertx\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
 	        return lib$es6$promise$asap$$useVertxTimer();
 	      } catch(e) {
@@ -2271,7 +2499,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	
 	    /* global define:true module:true window: true */
-	    if ("function" === 'function' && __webpack_require__(19)['amd']) {
+	    if ("function" === 'function' && __webpack_require__(18)['amd']) {
 	      !(__WEBPACK_AMD_DEFINE_RESULT__ = function() { return lib$es6$promise$umd$$ES6Promise; }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	    } else if (typeof module !== 'undefined' && module['exports']) {
 	      module['exports'] = lib$es6$promise$umd$$ES6Promise;
@@ -2387,17 +2615,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 18 */
 /***/ function(module, exports) {
 
-	/* (ignored) */
-
-/***/ },
-/* 19 */
-/***/ function(module, exports) {
-
 	module.exports = function() { throw new Error("define cannot be used indirect"); };
 
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2430,7 +2652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*! http://mths.be/base64 v0.1.0 by @mathias | MIT license */

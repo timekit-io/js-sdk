@@ -98,13 +98,34 @@ function Timekit() {
     return config;
   };
 
+  /**
+   * Returns the current config
+   * @type {Function}
+   * @return {Object}
+   */
   TK.getConfig = function() {
     return config;
   };
 
+  /**
+   * Set the active user manuallt (happens automatically on timekit.auth())
+   * @type {Function}
+   */
   TK.setUser = function(email, apiToken) {
     if (email){ userEmail = email; }
     if (apiToken) { userApiToken = apiToken; }
+  };
+
+  /**
+   * Returns the current active user
+   * @type {Function}
+   * @return {Object}
+   */
+  TK.getUser = function() {
+    return {
+      email: userEmail,
+      apiToken: userApiToken
+    };
   };
 
   /**
@@ -277,13 +298,220 @@ function Timekit() {
   TK.getAvailability = function(start, end, email) {
 
     return makeRequest({
-      url: '/events',
+      url: '/events/availability',
       method: 'get',
       params: {
         start: start,
         end: end,
         email: email
       }
+    });
+
+  };
+
+  /**
+   * Get a user's meetings
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getMeetings = function() {
+
+    return makeRequest({
+      url: '/meetings',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get a user's specific meeting
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getMeeting = function(token) {
+
+    return makeRequest({
+      url: '/meetings/' + token,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get a user's specific meeting
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createMeeting = function(what, where, suggestions) {
+
+    return makeRequest({
+      url: '/meetings',
+      method: 'post',
+      data: {
+        what: what,
+        where: where,
+        suggestions: suggestions
+      }
+    });
+
+  };
+
+  /**
+   * Get a user's specific meeting
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateMeeting = function(token, data) {
+
+    return makeRequest({
+      url: '/meetings/' + token,
+      method: 'put',
+      data: data
+    });
+
+  };
+
+  /**
+   * Set availability (true/faalse) on a meeting's suggestion
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.setMeetingAvailability = function(suggestionId, available) {
+
+    return makeRequest({
+      url: '/meetings/availability',
+      method: 'post',
+      data: {
+        suggestion_id: suggestionId,
+        available: available
+      }
+    });
+
+  };
+
+  /**
+   * Book/finalize the meeting, sending out meeting invites to all participants
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.bookMeeting = function(suggestionId) {
+
+    return makeRequest({
+      url: '/meetings/book',
+      method: 'post',
+      data: {
+        suggestion_id: suggestionId
+      }
+    });
+
+  };
+
+  /**
+   * Invite users/emails to a meeting, sending out invite emails to the supplied addresses
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.inviteToMeeting = function(token, emails) {
+
+    return makeRequest({
+      url: '/meetings/' + token + '/invite',
+      method: 'post',
+      data: {
+        emails: emails
+      }
+    });
+
+  };
+
+  /**
+   * Create a new user with the given properties
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createUser = function(firstName, lastName, email, password, timezone) {
+
+    return makeRequest({
+      url: '/users',
+      method: 'post',
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        password: password,
+        timezone: timezone
+      }
+    });
+
+  };
+
+  /**
+   * Fetch current user data from server
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getUserInfo = function() {
+
+    return makeRequest({
+      url: '/users/me',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Fetch current user data from server
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateUser = function(data) {
+
+    return makeRequest({
+      url: '/users/me',
+      method: 'put',
+      data: data
+    });
+
+  };
+
+  /**
+   * Get a user property by key
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getUserProperties = function() {
+
+    return makeRequest({
+      url: '/properties',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get a user property by key
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getUserProperty = function(key) {
+
+    return makeRequest({
+      url: '/properties/' + key,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Set or update user properties
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.setUserProperties = function(data) {
+
+    return makeRequest({
+      url: '/properties',
+      method: 'put',
+      data: data
     });
 
   };
