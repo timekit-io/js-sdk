@@ -22,7 +22,7 @@ The following libraries are bundled together with the SDK:
 
 ## Installation
 
-Comes in two flavours: minified and plain. See `/dist` folder.
+Comes in two flavours: minified (21.3 kb) and plain. See `/dist` folder.
 
 *TODO:* Add to bower and npm
 
