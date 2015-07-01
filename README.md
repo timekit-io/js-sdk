@@ -17,7 +17,7 @@ Features:
 
 The following libraries are bundled together with the SDK:
 
-- [axios](https://github.com/mzabriskie/axios) - a promise based HTTP client for the browser and node.js
+- [axios](https://github.com/mzabriskie/axios) - a promise-based HTTP client for the browser (using [XMLHttpRequests](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)) and node.js (using [http](http://nodejs.org/api/http.html))
 - [base64](https://github.com/mathiasbynens/base64) - a robust base64 encoder/decoder, used for basic auth headers
 
 ## Installation
@@ -188,7 +188,7 @@ webpack --config webpack.config.min.js
 
 ## Running tests
 
-We use [jasmine](http://jasmine.github.io) + [karma](http://karma-runner.github.io/) for unit testing, that works together with webpack.
+We use [jasmine](http://jasmine.github.io) + [karma](http://karma-runner.github.io/) for unit testing, which works together with webpack.
 Please note that most tests will fail if run against the live API url, as users won't be present.
 
 To run the test suite, simply do:
