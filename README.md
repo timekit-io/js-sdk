@@ -1,6 +1,6 @@
 # Timekit JS SDK
 
-[![Semver](http://img.shields.io/SemVer/0.0.2.png)](http://semver.org/spec/v0.0.2.html)
+[![Semver](http://img.shields.io/SemVer/0.0.3.png)](http://semver.org/spec/v0.0.3.html)
 
 Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [developers.timekit.io](http://developers.timekit.io).
 
@@ -83,8 +83,10 @@ timekit.auth(
 
 timekit.findTime(
     emails,     // [Array] list of emails as strings for users
+    filters,    // [Mixed] specify advanced filters to slice data (see http://developers.timekit.io/v2/docs/find-time-filters)
     future,     // [String] max time into the future, written as "3 months"
-    length      // [String] length of the timeslots, written as "30 minutes"
+    length,     // [String] length of the timeslots, written as "30 minutes"
+    sort        // [String] how should the resulting events be sorted (asc or desc)
 );
 
 timekit.getAccoutns();
