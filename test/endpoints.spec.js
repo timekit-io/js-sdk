@@ -114,13 +114,32 @@ describe('API endpoints without auth', function() {
   });
 
   it('should be able to fail authentication with wrong credentials by calling [GET] /auth', function(done) {
+    var response, request;
 
     timekit.auth(fixtures.userInvalidEmail, fixtures.userPassword)
-    .catch(function(response) {
-      expect(typeof response.data.error.message).toBe('string');
-      expect(response.data.error.status_code).toBe(401);
-      done();
+    .catch(function(res) {
+      response = res;
+
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 401,
+        statusText: 'Unauthorized',
+        responseText: {error:{message: "Email and password does not match any user"}},
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(typeof response.data.error.message).toBe('string');
+        expect(response.status).toBe(401);
+        done();
+      }, 0);
+    }, 0);
 
   });
 
