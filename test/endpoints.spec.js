@@ -119,7 +119,6 @@ describe('API endpoints without auth', function() {
     timekit.auth(fixtures.userInvalidEmail, fixtures.userPassword)
     .catch(function(res) {
       response = res;
-
     });
 
     setTimeout(function () {
@@ -160,7 +159,7 @@ describe('API endpoints without auth', function() {
 describe('API endpoints with auth', function() {
 
   beforeEach(function() {
-
+    jasmine.Ajax.install();
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
     timekit.configure({
@@ -172,17 +171,38 @@ describe('API endpoints with auth', function() {
 
   });
 
-  it('should be able to call [POST] /findtime endpoint', function(done) {
+  afterEach(function() {
+    jasmine.Ajax.uninstall();
+  });
 
+  it('should be able to call [POST] /findtime endpoint', function(done) {
+    var response, request;
     timekit.findTime(
       [fixtures.findTimeEmail1, fixtures.findTimeEmail2],
       fixtures.findTimeFuture,
       fixtures.findTimeLength
-    ).then(function(response) {
-      expect(response.data).toBeDefined();
-      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
-      done();
+    ).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": [ { "start": "2015-03-24 15:00:00", "end": "2015-03-24 16:00:00" }, { "start": "2015-03-24 21:45:00", "end": "2015-03-24 22:45:00" }, { "start": "2015-03-25 07:30:00", "end": "2015-03-25 08:30:00" }, { "start": "2015-03-25 16:30:00", "end": "2015-03-25 17:30:00" }, { "start": "2015-03-25 18:15:00", "end": "2015-03-25 19:15:00" } ] }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.data).toBeDefined();
+        expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
