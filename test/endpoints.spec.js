@@ -407,24 +407,59 @@ describe('API endpoints with auth', function() {
   });
 
   it('should be able to call [GET] /meetings', function(done) {
+    var request, response;
 
-    timekit.getMeetings().then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
-      done();
+    timekit.getMeetings().then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": [ { "id": 13, "what": "nemo", "where": "679 Harvey Spring Suite 784\ Sipesberg, LA 17622-1093", "token": "quqVQTOdyfA1t66K", "completed": false, "status_text": "COMPLETED", "status_code": 100, "start": null, "end": null }, { "id": 15, "what": "enim", "where": "081 Osinski Crescent Suite 774\ New Delfinachester, PW 03356", "token": "7kXN0aC9uCJYMi0P", "completed": false, "status_text": "COMPLETED", "status_code": 100, "start": null, "end": null }, { "id": 17, "what": "consequatur", "where": "690 Elouise Crossroad Suite 711\ Kuhlmanland, AZ 08572-8003", "token": "7B0k9nqyVFaAhu7Q", "completed": false, "status_text": "COMPLETED", "status_code": 100, "start": null, "end": null }, { "id": 22, "what": "Important business meeting", "where": "168 Aylin Divide Suite 336\ Tatumport, VT 75243", "token": "kFadq3XctXgyamuj", "completed": false, "status_text": "SCHEDULED", "status_code": 200, "start": "2015-03-24 10:30:00", "end": "2015-03-24 14:30:00" } ] }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
   it('should be able to call [GET] /meetings/:token', function(done) {
-
-    timekit.getMeeting(fixtures.meetingToken).then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(typeof response.data.data.what).toBe('string');
-      done();
+    var request, response;
+    timekit.getMeeting(fixtures.meetingToken).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": { "id": 1, "what": "molestiae", "where": "7173 McClure Manors Apt. 807\ Gulgowskitown, HI 02306-4030", "token": "A2hYcGJAppb2LreJ", "completed": true, "status_text": "COMPLETED", "status_code": 100, "start": "2015-03-24 10:30:00", "end": "2015-03-24 13:30:00" } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.data.what).toBe('string');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
