@@ -374,17 +374,35 @@ describe('API endpoints with auth', function() {
   });
 
   it('should be able to call [GET] /events/availability', function(done) {
+    var request, response;
 
     timekit.getAvailability(
       fixtures.eventsStart,
       fixtures.eventsEnd,
       fixtures.availabilityEmail
-    ).then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
-      done();
+    ).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": [ { "what": "Peter is busy!", "where": "Undisclosed", "start": "2015-04-04T09:00:00+00:00", "end": "2015-04-04T10:00:00+00:00", "allDay": false }, { "what": "Peter is busy!", "where": "Undisclosed", "start": "2015-03-28T16:00:00+00:00", "end": "2015-03-28T17:00:00+00:00", "allDay": false }, { "what": "Peter is busy!", "where": "Undisclosed", "start": "2015-04-06T16:00:00+00:00", "end": "2015-04-06T20:30:00+00:00", "allDay": false }, { "what": "Peter is busy!", "where": "Undisclosed", "start": "2015-03-30T22:00:00+00:00", "end": "2015-03-30T23:30:00+00:00", "allDay": false } ] }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
