@@ -256,24 +256,59 @@ describe('API endpoints with auth', function() {
   // });
 
   it('should be able to call [GET] /calendars', function(done) {
-
-    timekit.getCalendars().then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
-      done();
+    var request, response;
+    timekit.getCalendars().then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": [ { "name": "MyCalendar", "token": "2e911aa8-05b4-11e5-af06-000000007ed6", "description": "Laboriosam vitae minus", "system": false, "foregroundcolor": "#938710", "backgroundcolor": "#518d83" }, { "name": "Work", "token": "3e614av8-05g4-11e5-af06-000205005eg6", "description": "Consequatur doloribus", "system": false, "foregroundcolor": "#ed2ba6", "backgroundcolor": "#9b502a" } ] }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
   it('should be able to call [GET] /calendar/:token', function(done) {
+    var request, response;
 
-    timekit.getCalendar(fixtures.calendarToken).then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(typeof response.data.data.name).toBe('string');
-      done();
+    timekit.getCalendar(fixtures.calendarToken).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": { "name": "MyCalendar", "description": "Laboriosam vitae", "token": "2e921aa8-05b4-15e5-af06-000000007ed6", "system": false, "foregroundcolor": "#938710", "backgroundcolor": "#518d83" } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.data.name).toBe('string');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
