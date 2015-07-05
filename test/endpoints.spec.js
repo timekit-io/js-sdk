@@ -313,13 +313,31 @@ describe('API endpoints with auth', function() {
   });
 
   it('should be able to call [GET] /contacts', function(done) {
+    var request, response;
 
-    timekit.getContacts().then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
-      done();
+    timekit.getContacts().then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": [ { "name": "Timebird Copenhagen", "email": "timebirdcph@gmail.com", "isUser": true, "users": { "token": "zeokguHPBwiEydJEvhwh5Wvk7J74QhQBXvsM5NGX", "first_name": "Timebird", "last_name": "Copenhagen", "name": "Timebird Copenhagen", "email": "timebirdcph@gmail.com", "image": "http:\/\/lorempixel.com\/250\/250\/", "timezone": "Europe\/Copenhagen" } }, { "name": "Peter Jensen", "email": "peter-jensen@timekit.io", "isUser": true } ] }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
