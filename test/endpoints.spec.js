@@ -342,16 +342,34 @@ describe('API endpoints with auth', function() {
   });
 
   it('should be able to call [GET] /events', function(done) {
+    var request, response;
 
     timekit.getEvents(
       fixtures.eventsStart,
       fixtures.eventsEnd
-    ).then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
-      done();
+    ).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": [ { "id": 1, "what": "Ut voluptatum distinctio hic et est consequuntur fugiat.", "where": "Sunt fugiat reprehenderit delectus quo odit saepe ipsam.", "rsvp": "tentative", "allDay": false, "start": "2015-04-19T08:00:00+00:00", "end": "2015-04-19T13:00:00+00:00" }, { "id": 2, "what": "Et molestiae numquam aut facilis beatae.", "where": "Debitis rerum qui accusamus minima accusamus.", "rsvp": "tentative", "allDay": false, "start": "2015-03-25T21:00:00+00:00", "end": "2015-03-25T23:00:00+00:00" }, { "id": 3, "what": "Et vitae occaecati expedita sit consequuntur aliquam in.", "where": "Sequi ratione sunt dignissimos quis id.", "rsvp": "accepted", "allDay": false, "start": "2015-04-03T09:00:00+00:00", "end": "2015-04-03T11:30:00+00:00" }, { "id": 4, "what": "Voluptatibus iure est dolores optio alias.", "where": "Dolor et odio cum totam numquam incidunt.", "rsvp": "declined", "allDay": false, "start": "2015-04-20T21:00:00+00:00", "end": "2015-04-20T23:00:00+00:00" } ] }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
