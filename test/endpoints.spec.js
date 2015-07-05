@@ -437,6 +437,7 @@ describe('API endpoints with auth', function() {
 
   it('should be able to call [GET] /meetings/:token', function(done) {
     var request, response;
+
     timekit.getMeeting(fixtures.meetingToken).then(function(res) {
       response = res;
     });
@@ -464,41 +465,94 @@ describe('API endpoints with auth', function() {
   });
 
   it('should be able to call [POST] /meetings', function(done) {
+    var request, response;
 
     timekit.createMeeting(
       fixtures.newMeeting.what,
       fixtures.newMeeting.where,
       fixtures.newMeeting.suggestions
-    ).then(function(response) {
-      expect(response.status).toBe(201);
-      expect(response.data).toBeDefined();
-      expect(typeof response.data.data.what).toBe('string');
-      done();
+    ).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 201,
+        statusText: 'OK',
+        responseText: '{ "data": { "id": 1, "what": "Travel back to the future", "where": "Hill Valley Clock Tower", "token": "PuicNx37V2pY", // example "completed": false, "status_text": "PENDING", "status_code": 300, "start": null, "end": null, "suggestions": [{ "id": 1, "start": "1955-11-06 18:30:00", "end": "1955-11-06 19:00:00" }, { "id": 2, "start": "1955-11-12 22:04:00", "end": "1955-11-12 22:34:00" }, { "id": 3, "start": "1955-11-18 09:15:00", "end": "1955-11-18 09:45:00" }] } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(201);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.data.what).toBe('string');
+        done();
+      }, 0);
+    }, 0);
+
 
   });
 
   it('should be able to call [PUT] /meetings/:token', function(done) {
-
+    var request, response;
     timekit.updateMeeting(
       fixtures.meetingToken,
       fixtures.updateMeetingData
-    ).then(function(response) {
-      expect(response.status).toBe(204);
-      done();
+    ).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 204,
+        statusText: 'OK',
+        responseText: '{ "data": { "id": 1, "what": "Travel back to the future", "where": "Hill Valley Clock Tower", "token": "PuicNx37V2pY", // example "completed": false, "status_text": "PENDING", "status_code": 300, "start": null, "end": null, "suggestions": [{ "id": 1, "start": "1955-11-06 18:30:00", "end": "1955-11-06 19:00:00" }, { "id": 2, "start": "1955-11-12 22:04:00", "end": "1955-11-12 22:34:00" }, { "id": 3, "start": "1955-11-18 09:15:00", "end": "1955-11-18 09:45:00" }] } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(204);
+        done();
+      }, 0);
+    }, 0);
 
   });
 
   it('should be able to call [POST] /meetings/availability', function(done) {
-
+    var request, response;
     timekit.setMeetingAvailability(
       fixtures.meetingAvailability.suggestionId,
       fixtures.meetingAvailability.available
-    ).then(function(response) {
-      expect(response.status).toBe(204);
-      done();
+    ).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 204,
+        statusText: 'OK',
+        responseText: '{ "data": { "id": 1, "what": "Travel back to the future", "where": "Hill Valley Clock Tower", "token": "PuicNx37V2pY", // example "completed": false, "status_text": "PENDING", "status_code": 300, "start": null, "end": null, "suggestions": [{ "id": 1, "start": "1955-11-06 18:30:00", "end": "1955-11-06 19:00:00" }, { "id": 2, "start": "1955-11-12 22:04:00", "end": "1955-11-12 22:34:00" }, { "id": 3, "start": "1955-11-18 09:15:00", "end": "1955-11-18 09:45:00" }] } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(204);
+        done();
+      }, 0);
+    }, 0);
 
   });
 
