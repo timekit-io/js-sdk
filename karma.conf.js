@@ -29,7 +29,7 @@ module.exports = function(config) {
     // optionally, configure the reporter
     coverageReporter: {
       type : 'html',
-      dir : 'tests/coverage/'
+      dir : 'test/coverage/'
     },
 
     webpack: {

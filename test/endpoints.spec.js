@@ -481,7 +481,7 @@ describe('API endpoints with auth', function() {
       request.respondWith({
         status: 201,
         statusText: 'OK',
-        responseText: '{ "data": { "id": 1, "what": "Travel back to the future", "where": "Hill Valley Clock Tower", "token": "PuicNx37V2pY", // example "completed": false, "status_text": "PENDING", "status_code": 300, "start": null, "end": null, "suggestions": [{ "id": 1, "start": "1955-11-06 18:30:00", "end": "1955-11-06 19:00:00" }, { "id": 2, "start": "1955-11-12 22:04:00", "end": "1955-11-12 22:34:00" }, { "id": 3, "start": "1955-11-18 09:15:00", "end": "1955-11-18 09:45:00" }] } }',
+        responseText: '{ "data": { "id": 1, "what": "Travel back to the future", "where": "Hill Valley Clock Tower", "token": "PuicNx37V2pY", "completed": false, "status_text": "PENDING", "status_code": 300, "start": null, "end": null } }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -512,8 +512,7 @@ describe('API endpoints with auth', function() {
 
       request.respondWith({
         status: 204,
-        statusText: 'OK',
-        responseText: '{ "data": { "id": 1, "what": "Travel back to the future", "where": "Hill Valley Clock Tower", "token": "PuicNx37V2pY", // example "completed": false, "status_text": "PENDING", "status_code": 300, "start": null, "end": null, "suggestions": [{ "id": 1, "start": "1955-11-06 18:30:00", "end": "1955-11-06 19:00:00" }, { "id": 2, "start": "1955-11-12 22:04:00", "end": "1955-11-12 22:34:00" }, { "id": 3, "start": "1955-11-18 09:15:00", "end": "1955-11-18 09:45:00" }] } }',
+        statusText: 'No Content',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -529,6 +528,7 @@ describe('API endpoints with auth', function() {
 
   it('should be able to call [POST] /meetings/availability', function(done) {
     var request, response;
+
     timekit.setMeetingAvailability(
       fixtures.meetingAvailability.suggestionId,
       fixtures.meetingAvailability.available
@@ -541,8 +541,7 @@ describe('API endpoints with auth', function() {
 
       request.respondWith({
         status: 204,
-        statusText: 'OK',
-        responseText: '{ "data": { "id": 1, "what": "Travel back to the future", "where": "Hill Valley Clock Tower", "token": "PuicNx37V2pY", // example "completed": false, "status_text": "PENDING", "status_code": 300, "start": null, "end": null, "suggestions": [{ "id": 1, "start": "1955-11-06 18:30:00", "end": "1955-11-06 19:00:00" }, { "id": 2, "start": "1955-11-12 22:04:00", "end": "1955-11-12 22:34:00" }, { "id": 3, "start": "1955-11-18 09:15:00", "end": "1955-11-18 09:45:00" }] } }',
+        statusText: 'No Content',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -587,6 +586,7 @@ describe('API endpoints with auth', function() {
   // });
 
   it('should be able to call [POST] /users', function(done) {
+    var request, response;
 
     timekit.createUser(
       fixtures.newUser.firstName,
@@ -594,66 +594,173 @@ describe('API endpoints with auth', function() {
       fixtures.newUser.email,
       fixtures.newUser.password,
       fixtures.newUser.timezone
-    ).then(function(response) {
-      expect(response.status).toBe(201);
-      expect(response.data).toBeDefined();
-      expect(typeof response.data.data.email).toBe('string');
-      done();
+    ).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 201,
+        statusText: 'OK',
+        responseText: '{ "data": { "first_name": "Peter", "last_name": "Hansen", "name": "Peter Hansen", "email": "ph@timekit.io", "image": "http://www.link-to-img.com/image.png", "activated": false, "timezone": "Europe/Copenhagen", "token": "msoP0NPkjb6ZSWPBXnBjVEvTKAhZ5sz4", "last_sync": null, "api_token": "qp9kzAxarYBUqJVqj6uZADKwIL0jvWdXfQfxEKwv" } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(201);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.data.email).toBe('string');
+        done();
+      }, 0);
+    }, 0);
+
 
   });
 
   it('should be able to call [GET] /users/me', function(done) {
+    var response, request;
 
-    timekit.getUserInfo().then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(typeof response.data.data.email).toBe('string');
-      done();
+    timekit.getUserInfo().then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 201,
+        statusText: 'OK',
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(201);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.data.email).toBe('string');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
   it('should be able to call [PUT] /users/me', function(done) {
+    var response, request;
 
     timekit.updateUser({
       first_name: fixtures.updateUser.firstName,
       timezone: fixtures.updateUser.timezone,
-    }).then(function(response) {
-      expect(response.status).toBe(204);
-      done();
+    }).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 204,
+        statusText: 'No Content',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(204);
+        done();
+      }, 0);
+    }, 0);
 
   });
 
   it('should be able to call [GET] /properties', function(done) {
+    var response, request;
 
-    timekit.getUserProperties().then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
-      done();
+    timekit.getUserProperties().then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": [ { "key": "timebirdcphgmailcom-google-next-sync-token", "value": "CPCVytehvsQCEPCVytehvsQCGAU=", "created_at": "2015-03-24 10:31:13", "updated_at": "2015-03-24 10:33:29" }, { "key": "synced-contacts", "value": "1", "created_at": "2015-03-24 10:31:13", "updated_at": "2015-03-24 10:33:30" } ] }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+        done();
+      }, 0);
+    }, 0);
+
+
 
   });
 
   it('should be able to call [GET] /properties/:key', function(done) {
+    var response, request;
 
-    timekit.getUserProperty(fixtures.getUserPropertyKey).then(function(response) {
-      expect(response.status).toBe(200);
-      expect(response.data).toBeDefined();
-      expect(typeof response.data.data.value).toBe('string');
-      done();
+    timekit.getUserProperty(fixtures.getUserPropertyKey).then(function(res) {
+      response = res;
     });
 
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": { "key": "synced-contacts", "value": "1", "created_at": "2015-03-24 10:31:13", "updated_at": "2015-03-24 10:33:30" } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.data.value).toBe('string');
+        done();
+      }, 0);
+    }, 0);
   });
 
   it('should be able to call [PUT] /properties', function(done) {
+    var response, request;
 
-    timekit.setUserProperties(fixtures.setUserProperties).then(function(response) {
-      expect(response.status).toBe(204);
-      done();
+    timekit.setUserProperties(fixtures.setUserProperties).then(function(res) {
+      response = res;
     });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 204,
+        statusText: 'No Content',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(204);
+        done();
+      }, 0);
+    }, 0);
 
   });
 
