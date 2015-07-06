@@ -22,8 +22,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'test/*.spec.js': ['webpack', 'sourcemap'],
-      'src/timekit.js': ['coverage']
+      'test/*.spec.js': ['webpack', 'sourcemap']
     },
 
     // optionally, configure the reporter
@@ -33,7 +32,14 @@ module.exports = function(config) {
     },
 
     webpack: {
-      devtool: 'inline-source-map'
+      devtool: 'inline-source-map',
+      module: {
+        postLoaders: [ {
+          test: /\.js$/,
+          exclude: /(dist|test|node_modules|bower_components)\//,
+          loader: 'istanbul-instrumenter'
+        } ]
+      },
     },
 
     webpackServer: {
@@ -47,12 +53,6 @@ module.exports = function(config) {
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     // reporters: ['coverage'],
     reporters: ['spec', 'coverage'],
-
-    // coverageReporter: {
-    //   type: 'lcov',
-    //   dir: 'coverage/',
-    //   subdir: '.'
-    // },
 
     webpackMiddleware: {
         noInfo: true
