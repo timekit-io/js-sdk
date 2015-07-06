@@ -1,6 +1,9 @@
 # Timekit JS SDK
 
-[![Semver](http://img.shields.io/SemVer/0.0.3.png)](http://semver.org/spec/v0.0.3.html)
+[![Circle CI](https://img.shields.io/circleci/project/timekit-io/js-sdk.svg)](https://circleci.com/gh/timekit-io/js-sdk)
+[![Code Coverage](https://img.shields.io/badge/coverage-91%25-green.svg)](https://github.com/timekit-io/js-sdk)
+
+**Latest release:**  *v0.0.4*
 
 Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [developers.timekit.io](http://developers.timekit.io).
 
@@ -10,8 +13,6 @@ Features:
 - Returns ES-6/A+ style promises
 - Works in both node.js and in the browser (>=IE8 and evergreen)
 - Supports custom timestamp formats and timezones
-
-*TODO:* Support for dynamic includes
 
 ## Dependencies
 
@@ -23,8 +24,6 @@ The following libraries are bundled together with the SDK:
 ## Installation
 
 Comes in two flavours: minified (21.3 kb) and plain. See `/dist` folder.
-
-*TODO:* Add to bower and npm
 
 ## Usage/module loading
 
@@ -186,19 +185,24 @@ webpack
 webpack --config webpack.config.min.js 
 ```
 
-*TODO:* Make standalone version without dependencies bundled
-
 ## Running tests
 
 We use [jasmine](http://jasmine.github.io) + [karma](http://karma-runner.github.io/) for unit testing, which works together with webpack.
-Please note that most tests will fail if run against the live API url, as users won't be present.
 
 To run the test suite, simply do:
 ```bash
 # install dev dependencies
 npm install
-# start karma and run once
+# install karma as global
+npm install -g karma
+# start karma and run 
 karma start
 ```
 
-*TODO:* Mock API responses for independent tests
+## Roadmap/todos
+
+Stuff to do, among others:
+- Support for dynamic includes (potentially restructure method arguments)
+- Add to bower and npm (when we hit v0.1.0)
+- Make standalone version without dependencies bundled
+- Fix CommonJS2 webpack build (some Axios dependency error)
