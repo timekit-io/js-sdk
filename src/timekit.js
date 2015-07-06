@@ -157,15 +157,17 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.findTime = function(emails, future, length) {
+  TK.findTime = function(emails, filters, future, length, sort) {
 
     return makeRequest({
       url: '/findtime',
       method: 'post',
       data: {
         emails: emails,
+        filters: filters,
         future: future,
-        length: length
+        length: length,
+        sort: sort
       }
     });
 

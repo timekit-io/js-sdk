@@ -12,10 +12,21 @@ var fixtures = {
   userInvalidEmail: 'invaliduser@gmail.com',
   userPassword:   'password',
   userApiToken:   'password',
-  findTimeEmail1: 'timebirdcph@gmail.com',
-  findTimeEmail2: 'timebirdnyc@gmail.com',
-  findTimeFuture: '3 days',
-  findTimeLength: '30 minutes',
+  findTime: {
+    emails: ['timebirdcph@gmail.com', 'timebirdnyc@gmail.com'],
+    filters: {
+      'or': [
+        { 'specific_day': {'day': 'Monday'} },
+        { 'specific_day_and_time': {'day': 'Wednesday', 'start': 10, 'end': 12, 'timezone': 'Europe/Copenhagen'} }
+      ],
+      'and': [
+        { 'business_hours': {'timezone': 'America/Los_angeles'} }
+      ]
+    },
+    future: '3 days',
+    lengthVar: '30 minutes',
+    sort: 'asc'
+  },
   eventsStart:    moment().format(),
   eventsEnd:      moment().add(3,'weeks').format(),
   availabilityEmail: 'timebirdnyc@gmail.com',
@@ -134,9 +145,11 @@ describe('API endpoints with auth', function() {
   it('should be able to call [POST] /findtime endpoint', function(done) {
 
     timekit.findTime(
-      [fixtures.findTimeEmail1, fixtures.findTimeEmail2],
-      fixtures.findTimeFuture,
-      fixtures.findTimeLength
+      fixtures.findTime.emails,
+      fixtures.findTime.filters,
+      fixtures.findTime.future,
+      fixtures.findTime.lengthVar,
+      fixtures.findTime.sort
     ).then(function(response) {
       expect(response.data).toBeDefined();
       expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
