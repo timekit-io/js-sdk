@@ -518,6 +518,68 @@ function Timekit() {
 
   };
 
+  /**
+   * Create a new Timekit app
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createApp = function(name, contactName, contactEmail) {
+
+    return makeRequest({
+      url: '/apps',
+      method: 'post',
+      data: {
+        name: name,
+        contact_name: name,
+        contact_email: name
+      }
+    });
+
+  };
+
+  /**
+   * Get list of apps
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getApps = function() {
+
+    return makeRequest({
+      url: '/apps',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get settings for a specific app
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getApp = function(token) {
+
+    return makeRequest({
+      url: '/apps/' + token,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Update settings for a specific app
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateApp = function(token, data) {
+
+    return makeRequest({
+      url: '/apps/' + token,
+      method: 'put',
+      data: data
+    });
+
+  };
+
   return TK;
 
 }
