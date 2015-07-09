@@ -530,8 +530,8 @@ function Timekit() {
       method: 'post',
       data: {
         name: name,
-        contact_name: name,
-        contact_email: name
+        contact_name: contactName,
+        contact_email: contactEmail
       }
     });
 
