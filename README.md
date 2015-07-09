@@ -171,6 +171,23 @@ timekit.getUserProperty(
 timekit.setUserProperties(
     data        // [Object] key value pairs with the user properties to set or overwrite
 );
+
+timekit.createApp(
+    name,        // [String] Human friendly name of the Timekit app (will be slugged automatically)
+    contactName, // [String] Name of primary contact
+    contactEmail // [String] Email of primary contact
+);
+
+timekit.getApps();
+
+timekit.getApp(
+    slug         // [String] Slug of the Timekit app you want to retrieve
+);
+
+timekit.updateApp(
+    slug,        // [String] Slug of the Timekit app you want to update
+    data         // [Object] Settings for the app you want to update (e.g. key 'callback')
+);
 ```
 
 ## Building from source
