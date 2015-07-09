@@ -1,9 +1,9 @@
 # Timekit JS SDK
 
 [![Circle CI](https://img.shields.io/circleci/project/timekit-io/js-sdk.svg)](https://circleci.com/gh/timekit-io/js-sdk)
-[![Code Coverage](https://img.shields.io/badge/coverage-91%25-green.svg)](https://github.com/timekit-io/js-sdk)
+[![Code Coverage](https://img.shields.io/badge/coverage-92%25-green.svg)](https://github.com/timekit-io/js-sdk)
 
-**Latest release:**  *v0.0.4*
+**Latest release:**  *v0.0.5*
 
 Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [developers.timekit.io](http://developers.timekit.io).
 
