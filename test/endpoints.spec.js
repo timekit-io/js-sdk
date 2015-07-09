@@ -79,6 +79,7 @@ var fixtures = {
     ContactEmail: utils.emailGenerator()
   },
   getAppSlug:    'zvwrOk1Up58DwU0ue8q99VM0HnN22sQc',
+  updateAppSlug: 'zvwrOk1Up58DwU0ue8q99VM0HnN22sQc',
   updateAppSettings: {
     callback:     'http://timekit.io'
   }
@@ -874,6 +875,36 @@ it('should be able to call [POST] /apps', function(done) {
         expect(response.status).toBe(200);
         expect(response.data).toBeDefined();
         expect(typeof response.data.data.slug).toBe('string');
+        done();
+      }, 0);
+    }, 0);
+
+  });
+
+
+  it('should be able to call [PUT] /apps/:slug', function(done) {
+    var response, request;
+
+    timekit.updateApp(
+      fixtures.updateAppSlug,
+      fixtures.updateAppSettings
+    ).then(function(res) {
+      response = res;
+    });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 204,
+        statusText: 'No Content',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(204);
         done();
       }, 0);
     }, 0);

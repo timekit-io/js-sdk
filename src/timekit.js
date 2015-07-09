@@ -556,10 +556,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getApp = function(token) {
+  TK.getApp = function(slug) {
 
     return makeRequest({
-      url: '/apps/' + token,
+      url: '/apps/' + slug,
       method: 'get'
     });
 
@@ -570,10 +570,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.updateApp = function(token, data) {
+  TK.updateApp = function(slug, data) {
 
     return makeRequest({
-      url: '/apps/' + token,
+      url: '/apps/' + slug,
       method: 'put',
       data: data
     });
