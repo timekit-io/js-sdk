@@ -523,15 +523,14 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.createApp = function(name, contactName, contactEmail) {
+  TK.createApp = function(name, settings) {
 
     return makeRequest({
       url: '/apps',
       method: 'post',
       data: {
         name: name,
-        contact_name: contactName,
-        contact_email: contactEmail
+        settings: settings
       }
     });
 

@@ -75,8 +75,10 @@ var fixtures = {
   },
   createApp: {
     name:         'TestApplication',
-    contactName:  'John Doe',
-    ContactEmail: utils.emailGenerator()
+    settings: {
+      contact_name: 'John Doe',
+      contact_email: utils.emailGenerator()
+    }
   },
   getAppSlug:    'zvwrOk1Up58DwU0ue8q99VM0HnN22sQc',
   updateAppSlug: 'zvwrOk1Up58DwU0ue8q99VM0HnN22sQc',
@@ -793,8 +795,7 @@ it('should be able to call [POST] /apps', function(done) {
 
     timekit.createApp(
       fixtures.createApp.name,
-      fixtures.createApp.contactName,
-      fixtures.createApp.contactEmail
+      fixtures.createApp.settings
     ).then(function(res) {
       response = res;
     });

@@ -174,8 +174,7 @@ timekit.setUserProperties(
 
 timekit.createApp(
     name,        // [String] Human friendly name of the Timekit app (will be slugged automatically)
-    contactName, // [String] Name of primary contact
-    contactEmail // [String] Email of primary contact
+    settings     // [Object] Contain key/value pairs of settings like 'contact_name', 'contact_email' & 'callback'
 );
 
 timekit.getApps();
