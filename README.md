@@ -1,9 +1,9 @@
 # Timekit JS SDK
 
 [![Circle CI](https://img.shields.io/circleci/project/timekit-io/js-sdk.svg)](https://circleci.com/gh/timekit-io/js-sdk)
-[![Code Coverage](https://img.shields.io/badge/coverage-91%25-green.svg)](https://github.com/timekit-io/js-sdk)
+[![Code Coverage](https://img.shields.io/badge/coverage-92%25-green.svg)](https://github.com/timekit-io/js-sdk)
 
-**Latest release:**  *v0.0.4*
+**Latest release:**  *v0.0.5*
 
 Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [developers.timekit.io](http://developers.timekit.io).
 
@@ -170,6 +170,22 @@ timekit.getUserProperty(
 
 timekit.setUserProperties(
     data        // [Object] key value pairs with the user properties to set or overwrite
+);
+
+timekit.createApp(
+    name,        // [String] Human friendly name of the Timekit app (will be slugged automatically)
+    settings     // [Object] Contain key/value pairs of settings like 'contact_name', 'contact_email' & 'callback'
+);
+
+timekit.getApps();
+
+timekit.getApp(
+    slug         // [String] Slug of the Timekit app you want to retrieve
+);
+
+timekit.updateApp(
+    slug,        // [String] Slug of the Timekit app you want to update
+    data         // [Object] Settings for the app you want to update (e.g. key 'callback')
 );
 ```
 

@@ -70,8 +70,20 @@ var fixtures = {
   },
   getUserPropertyKey: 'timebirdcphgmailcom-google-next-sync-token',
   setUserProperties: {
-    testKey1:      'testValue1',
-    testKey2:      'testValue2'
+    testKey1:     'testValue1',
+    testKey2:     'testValue2'
+  },
+  createApp: {
+    name:         'TestApplication',
+    settings: {
+      contact_name: 'John Doe',
+      contact_email: utils.emailGenerator()
+    }
+  },
+  getAppSlug:    'zvwrOk1Up58DwU0ue8q99VM0HnN22sQc',
+  updateAppSlug: 'zvwrOk1Up58DwU0ue8q99VM0HnN22sQc',
+  updateAppSettings: {
+    callback:     'http://timekit.io'
   }
 }
 
@@ -756,6 +768,128 @@ describe('API endpoints with auth', function() {
     var response, request;
 
     timekit.setUserProperties(fixtures.setUserProperties).then(function(res) {
+      response = res;
+    });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 204,
+        statusText: 'No Content',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(204);
+        done();
+      }, 0);
+    }, 0);
+
+  });
+
+it('should be able to call [POST] /apps', function(done) {
+    var response, request;
+
+    timekit.createApp(
+      fixtures.createApp.name,
+      fixtures.createApp.settings
+    ).then(function(res) {
+      response = res;
+    });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 201,
+        statusText: 'Created',
+        responseText: '{ "data": { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "token": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(201);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.data.slug).toBe('string');
+        done();
+      }, 0);
+    }, 0);
+
+  });
+
+  it('should be able to call [GET] /apps', function(done) {
+    var response, request;
+
+    timekit.getApps().then(function(res) {
+      response = res;
+    });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": [ { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "token": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } } ] }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+        done();
+      }, 0);
+    }, 0);
+
+  });
+
+  it('should be able to call [GET] /apps/:slug', function(done) {
+    var response, request;
+
+    timekit.getApp(
+      fixtures.getAppSlug
+    ).then(function(res) {
+      response = res;
+    });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "token": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.data.slug).toBe('string');
+        done();
+      }, 0);
+    }, 0);
+
+  });
+
+
+  it('should be able to call [PUT] /apps/:slug', function(done) {
+    var response, request;
+
+    timekit.updateApp(
+      fixtures.updateAppSlug,
+      fixtures.updateAppSettings
+    ).then(function(res) {
       response = res;
     });
 
