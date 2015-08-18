@@ -189,6 +189,26 @@ timekit.updateApp(
 );
 ```
 
+## Dynamic includes
+
+The Timekit API have support for [dynamically including related objects](http://developers.timekit.io/docs/dynamic-includes) (aka. expand objects). We supports this functionality by providing a chainable/fluent method called `.include()` that can be called right before a request. 
+
+The method takes unlimited string arguments, with each one being a model that you want included in the response. For nested data (e.g. events grouped by calendar), use the dot notation to dig into relations, like `calender.events`.
+
+Example:
+
+```javascript
+
+timekit
+.include('meetings', 'calendars.events')
+.getUserInfo()
+.then(function(response) {
+    // Response contains JSON data with nested info on the user's calendars, events and meetings
+});
+```
+
+This is super powerful because it means that you can avoid unnecessary extra requests compared to fetching each resource sequentially.
+
 ## Building from source
 
 We use [webpack](http://webpack.github.io) for packaging the library as a module. To build the source files in `/src` to `/dist`, run:
