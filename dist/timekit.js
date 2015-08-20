@@ -76,6 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  var userEmail;
 	  var userApiToken;
+	  var includes;
 	
 	  /**
 	   * Default config
@@ -123,15 +124,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (config.outputTimestampFormat) { args.headers['Timekit-OutputTimestampFormat'] = config.outputTimestampFormat; }
 	    if (config.timezone) { args.headers['Timekit-Timezone'] = config.timezone; }
 	
-	    // args.transformResponse = [function(response) {
-	    //   // console.log('transformResponse');
-	    //   // console.log(JSON.parse(response));
-	    //   // if (response.data) {
-	    //   //   response.result = response.data.data || response.data;
-	    //   //   delete response.data;
-	    //   // }
-	    //   return response;
-	    // }];
+	    if (includes && includes.length > 0) {
+	      if (args.params === undefined) { args.params = {}; }
+	      args.params.include = includes.join();
+	      includes = [];
+	    }
 	
 	    var request = axios(args);
 	
@@ -182,6 +179,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      email: userEmail,
 	      apiToken: userApiToken
 	    };
+	  };
+	
+	  /**
+	   * Add supplied dynamic includes to the next request (fluent/chainable return)
+	   * @type {Function}
+	   * @return {Object}
+	   */
+	  TK.include = function() {
+	    includes = Array.prototype.slice.call(arguments);
+	    return this;
 	  };
 	
 	  /**
