@@ -7,7 +7,7 @@ var utils = require('./helpers/utils');
 var fixtures = {
   app:            'demo',
   apiBaseUrl:     'http://api-localhost.timekit.io/',
-  calendarToken:  '1e396a70-1919-11e5-a165-080027c7e7dd',
+  calendarId:  '1e396a70-1919-11e5-a165-080027c7e7dd',
   userEmail:      'timebirdcph@gmail.com',
   userInvalidEmail: 'invaliduser@gmail.com',
   userPassword:   'password',
@@ -30,7 +30,7 @@ var fixtures = {
   eventsStart:    moment().format(),
   eventsEnd:      moment().add(3,'weeks').format(),
   availabilityEmail: 'timebirdnyc@gmail.com',
-  meetingToken:   '7zdMNR48cJTjIRhz',
+  meetingId:   '7zdMNR48cJTjIRhz',
   newMeeting: {
     what:         'test title',
     where:        'test location',
@@ -119,7 +119,7 @@ describe('API endpoints without auth', function() {
       request.respondWith({
         status: 200,
         statusText: 'OK',
-        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "img": "http:\/\/www.gravatar.com\/avatar\/35b00087ea20066e5da95f8359183f04", "activated": true, "timezone": "America\/Los_Angeles", "token": "TWXVID51gpqKcLVMQauomHqIrw92acw8", "last_sync": null, "api_token": "nvHfRSlhvsnlg4rS7Wt28Ty47qdgegwSu3YK7hPW" } }',
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "img": "http:\/\/www.gravatar.com\/avatar\/35b00087ea20066e5da95f8359183f04", "activated": true, "timezone": "America\/Los_Angeles", "id": "TWXVID51gpqKcLVMQauomHqIrw92acw8", "last_sync": null, "api_token": "nvHfRSlhvsnlg4rS7Wt28Ty47qdgegwSu3YK7hPW" } }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -293,7 +293,7 @@ describe('API endpoints with auth', function() {
       request.respondWith({
         status: 200,
         statusText: 'OK',
-        responseText: '{ "data": [ { "name": "MyCalendar", "token": "2e911aa8-05b4-11e5-af06-000000007ed6", "description": "Laboriosam vitae minus", "system": false, "foregroundcolor": "#938710", "backgroundcolor": "#518d83" }, { "name": "Work", "token": "3e614av8-05g4-11e5-af06-000205005eg6", "description": "Consequatur doloribus", "system": false, "foregroundcolor": "#ed2ba6", "backgroundcolor": "#9b502a" } ] }',
+        responseText: '{ "data": [ { "name": "MyCalendar", "id": "2e911aa8-05b4-11e5-af06-000000007ed6", "description": "Laboriosam vitae minus", "system": false, "foregroundcolor": "#938710", "backgroundcolor": "#518d83" }, { "name": "Work", "id": "3e614av8-05g4-11e5-af06-000205005eg6", "description": "Consequatur doloribus", "system": false, "foregroundcolor": "#ed2ba6", "backgroundcolor": "#9b502a" } ] }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -309,10 +309,10 @@ describe('API endpoints with auth', function() {
 
   });
 
-  it('should be able to call [GET] /calendar/:token', function(done) {
+  it('should be able to call [GET] /calendar/:id', function(done) {
     var request, response;
 
-    timekit.getCalendar(fixtures.calendarToken).then(function(res) {
+    timekit.getCalendar(fixtures.calendarId).then(function(res) {
       response = res;
     });
 
@@ -322,7 +322,7 @@ describe('API endpoints with auth', function() {
       request.respondWith({
         status: 200,
         statusText: 'OK',
-        responseText: '{ "data": { "name": "MyCalendar", "description": "Laboriosam vitae", "token": "2e921aa8-05b4-15e5-af06-000000007ed6", "system": false, "foregroundcolor": "#938710", "backgroundcolor": "#518d83" } }',
+        responseText: '{ "data": { "name": "MyCalendar", "description": "Laboriosam vitae", "id": "2e921aa8-05b4-15e5-af06-000000007ed6", "system": false, "foregroundcolor": "#938710", "backgroundcolor": "#518d83" } }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -351,7 +351,7 @@ describe('API endpoints with auth', function() {
       request.respondWith({
         status: 200,
         statusText: 'OK',
-        responseText: '{ "data": [ { "name": "Timebird Copenhagen", "email": "timebirdcph@gmail.com", "isUser": true, "users": { "token": "zeokguHPBwiEydJEvhwh5Wvk7J74QhQBXvsM5NGX", "first_name": "Timebird", "last_name": "Copenhagen", "name": "Timebird Copenhagen", "email": "timebirdcph@gmail.com", "image": "http:\/\/lorempixel.com\/250\/250\/", "timezone": "Europe\/Copenhagen" } }, { "name": "Peter Jensen", "email": "peter-jensen@timekit.io", "isUser": true } ] }',
+        responseText: '{ "data": [ { "name": "Timebird Copenhagen", "email": "timebirdcph@gmail.com", "isUser": true, "users": { "id": "zeokguHPBwiEydJEvhwh5Wvk7J74QhQBXvsM5NGX", "first_name": "Timebird", "last_name": "Copenhagen", "name": "Timebird Copenhagen", "email": "timebirdcph@gmail.com", "image": "http:\/\/lorempixel.com\/250\/250\/", "timezone": "Europe\/Copenhagen" } }, { "name": "Peter Jensen", "email": "peter-jensen@timekit.io", "isUser": true } ] }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -445,7 +445,7 @@ describe('API endpoints with auth', function() {
       request.respondWith({
         status: 200,
         statusText: 'OK',
-        responseText: '{ "data": [ { "id": 13, "what": "nemo", "where": "679 Harvey Spring Suite 784\ Sipesberg, LA 17622-1093", "token": "quqVQTOdyfA1t66K", "completed": false, "status_text": "COMPLETED", "status_code": 100, "start": null, "end": null }, { "id": 15, "what": "enim", "where": "081 Osinski Crescent Suite 774\ New Delfinachester, PW 03356", "token": "7kXN0aC9uCJYMi0P", "completed": false, "status_text": "COMPLETED", "status_code": 100, "start": null, "end": null }, { "id": 17, "what": "consequatur", "where": "690 Elouise Crossroad Suite 711\ Kuhlmanland, AZ 08572-8003", "token": "7B0k9nqyVFaAhu7Q", "completed": false, "status_text": "COMPLETED", "status_code": 100, "start": null, "end": null }, { "id": 22, "what": "Important business meeting", "where": "168 Aylin Divide Suite 336\ Tatumport, VT 75243", "token": "kFadq3XctXgyamuj", "completed": false, "status_text": "SCHEDULED", "status_code": 200, "start": "2015-03-24 10:30:00", "end": "2015-03-24 14:30:00" } ] }',
+        responseText: '{ "data": [ { "id": 13, "what": "nemo", "where": "679 Harvey Spring Suite 784\ Sipesberg, LA 17622-1093", "id": "quqVQTOdyfA1t66K", "completed": false, "status_text": "COMPLETED", "status_code": 100, "start": null, "end": null }, { "id": 15, "what": "enim", "where": "081 Osinski Crescent Suite 774\ New Delfinachester, PW 03356", "id": "7kXN0aC9uCJYMi0P", "completed": false, "status_text": "COMPLETED", "status_code": 100, "start": null, "end": null }, { "id": 17, "what": "consequatur", "where": "690 Elouise Crossroad Suite 711\ Kuhlmanland, AZ 08572-8003", "id": "7B0k9nqyVFaAhu7Q", "completed": false, "status_text": "COMPLETED", "status_code": 100, "start": null, "end": null }, { "id": 22, "what": "Important business meeting", "where": "168 Aylin Divide Suite 336\ Tatumport, VT 75243", "id": "kFadq3XctXgyamuj", "completed": false, "status_text": "SCHEDULED", "status_code": 200, "start": "2015-03-24 10:30:00", "end": "2015-03-24 14:30:00" } ] }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -461,10 +461,10 @@ describe('API endpoints with auth', function() {
 
   });
 
-  it('should be able to call [GET] /meetings/:token', function(done) {
+  it('should be able to call [GET] /meetings/:id', function(done) {
     var request, response;
 
-    timekit.getMeeting(fixtures.meetingToken).then(function(res) {
+    timekit.getMeeting(fixtures.meetingId).then(function(res) {
       response = res;
     });
 
@@ -474,7 +474,7 @@ describe('API endpoints with auth', function() {
       request.respondWith({
         status: 200,
         statusText: 'OK',
-        responseText: '{ "data": { "id": 1, "what": "molestiae", "where": "7173 McClure Manors Apt. 807\ Gulgowskitown, HI 02306-4030", "token": "A2hYcGJAppb2LreJ", "completed": true, "status_text": "COMPLETED", "status_code": 100, "start": "2015-03-24 10:30:00", "end": "2015-03-24 13:30:00" } }',
+        responseText: '{ "data": { "id": 1, "what": "molestiae", "where": "7173 McClure Manors Apt. 807\ Gulgowskitown, HI 02306-4030", "id": "A2hYcGJAppb2LreJ", "completed": true, "status_text": "COMPLETED", "status_code": 100, "start": "2015-03-24 10:30:00", "end": "2015-03-24 13:30:00" } }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -507,7 +507,7 @@ describe('API endpoints with auth', function() {
       request.respondWith({
         status: 201,
         statusText: 'OK',
-        responseText: '{ "data": { "id": 1, "what": "Travel back to the future", "where": "Hill Valley Clock Tower", "token": "PuicNx37V2pY", "completed": false, "status_text": "PENDING", "status_code": 300, "start": null, "end": null } }',
+        responseText: '{ "data": { "id": 1, "what": "Travel back to the future", "where": "Hill Valley Clock Tower", "id": "PuicNx37V2pY", "completed": false, "status_text": "PENDING", "status_code": 300, "start": null, "end": null } }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -524,10 +524,10 @@ describe('API endpoints with auth', function() {
 
   });
 
-  it('should be able to call [PUT] /meetings/:token', function(done) {
+  it('should be able to call [PUT] /meetings/:id', function(done) {
     var request, response;
     timekit.updateMeeting(
-      fixtures.meetingToken,
+      fixtures.meetingId,
       fixtures.updateMeetingData
     ).then(function(res) {
       response = res;
@@ -599,10 +599,10 @@ describe('API endpoints with auth', function() {
 
   // });
 
-  // it('should be able to call [POST] /meetings/:token/invite', function(done) {
+  // it('should be able to call [POST] /meetings/:id/invite', function(done) {
 
   //   timekit.inviteToMeeting(
-  //     fixtures.meetingToken,
+  //     fixtures.meetingId,
   //     fixtures.inviteToMeetingEmails
   //   ).then(function(response) {
   //     expect(response.status).toBe(204);
@@ -630,7 +630,7 @@ describe('API endpoints with auth', function() {
       request.respondWith({
         status: 201,
         statusText: 'OK',
-        responseText: '{ "data": { "first_name": "Peter", "last_name": "Hansen", "name": "Peter Hansen", "email": "ph@timekit.io", "image": "http://www.link-to-img.com/image.png", "activated": false, "timezone": "Europe/Copenhagen", "token": "msoP0NPkjb6ZSWPBXnBjVEvTKAhZ5sz4", "last_sync": null, "api_token": "qp9kzAxarYBUqJVqj6uZADKwIL0jvWdXfQfxEKwv" } }',
+        responseText: '{ "data": { "first_name": "Peter", "last_name": "Hansen", "name": "Peter Hansen", "email": "ph@timekit.io", "image": "http://www.link-to-img.com/image.png", "activated": false, "timezone": "Europe/Copenhagen", "id": "msoP0NPkjb6ZSWPBXnBjVEvTKAhZ5sz4", "last_sync": null, "api_token": "qp9kzAxarYBUqJVqj6uZADKwIL0jvWdXfQfxEKwv" } }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -660,7 +660,7 @@ describe('API endpoints with auth', function() {
       request.respondWith({
         status: 201,
         statusText: 'OK',
-        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "id": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -806,7 +806,7 @@ it('should be able to call [POST] /apps', function(done) {
       request.respondWith({
         status: 201,
         statusText: 'Created',
-        responseText: '{ "data": { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "token": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } } }',
+        responseText: '{ "data": { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "id": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } } }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -835,7 +835,7 @@ it('should be able to call [POST] /apps', function(done) {
       request.respondWith({
         status: 200,
         statusText: 'OK',
-        responseText: '{ "data": [ { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "token": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } } ] }',
+        responseText: '{ "data": [ { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "id": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } } ] }',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -866,7 +866,7 @@ it('should be able to call [POST] /apps', function(done) {
       request.respondWith({
         status: 200,
         statusText: 'OK',
-        responseText: '{ "data": { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "token": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } } }',
+        responseText: '{ "data": { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "id": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } } }',
         headers: {
           'Content-Type': 'application/json'
         }

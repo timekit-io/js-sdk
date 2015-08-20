@@ -2,7 +2,7 @@
 
 /*!
  * Timekit JavaScript SDK
- * Version: 0.0.1
+ * Version: 0.0.6
  * http://timekit.io
  *
  * Copyright 2015 Timekit, Inc.
@@ -258,10 +258,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getCalendar = function(token) {
+  TK.getCalendar = function(id) {
 
     return makeRequest({
-      url: '/calendars/' + token,
+      url: '/calendars/' + id,
       method: 'get'
     });
 
@@ -337,10 +337,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getMeeting = function(token) {
+  TK.getMeeting = function(id) {
 
     return makeRequest({
-      url: '/meetings/' + token,
+      url: '/meetings/' + id,
       method: 'get'
     });
 
@@ -370,10 +370,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.updateMeeting = function(token, data) {
+  TK.updateMeeting = function(id, data) {
 
     return makeRequest({
-      url: '/meetings/' + token,
+      url: '/meetings/' + id,
       method: 'put',
       data: data
     });
@@ -420,10 +420,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.inviteToMeeting = function(token, emails) {
+  TK.inviteToMeeting = function(id, emails) {
 
     return makeRequest({
-      url: '/meetings/' + token + '/invite',
+      url: '/meetings/' + id + '/invite',
       method: 'post',
       data: {
         emails: emails
