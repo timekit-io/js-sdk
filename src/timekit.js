@@ -181,6 +181,21 @@ function Timekit() {
   };
 
   /**
+   * Find mutual availability across multiple users/calendars
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.findTimeBulk = function(data) {
+
+    return makeRequest({
+      url: '/findtime/bulk',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
    * Get user's connected accounts
    * @type {Function}
    * @return {Promise}
@@ -199,9 +214,9 @@ function Timekit() {
    * @type {Function}
    * @return {String}
    */
-  TK.accountGoogleSignup = function(shouldRedirect) {
+  TK.accountGoogleSignup = function(shouldRedirect, callback) {
 
-    var url = buildUrl('/accounts/google/signup') + '?Timekit-App=' + config.app;
+    var url = buildUrl('/accounts/google/signup') + '?Timekit-App=' + config.app + (callback ? '&callback=' + callback : '');
 
     if(shouldRedirect && window) {
       window.location.href = url;
@@ -268,6 +283,20 @@ function Timekit() {
   };
 
   /**
+   * Delete a calendar
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.deleteCalendar = function(id) {
+
+    return makeRequest({
+      url: '/calendars/' + id,
+      method: 'delete'
+    });
+
+  };
+
+  /**
    * Get users contacts that are present on Timekit (synced from providers)
    * @type {Function}
    * @return {Promise}
@@ -282,7 +311,7 @@ function Timekit() {
   };
 
   /**
-   * Get all user's events present from synced accounts (use FindTime for more detailed querying)
+   * Get all user's events
    * @type {Function}
    * @return {Promise}
    */
@@ -295,6 +324,57 @@ function Timekit() {
         start: start,
         end: end
       }
+    });
+
+  };
+
+  /**
+   * Create a new event
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createEvent = function(start, end, what, where, calendarToken, invite, participants) {
+
+    return makeRequest({
+      url: '/events',
+      method: 'post',
+      data: {
+        start: start,
+        end: end,
+        what: what,
+        where: where,
+        calendar_id: calendarToken,
+        invite: invite,
+        participants: participants
+      }
+    });
+
+  };
+
+  /**
+   * Get a user's event by ID
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getEvent = function(id) {
+
+    return makeRequest({
+      url: '/events/' + id,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Delete a user's event by ID
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.deleteEvent = function(id) {
+
+    return makeRequest({
+      url: '/events/' + id,
+      method: 'delete'
     });
 
   };
@@ -582,6 +662,20 @@ function Timekit() {
       url: '/apps/' + slug,
       method: 'put',
       data: data
+    });
+
+  };
+
+  /**
+   * Delete an app
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.deleteApp = function(slug) {
+
+    return makeRequest({
+      url: '/apps/' + slug,
+      method: 'delete'
     });
 
   };

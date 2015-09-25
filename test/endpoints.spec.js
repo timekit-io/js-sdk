@@ -7,7 +7,7 @@ var utils = require('./helpers/utils');
 var fixtures = {
   app:            'demo',
   apiBaseUrl:     'http://api-localhost.timekit.io/',
-  calendarId:  '1e396a70-1919-11e5-a165-080027c7e7dd',
+  calendarId:     '1e396a70-1919-11e5-a165-080027c7e7dd',
   userEmail:      'timebirdcph@gmail.com',
   userInvalidEmail: 'invaliduser@gmail.com',
   userPassword:   'password',
@@ -23,14 +23,14 @@ var fixtures = {
         { 'business_hours': {'timezone': 'America/Los_angeles'} }
       ]
     },
-    future: '3 days',
-    lengthVar: '30 minutes',
-    sort: 'asc'
+    future:       '3 days',
+    lengthVar:    '30 minutes',
+    sort:         'asc'
   },
   eventsStart:    moment().format(),
   eventsEnd:      moment().add(3,'weeks').format(),
   availabilityEmail: 'timebirdnyc@gmail.com',
-  meetingId:   '7zdMNR48cJTjIRhz',
+  meetingId:      '7zdMNR48cJTjIRhz',
   newMeeting: {
     what:         'test title',
     where:        'test location',
@@ -258,28 +258,63 @@ describe('API endpoints with auth', function() {
       }, 0);
     }, 0);
 
+  });
+
+  it('should be able to call [GET] /accounts/google/calendars endpoint', function(done) {
+    var request, response;
+
+    timekit.getAccountGoogleCalendars().then(function(res) {
+      response = res;
+    });
+
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{"data": [{"name": "ph@timekit.io", "description": null, "synced": true, "property_key": "phtimekitio"}, {"name": "Birthdays", "description": "Displays birthdays of people in Google Contacts and optionally Your Circles from Google+. Also displays anniversary and other event dates from Google Contacts, if applicable.", "synced": false, "property_key": "birthdays"}, {"name": "Holidays in Denmark", "description": "Holidays and Observances in Denmark", "synced": false, "property_key": "holidays-in-denmark"}, {"name": "Week Numbers", "description": "Week numbers displayed weekly", "synced": false, "property_key": "week-numbers"} ] }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setTimeout(function () {
+        expect(response.data).toBeDefined();
+        expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
+        done();
+      }, 0);
+    }, 0);
 
   });
 
-  // it('should be able to call [GET] /accounts/google/calendars endpoint', function(done) {
+  it('should be able to call [GET] /accounts/sync endpoint', function(done) {
+    var request, response;
 
-  //   timekit.getAccountGoogleCalendars().then(function(response) {
-  //     expect(response.data).toBeDefined();
-  //     expect(Object.prototype.toString.call(response.data.data)).toBe('[object Array]');
-  //     done();
-  //   });
+    timekit.accountSync().then(function(res) {
+      response = res;
+    });
 
-  // });
+    setTimeout(function () {
+      request = jasmine.Ajax.requests.mostRecent();
 
-  // it('should be able to call [GET] /accounts/sync endpoint', function(done) {
+      request.respondWith({
+        status: 200,
+        statusText: 'OK',
+        responseText: '{ "data": { "description": "Synced 25 events", "count": 25 } }',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-  //   timekit.accountSync().then(function(response) {
-  //     expect(response.data).toBeDefined();
-  //     expect(typeof response.data.count).toBe('number');
-  //     done();
-  //   });
+      setTimeout(function () {
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.data.count).toBe('number');
+        done();
+      }, 0);
+    }, 0);
 
-  // });
+  });
 
   it('should be able to call [GET] /calendars', function(done) {
     var request, response;
