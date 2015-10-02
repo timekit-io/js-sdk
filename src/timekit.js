@@ -2,7 +2,7 @@
 
 /*!
  * Timekit JavaScript SDK
- * Version: 0.0.7
+ * Version: 1.0.0
  * http://timekit.io
  *
  * Copyright 2015 Timekit, Inc.
@@ -54,11 +54,18 @@ function Timekit() {
   };
 
   /**
+   * Root Object that holds methods to expose for API consumption
+   * @type {Object}
+   */
+  var TK = {};
+
+
+  /**
    * Prepare and make HTTP request to API
    * @type {Object}
    * @return {Promise}
    */
-  var makeRequest = function(args) {
+  TK.makeRequest = function(args) {
 
     // construct URL with base, version and endpoint
     args.url = buildUrl(args.url);
@@ -101,19 +108,6 @@ function Timekit() {
 
     return request;
   };
-
-  /**
-   * Root Object that holds methods to expose for API consumption
-   * @type {Object}
-   */
-  var TK = {};
-
-  /**
-   * Expose the lowlevel makeRequest for the outside to use
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.request = makeRequest;
 
   /**
    * Overwrite default config with supplied settings
@@ -172,7 +166,7 @@ function Timekit() {
    */
   TK.getAccounts = function() {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/accounts',
       method: 'get'
     });
@@ -203,7 +197,7 @@ function Timekit() {
    */
   TK.getAccountGoogleCalendars = function() {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/accounts/google/calendars',
       method: 'get'
     });
@@ -217,7 +211,7 @@ function Timekit() {
    */
   TK.accountSync = function() {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/accounts/sync',
       method: 'get'
     });
@@ -231,7 +225,7 @@ function Timekit() {
    */
   TK.auth = function(data) {
 
-    var r = makeRequest({
+    var r = TK.makeRequest({
       url: '/auth',
       method: 'post',
       data: data
@@ -254,7 +248,7 @@ function Timekit() {
    */
   TK.getApps = function() {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/apps',
       method: 'get'
     });
@@ -268,7 +262,7 @@ function Timekit() {
    */
   TK.getApp = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/apps/' + data.slug,
       method: 'get'
     });
@@ -282,7 +276,7 @@ function Timekit() {
    */
   TK.createApp = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/apps',
       method: 'post',
       data: data
@@ -300,7 +294,7 @@ function Timekit() {
     var slug = data.slug;
     delete data.slug;
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/apps/' + slug,
       method: 'put',
       data: data
@@ -315,7 +309,7 @@ function Timekit() {
    */
   TK.deleteApp = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/apps/' + data.slug,
       method: 'delete'
     });
@@ -329,7 +323,7 @@ function Timekit() {
    */
   TK.getCalendars = function() {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/calendars',
       method: 'get'
     });
@@ -343,7 +337,7 @@ function Timekit() {
    */
   TK.getCalendar = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/calendars/' + data.id,
       method: 'get'
     });
@@ -357,7 +351,7 @@ function Timekit() {
    */
   TK.createCalendar = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/calendars/',
       method: 'post',
       data: data
@@ -372,7 +366,7 @@ function Timekit() {
    */
   TK.deleteCalendar = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/calendars/' + data.id,
       method: 'delete'
     });
@@ -386,7 +380,7 @@ function Timekit() {
    */
   TK.getContacts = function() {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/contacts/',
       method: 'get'
     });
@@ -400,7 +394,7 @@ function Timekit() {
    */
   TK.getEvents = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/events',
       method: 'get',
       params: data
@@ -415,7 +409,7 @@ function Timekit() {
    */
   TK.getEvent = function(id) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/events/' + id,
       method: 'get'
     });
@@ -429,7 +423,7 @@ function Timekit() {
    */
   TK.createEvent = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/events',
       method: 'post',
       data: data
@@ -444,7 +438,7 @@ function Timekit() {
    */
   TK.deleteEvent = function(id) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/events/' + id,
       method: 'delete'
     });
@@ -458,7 +452,7 @@ function Timekit() {
    */
   TK.getAvailability = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/events/availability',
       method: 'get',
       params: data
@@ -473,7 +467,7 @@ function Timekit() {
    */
   TK.findTime = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/findtime',
       method: 'post',
       data: data
@@ -488,7 +482,7 @@ function Timekit() {
    */
   TK.findTimeBulk = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/findtime/bulk',
       method: 'post',
       data: data
@@ -503,7 +497,7 @@ function Timekit() {
    */
   TK.getMeetings = function() {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/meetings',
       method: 'get'
     });
@@ -517,7 +511,7 @@ function Timekit() {
    */
   TK.getMeeting = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/meetings/' + data.id,
       method: 'get'
     });
@@ -531,7 +525,7 @@ function Timekit() {
    */
   TK.createMeeting = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/meetings',
       method: 'post',
       data: data
@@ -549,7 +543,7 @@ function Timekit() {
     var id = data.id;
     delete data.id;
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/meetings/' + id,
       method: 'put',
       data: data
@@ -564,7 +558,7 @@ function Timekit() {
    */
   TK.setMeetingAvailability = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/meetings/availability',
       method: 'post',
       data: data
@@ -579,7 +573,7 @@ function Timekit() {
    */
   TK.bookMeeting = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/meetings/book',
       method: 'post',
       data: data
@@ -597,7 +591,7 @@ function Timekit() {
     var id = data.id;
     delete data.id;
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/meetings/' + id + '/invite',
       method: 'post',
       data: data
@@ -612,7 +606,7 @@ function Timekit() {
    */
   TK.createUser = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/users',
       method: 'post',
       data: data
@@ -627,7 +621,7 @@ function Timekit() {
    */
   TK.getUserInfo = function() {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/users/me',
       method: 'get'
     });
@@ -641,7 +635,7 @@ function Timekit() {
    */
   TK.updateUser = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/users/me',
       method: 'put',
       data: data
@@ -656,7 +650,7 @@ function Timekit() {
    */
   TK.resetUserPassword = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/users/resetpassword',
       method: 'post',
       data: data
@@ -671,7 +665,7 @@ function Timekit() {
    */
   TK.getUserProperties = function() {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/properties',
       method: 'get'
     });
@@ -685,7 +679,7 @@ function Timekit() {
    */
   TK.getUserProperty = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/properties/' + data.key,
       method: 'get'
     });
@@ -699,7 +693,7 @@ function Timekit() {
    */
   TK.setUserProperties = function(data) {
 
-    return makeRequest({
+    return TK.makeRequest({
       url: '/properties',
       method: 'put',
       data: data

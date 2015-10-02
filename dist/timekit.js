@@ -58,7 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*!
 	 * Timekit JavaScript SDK
-	 * Version: 0.0.7
+	 * Version: 1.0.0
 	 * http://timekit.io
 	 *
 	 * Copyright 2015 Timekit, Inc.
@@ -110,11 +110,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
+	   * Root Object that holds methods to expose for API consumption
+	   * @type {Object}
+	   */
+	  var TK = {};
+	
+	
+	  /**
 	   * Prepare and make HTTP request to API
 	   * @type {Object}
 	   * @return {Promise}
 	   */
-	  var makeRequest = function(args) {
+	  TK.makeRequest = function(args) {
 	
 	    // construct URL with base, version and endpoint
 	    args.url = buildUrl(args.url);
@@ -157,19 +164,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return request;
 	  };
-	
-	  /**
-	   * Root Object that holds methods to expose for API consumption
-	   * @type {Object}
-	   */
-	  var TK = {};
-	
-	  /**
-	   * Expose the lowlevel makeRequest for the outside to use
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.request = makeRequest;
 	
 	  /**
 	   * Overwrite default config with supplied settings
@@ -228,7 +222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getAccounts = function() {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/accounts',
 	      method: 'get'
 	    });
@@ -259,7 +253,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getAccountGoogleCalendars = function() {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/accounts/google/calendars',
 	      method: 'get'
 	    });
@@ -273,7 +267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.accountSync = function() {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/accounts/sync',
 	      method: 'get'
 	    });
@@ -287,7 +281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.auth = function(data) {
 	
-	    var r = makeRequest({
+	    var r = TK.makeRequest({
 	      url: '/auth',
 	      method: 'post',
 	      data: data
@@ -310,7 +304,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getApps = function() {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/apps',
 	      method: 'get'
 	    });
@@ -324,7 +318,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getApp = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/apps/' + data.slug,
 	      method: 'get'
 	    });
@@ -338,7 +332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.createApp = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/apps',
 	      method: 'post',
 	      data: data
@@ -356,7 +350,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var slug = data.slug;
 	    delete data.slug;
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/apps/' + slug,
 	      method: 'put',
 	      data: data
@@ -371,7 +365,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.deleteApp = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/apps/' + data.slug,
 	      method: 'delete'
 	    });
@@ -385,7 +379,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getCalendars = function() {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/calendars',
 	      method: 'get'
 	    });
@@ -399,7 +393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getCalendar = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/calendars/' + data.id,
 	      method: 'get'
 	    });
@@ -413,7 +407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.createCalendar = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/calendars/',
 	      method: 'post',
 	      data: data
@@ -428,7 +422,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.deleteCalendar = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/calendars/' + data.id,
 	      method: 'delete'
 	    });
@@ -442,7 +436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getContacts = function() {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/contacts/',
 	      method: 'get'
 	    });
@@ -456,7 +450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getEvents = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/events',
 	      method: 'get',
 	      params: data
@@ -471,7 +465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getEvent = function(id) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/events/' + id,
 	      method: 'get'
 	    });
@@ -485,7 +479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.createEvent = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/events',
 	      method: 'post',
 	      data: data
@@ -500,7 +494,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.deleteEvent = function(id) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/events/' + id,
 	      method: 'delete'
 	    });
@@ -514,7 +508,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getAvailability = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/events/availability',
 	      method: 'get',
 	      params: data
@@ -529,7 +523,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.findTime = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/findtime',
 	      method: 'post',
 	      data: data
@@ -544,7 +538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.findTimeBulk = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/findtime/bulk',
 	      method: 'post',
 	      data: data
@@ -559,7 +553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getMeetings = function() {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/meetings',
 	      method: 'get'
 	    });
@@ -573,7 +567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getMeeting = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/meetings/' + data.id,
 	      method: 'get'
 	    });
@@ -587,7 +581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.createMeeting = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/meetings',
 	      method: 'post',
 	      data: data
@@ -605,7 +599,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var id = data.id;
 	    delete data.id;
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/meetings/' + id,
 	      method: 'put',
 	      data: data
@@ -620,7 +614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.setMeetingAvailability = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/meetings/availability',
 	      method: 'post',
 	      data: data
@@ -635,7 +629,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.bookMeeting = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/meetings/book',
 	      method: 'post',
 	      data: data
@@ -653,7 +647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var id = data.id;
 	    delete data.id;
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/meetings/' + id + '/invite',
 	      method: 'post',
 	      data: data
@@ -668,7 +662,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.createUser = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/users',
 	      method: 'post',
 	      data: data
@@ -683,7 +677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getUserInfo = function() {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/users/me',
 	      method: 'get'
 	    });
@@ -697,7 +691,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.updateUser = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/users/me',
 	      method: 'put',
 	      data: data
@@ -712,7 +706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.resetUserPassword = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/users/resetpassword',
 	      method: 'post',
 	      data: data
@@ -727,7 +721,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getUserProperties = function() {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/properties',
 	      method: 'get'
 	    });
@@ -741,7 +735,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.getUserProperty = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/properties/' + data.key,
 	      method: 'get'
 	    });
@@ -755,7 +749,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.setUserProperties = function(data) {
 	
-	    return makeRequest({
+	    return TK.makeRequest({
 	      url: '/properties',
 	      method: 'put',
 	      data: data

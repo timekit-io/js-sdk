@@ -3,7 +3,7 @@
 [![Circle CI](https://img.shields.io/circleci/project/timekit-io/js-sdk.svg)](https://circleci.com/gh/timekit-io/js-sdk)
 [![Code Coverage](https://img.shields.io/badge/coverage-92%25-green.svg)](https://github.com/timekit-io/js-sdk)
 
-**Latest release:**  *v0.0.7*
+**Latest release:**  *v1.0.0*
 
 Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [developers.timekit.io](http://developers.timekit.io).
 
@@ -84,6 +84,8 @@ All the Timekit API endpoints are supported as methods. For endpoints taking par
 
 If you supply keys as camelCased, they will automatically be converted to snake_case for you. Responses can also be converted to camelCase automatically if you set the config variable "convertResponseToCamelcase" to true.
 
+Endpoints/methods:
+
 ```javascript
 // Accounts endpoints
 timekit.getAccounts();
@@ -141,6 +143,36 @@ timekit.getUserProperty(data);
 timekit.setUserProperties(data);
 ```
 
+Example:
+```javascript
+
+timekit.createEvent({
+  start: '2015-10-26T15:45:00+00:07',
+  end: '2015-10-26T17:30:00+00:07',
+  what: 'Coffee with the timelords',
+  where: 'Timekit HQ @ San Francisco',
+  calendar_id: '794f6cca-68b5-11e5-9d70-feff819cdc9f',
+  invite: true
+  participants: ['doc.brown@timekit.io', 'john@doe.com']
+});
+```
+
+## Usage (lowlevel API)
+
+If you, for some reason, would like direct access to axios's request API, you can call the `timekit.makeRequest()` method. We'll still set the correct config headers and includes, but otherwise it supports all the settings that [axios](https://github.com/mzabriskie/axios) does.
+
+Example:
+```javascript
+
+timekit.makeRequest({
+  url: '/endpointurlhere',
+  method: 'post',
+  data: {
+    key: value
+  }
+});
+```
+
 ## Dynamic includes
 
 The Timekit API have support for [dynamically including related models](http://developers.timekit.io/docs/dynamic-includes) (aka. expand objects). We supports this functionality by providing a chainable/fluent method called `.include()` that can be called right before a request.
@@ -190,5 +222,5 @@ karma start
 ## Roadmap/todos
 
 Stuff to do, among others:
-- Add to bower and npm (when we hit v0.1.0)
+- Add to bower and npm (when we hit v1.0.0)
 - Make standalone version without dependencies bundled
