@@ -24,45 +24,47 @@ The following libraries are bundled together with the SDK:
 
 ## Module loading
 
-The SDK is UMD (Universal Module Definition) compatible, which means that it can be loaded in various module formats:
-See `/examples` for implementation examples.
+The SDK is UMD (Universal Module Definition) compatible, which means that it can be loaded in various module formats across both browsers and server.
 
-**AMD (with e.g. require.js)**
+*Note: Use plain or minified builds in `/dist` when using in browser. In node, `/src/timekit.js` will be used through npm (or reference it manually in your require)*
+
+
+**AMD (with e.g. require.js)**  
 ```javascript
 requirejs(['timekit'], function(timekit) {
     console.log(timekit);
 });
 ```
 
-**CommonJS2 (in e.g. node.js)**
+**CommonJS2 (in e.g. node.js)**  
 ```javascript
 var timekit = require('timekit');
 console.log(timekit);
-
 ```
-*Reference `/src` when using in node*
 
-**As a global variable (in browsers)**
+**As a global variable (in browsers)**  
 ```javascript
 <script src="timekit.js"></script>
 <script>
     console.log(timekit);
 </script>
 ```
-*Reference plain or minified builds in `/dist` when using in browser*
+
+See `/examples` for implementation examples.
 
 ## Usage (init)
+Using the SDK is easy. For default behaviour, you don't need to set any configuration. In case you need to, here's the available options:
 
 ```javascript
 // Overwrites default config with supplied object, possible keys with default values below
 timekit.configure({
-    app:        'demo'                      // app name registered with timekit (get in touch)
-    apiBaseUrl: 'https://api.timekit.io/',  // API endpoint (do not change)
-    apiVersion: 'v2'                        // version of API to call (do not change)
-    inputTimestampFormat:  'Y-m-d h:ia',    // default timestamp format that you supply
-    outputTimestampFormat: 'Y-m-d h:ia',    // default timestamp format that you want the API to return
-    timezone:   'Europe/Copenhagen',        // override user's timezone for custom formatted timestamps in another timezone
-    convertResponseToCamelcase: true        // should keys in JSON response automatically be converted from snake_case to camelCase?
+    app:                        'demo'                      // app name registered with timekit (get in touch)
+    apiBaseUrl:                 'https://api.timekit.io/',  // API endpoint (do not change)
+    apiVersion:                 'v2'                        // version of API to call (do not change)
+    inputTimestampFormat:       'Y-m-d h:ia',               // default timestamp format that you supply
+    outputTimestampFormat:      'Y-m-d h:ia',               // default timestamp format that you want the API to return
+    timezone:                   'Europe/Copenhagen',        // override user's timezone for custom formatted timestamps in another timezone
+    convertResponseToCamelcase: false                       // should keys in JSON response automatically be converted from snake_case to camelCase?
 });
 
 // Returns current config object
@@ -74,7 +76,7 @@ timekit.setUser(
     apiToken    // [String] access token retrieved from API
 );
 
-// Returns current user object
+// Returns current user that have been set previously (email and apiToken)
 timekit.getUser(); 
 ```
 
@@ -143,33 +145,59 @@ timekit.getUserProperty(data);
 timekit.setUserProperties(data);
 ```
 
-Example:
+Request example:
 ```javascript
 
 timekit.createEvent({
-  start: '2015-10-26T15:45:00+00:07',
-  end: '2015-10-26T17:30:00+00:07',
-  what: 'Coffee with the timelords',
-  where: 'Timekit HQ @ San Francisco',
-  calendar_id: '794f6cca-68b5-11e5-9d70-feff819cdc9f',
-  invite: true
-  participants: ['doc.brown@timekit.io', 'john@doe.com']
+  start:        '2015-10-26T15:45:00+00:07',
+  end:          '2015-10-26T17:30:00+00:07',
+  what:         'Coffee with the timelords',
+  where:        'Timekit HQ @ San Francisco',
+  participants: ['doc.brown@timekit.io', 'john@doe.com'],
+  invite:       true,
+  calendar_id:  '794f6cca-68b5-11e5-9d70-feff819cdc9f'
+}).then(function(response){
+  console.log(response);
+}).catch(function(response){
+  console.log(response);
 });
+```
+
+Response example:
+```javascript
+
+{
+  // data is the response that was provided by the server
+  data: {},
+  // status is the HTTP status code from the server response
+  status: 200,
+  // statusText is the HTTP status message from the server response
+  statusText: 'OK',
+  // headers the headers that the server responded with
+  headers: {},
+  // config is the config that was provided to `axios` for the request
+  config: {}
+}
 ```
 
 ## Usage (lowlevel API)
 
-If you, for some reason, would like direct access to axios's request API, you can call the `timekit.makeRequest()` method. We'll still set the correct config headers and includes, but otherwise it supports all the settings that [axios](https://github.com/mzabriskie/axios) does.
+If you, for some reason, would like direct access to axios's request API, you can call the `timekit.makeRequest()` method directly. We'll still set the correct config headers, base url and includes, but otherwise it supports all the settings that [axios](https://github.com/mzabriskie/axios) does.
 
 Example:
 ```javascript
 
 timekit.makeRequest({
-  url: '/endpointurlhere',
+  url: '/endpoint/goes/here',
   method: 'post',
   data: {
-    key: value
-  }
+    key: 'value'
+  },
+  timeout: 1000
+}).then(function(response){
+  console.log(response);
+}).catch(function(response){
+  console.log(response);
 });
 ```
 
