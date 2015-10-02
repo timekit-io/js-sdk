@@ -80,7 +80,8 @@ timekit.getUser();
 ## Usage (endpoints)
 
 All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the `data` argument should be an object with keys named as referenced in the docs - see: http://developers.timekit.io
-If you supply the keys as camelCased, they wil automatically be converted to snake_case for you. Responses will also be converted to camelCase automatically, which however can be changed in the config.
+
+If you supply keys as camelCased, they will automatically be converted to snake_case for you. Responses can also be converted to camelCase automatically if you set the config variable "convertResponseToCamelcase" to true.
 
 ```javascript
 // Accounts endpoints
