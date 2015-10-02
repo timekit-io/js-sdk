@@ -2,7 +2,7 @@
 
 /*!
  * Timekit JavaScript SDK
- * Version: 0.0.6
+ * Version: 0.0.7
  * http://timekit.io
  *
  * Copyright 2015 Timekit, Inc.
@@ -11,6 +11,7 @@
  */
 var axios = require('axios');
 var base64 = require('base-64');
+var humps = require('humps');
 
 function Timekit() {
 
@@ -29,7 +30,8 @@ function Timekit() {
   var config = {
     app: 'demo',
     apiBaseUrl: 'https://api.timekit.io/',
-    apiVersion: 'v2'
+    apiVersion: 'v2',
+    convertResponseToCamelcase: false
   };
 
   /**
@@ -58,23 +60,44 @@ function Timekit() {
    */
   var makeRequest = function(args) {
 
+    // construct URL with base, version and endpoint
     args.url = buildUrl(args.url);
-    args.headers = {
-      'Timekit-App': config.app,
-    };
 
+    // add http headers if applicable
+    args.headers = { 'Timekit-App': config.app };
     if (userEmail && userApiToken) { args.headers.Authorization = 'Basic ' + encodeAuthHeader(); }
     if (config.inputTimestampFormat) { args.headers['Timekit-InputTimestampFormat'] = config.inputTimestampFormat; }
     if (config.outputTimestampFormat) { args.headers['Timekit-OutputTimestampFormat'] = config.outputTimestampFormat; }
     if (config.timezone) { args.headers['Timekit-Timezone'] = config.timezone; }
 
+    // add dynamic includes if applicable
     if (includes && includes.length > 0) {
       if (args.params === undefined) { args.params = {}; }
       args.params.include = includes.join();
       includes = [];
     }
 
+    // decamelize keys in data objects
+    if (args.data) { args.data = humps.decamelizeKeys(args.data); }
+
+    // register response interceptor for data manipulation
+    var interceptor = axios.interceptors.response.use(function (response) {
+      if(response.data && response.data.data) {
+        response.data = response.data.data;
+        if (config.convertResponseToCamelcase) {
+          response.data = humps.camelizeKeys(response.data);
+        }
+      }
+      return response;
+    }, function (error) {
+      return Promise.reject(error);
+    });
+
+    // execute request!
     var request = axios(args);
+
+    // deregister response interceptor
+    axios.interceptors.response.eject(interceptor);
 
     return request;
   };
@@ -84,6 +107,13 @@ function Timekit() {
    * @type {Object}
    */
   var TK = {};
+
+  /**
+   * Expose the lowlevel makeRequest for the outside to use
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.request = makeRequest;
 
   /**
    * Overwrite default config with supplied settings
@@ -109,8 +139,8 @@ function Timekit() {
    * @type {Function}
    */
   TK.setUser = function(email, apiToken) {
-    if (email){ userEmail = email; }
-    if (apiToken) { userApiToken = apiToken; }
+    userEmail = email;
+    userApiToken = apiToken;
   };
 
   /**
@@ -136,66 +166,6 @@ function Timekit() {
   };
 
   /**
-   * Authenticate a user to retrive API token for future calls
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.auth = function(email, password) {
-
-    var r = makeRequest({
-      url: '/auth',
-      method: 'post',
-      data: {
-        email: email,
-        password: password
-      }
-    });
-
-    r.then(function(response) {
-      TK.setUser(response.data.data.email, response.data.data.api_token);
-    });
-
-    return r;
-
-  };
-
-  /**
-   * Find mutual availability across multiple users/calendars
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.findTime = function(emails, filters, future, length, sort) {
-
-    return makeRequest({
-      url: '/findtime',
-      method: 'post',
-      data: {
-        emails: emails,
-        filters: filters,
-        future: future,
-        length: length,
-        sort: sort
-      }
-    });
-
-  };
-
-  /**
-   * Find mutual availability across multiple users/calendars
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.findTimeBulk = function(data) {
-
-    return makeRequest({
-      url: '/findtime/bulk',
-      method: 'post',
-      data: data
-    });
-
-  };
-
-  /**
    * Get user's connected accounts
    * @type {Function}
    * @return {Promise}
@@ -214,11 +184,11 @@ function Timekit() {
    * @type {Function}
    * @return {String}
    */
-  TK.accountGoogleSignup = function(shouldRedirect, callback) {
+  TK.accountGoogleSignup = function(data, shouldAutoRedirect) {
 
-    var url = buildUrl('/accounts/google/signup') + '?Timekit-App=' + config.app + (callback ? '&callback=' + callback : '');
+    var url = buildUrl('/accounts/google/signup') + '?Timekit-App=' + config.app + (data && data.callback ? '&callback=' + data.callback : '');
 
-    if(shouldRedirect && window) {
+    if(shouldAutoRedirect && window) {
       window.location.href = url;
     } else {
       return url;
@@ -228,7 +198,7 @@ function Timekit() {
 
   /**
    * Get user's Google calendars
-   * @type {Function}
+   * @type {Function
    * @return {Promise}
    */
   TK.getAccountGoogleCalendars = function() {
@@ -255,6 +225,104 @@ function Timekit() {
   };
 
   /**
+   * Authenticate a user to retrive API token for future calls
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.auth = function(data) {
+
+    var r = makeRequest({
+      url: '/auth',
+      method: 'post',
+      data: data
+    });
+
+    r.then(function(response) {
+      TK.setUser(response.data.email, response.data.api_token);
+    }).catch(function(){
+      TK.setUser('','');
+    });
+
+    return r;
+
+  };
+
+  /**
+   * Get list of apps
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getApps = function() {
+
+    return makeRequest({
+      url: '/apps',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get settings for a specific app
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getApp = function(data) {
+
+    return makeRequest({
+      url: '/apps/' + data.slug,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Create a new Timekit app
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createApp = function(data) {
+
+    return makeRequest({
+      url: '/apps',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Update settings for a specific app
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateApp = function(data) {
+
+    var slug = data.slug;
+    delete data.slug;
+
+    return makeRequest({
+      url: '/apps/' + slug,
+      method: 'put',
+      data: data
+    });
+
+  };
+
+  /**
+   * Delete an app
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.deleteApp = function(data) {
+
+    return makeRequest({
+      url: '/apps/' + data.slug,
+      method: 'delete'
+    });
+
+  };
+
+  /**
    * Get users calendars that are present on Timekit (synced from providers)
    * @type {Function}
    * @return {Promise}
@@ -273,11 +341,26 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getCalendar = function(id) {
+  TK.getCalendar = function(data) {
 
     return makeRequest({
-      url: '/calendars/' + id,
+      url: '/calendars/' + data.id,
       method: 'get'
+    });
+
+  };
+
+  /**
+   * Create a new calendar for current user
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createCalendar = function(data) {
+
+    return makeRequest({
+      url: '/calendars/',
+      method: 'post',
+      data: data
     });
 
   };
@@ -287,10 +370,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.deleteCalendar = function(id) {
+  TK.deleteCalendar = function(data) {
 
     return makeRequest({
-      url: '/calendars/' + id,
+      url: '/calendars/' + data.id,
       method: 'delete'
     });
 
@@ -315,38 +398,12 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getEvents = function(start, end) {
+  TK.getEvents = function(data) {
 
     return makeRequest({
       url: '/events',
       method: 'get',
-      params: {
-        start: start,
-        end: end
-      }
-    });
-
-  };
-
-  /**
-   * Create a new event
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.createEvent = function(start, end, what, where, calendarToken, invite, participants) {
-
-    return makeRequest({
-      url: '/events',
-      method: 'post',
-      data: {
-        start: start,
-        end: end,
-        what: what,
-        where: where,
-        calendar_id: calendarToken,
-        invite: invite,
-        participants: participants
-      }
+      params: data
     });
 
   };
@@ -361,6 +418,21 @@ function Timekit() {
     return makeRequest({
       url: '/events/' + id,
       method: 'get'
+    });
+
+  };
+
+  /**
+   * Create a new event
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createEvent = function(data) {
+
+    return makeRequest({
+      url: '/events',
+      method: 'post',
+      data: data
     });
 
   };
@@ -384,16 +456,42 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getAvailability = function(start, end, email) {
+  TK.getAvailability = function(data) {
 
     return makeRequest({
       url: '/events/availability',
       method: 'get',
-      params: {
-        start: start,
-        end: end,
-        email: email
-      }
+      params: data
+    });
+
+  };
+
+  /**
+   * Find mutual availability across multiple users/calendars
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.findTime = function(data) {
+
+    return makeRequest({
+      url: '/findtime',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Find mutual availability across multiple users/calendars
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.findTimeBulk = function(data) {
+
+    return makeRequest({
+      url: '/findtime/bulk',
+      method: 'post',
+      data: data
     });
 
   };
@@ -417,10 +515,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getMeeting = function(id) {
+  TK.getMeeting = function(data) {
 
     return makeRequest({
-      url: '/meetings/' + id,
+      url: '/meetings/' + data.id,
       method: 'get'
     });
 
@@ -431,16 +529,12 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.createMeeting = function(what, where, suggestions) {
+  TK.createMeeting = function(data) {
 
     return makeRequest({
       url: '/meetings',
       method: 'post',
-      data: {
-        what: what,
-        where: where,
-        suggestions: suggestions
-      }
+      data: data
     });
 
   };
@@ -450,7 +544,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.updateMeeting = function(id, data) {
+  TK.updateMeeting = function(data) {
+
+    var id = data.id;
+    delete data.id;
 
     return makeRequest({
       url: '/meetings/' + id,
@@ -465,15 +562,12 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.setMeetingAvailability = function(suggestionId, available) {
+  TK.setMeetingAvailability = function(data) {
 
     return makeRequest({
       url: '/meetings/availability',
       method: 'post',
-      data: {
-        suggestion_id: suggestionId,
-        available: available
-      }
+      data: data
     });
 
   };
@@ -483,14 +577,12 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.bookMeeting = function(suggestionId) {
+  TK.bookMeeting = function(data) {
 
     return makeRequest({
       url: '/meetings/book',
       method: 'post',
-      data: {
-        suggestion_id: suggestionId
-      }
+      data: data
     });
 
   };
@@ -500,14 +592,15 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.inviteToMeeting = function(id, emails) {
+  TK.inviteToMeeting = function(data) {
+
+    var id = data.id;
+    delete data.id;
 
     return makeRequest({
       url: '/meetings/' + id + '/invite',
       method: 'post',
-      data: {
-        emails: emails
-      }
+      data: data
     });
 
   };
@@ -517,18 +610,12 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.createUser = function(firstName, lastName, email, password, timezone) {
+  TK.createUser = function(data) {
 
     return makeRequest({
       url: '/users',
       method: 'post',
-      data: {
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-        password: password,
-        timezone: timezone
-      }
+      data: data
     });
 
   };
@@ -563,6 +650,21 @@ function Timekit() {
   };
 
   /**
+   * Reset password for a user
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.resetUserPassword = function(data) {
+
+    return makeRequest({
+      url: '/users/resetpassword',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
    * Get a user property by key
    * @type {Function}
    * @return {Promise}
@@ -581,10 +683,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getUserProperty = function(key) {
+  TK.getUserProperty = function(data) {
 
     return makeRequest({
-      url: '/properties/' + key,
+      url: '/properties/' + data.key,
       method: 'get'
     });
 
@@ -601,81 +703,6 @@ function Timekit() {
       url: '/properties',
       method: 'put',
       data: data
-    });
-
-  };
-
-  /**
-   * Create a new Timekit app
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.createApp = function(name, settings) {
-
-    return makeRequest({
-      url: '/apps',
-      method: 'post',
-      data: {
-        name: name,
-        settings: settings
-      }
-    });
-
-  };
-
-  /**
-   * Get list of apps
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.getApps = function() {
-
-    return makeRequest({
-      url: '/apps',
-      method: 'get'
-    });
-
-  };
-
-  /**
-   * Get settings for a specific app
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.getApp = function(slug) {
-
-    return makeRequest({
-      url: '/apps/' + slug,
-      method: 'get'
-    });
-
-  };
-
-  /**
-   * Update settings for a specific app
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.updateApp = function(slug, data) {
-
-    return makeRequest({
-      url: '/apps/' + slug,
-      method: 'put',
-      data: data
-    });
-
-  };
-
-  /**
-   * Delete an app
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.deleteApp = function(slug) {
-
-    return makeRequest({
-      url: '/apps/' + slug,
-      method: 'delete'
     });
 
   };
