@@ -16,7 +16,7 @@ var fixtures = {
 /**
  * Call API endpoints that requires auth headers
  */
-describe('API endpoints using dynamic includes', function() {
+describe('Dynamic includes', function() {
 
   beforeEach(function() {
     jasmine.Ajax.install();
@@ -45,30 +45,26 @@ describe('API endpoints using dynamic includes', function() {
       response = res;
     });
 
-    setTimeout(function () {
+    utils.tick(function () {
       request = jasmine.Ajax.requests.mostRecent();
 
       request.respondWith({
         status: 200,
-        statusText: 'OK',
-        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
       });
 
-      setTimeout(function () {
+      utils.tick(function () {
         // Response data
         expect(response.status).toBe(200);
         expect(response.data).toBeDefined();
-        expect(typeof response.data.data.email).toBe('string');
+        expect(typeof response.data.email).toBe('string');
         // Dynamic include query params
         expect(response.config.params).toBeDefined();
         expect(response.config.params.include).toBe(fixtures.includesSingle.join());
         expect(request.url).toBe(fixtures.apiBaseUrl + 'v2/users/me?include=' + fixtures.includesSingle.join());
         done();
-      }, 0);
-    }, 0);
+      });
+    });
 
   });
 
@@ -82,30 +78,26 @@ describe('API endpoints using dynamic includes', function() {
       response = res;
     });
 
-    setTimeout(function () {
+    utils.tick(function () {
       request = jasmine.Ajax.requests.mostRecent();
 
       request.respondWith({
         status: 200,
-        statusText: 'OK',
-        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
       });
 
-      setTimeout(function () {
+      utils.tick(function () {
         // Response data
         expect(response.status).toBe(200);
         expect(response.data).toBeDefined();
-        expect(typeof response.data.data.email).toBe('string');
+        expect(typeof response.data.email).toBe('string');
         // Dynamic include query params
         expect(response.config.params).toBeDefined();
         expect(response.config.params.include).toBe(fixtures.includesMulti.join());
         expect(request.url).toBe(fixtures.apiBaseUrl + 'v2/users/me?include=' + fixtures.includesMulti.join());
         done();
-      }, 0);
-    }, 0);
+      });
+    });
 
   });
 
@@ -114,35 +106,33 @@ describe('API endpoints using dynamic includes', function() {
 
     timekit
     .include(fixtures.includesMulti[0],fixtures.includesMulti[1])
-    .getCalendar('123')
+    .getCalendar({
+      id: '123'
+    })
     .then(function(res) {
       response = res;
     });
 
-    setTimeout(function () {
+    utils.tick(function () {
       request = jasmine.Ajax.requests.mostRecent();
 
       request.respondWith({
         status: 200,
-        statusText: 'OK',
-        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
       });
 
-      setTimeout(function () {
+      utils.tick(function () {
         // Response data
         expect(response.status).toBe(200);
         expect(response.data).toBeDefined();
-        expect(typeof response.data.data.email).toBe('string');
+        expect(typeof response.data.email).toBe('string');
         // Dynamic include query params
         expect(response.config.params).toBeDefined();
         expect(response.config.params.include).toBe(fixtures.includesMulti.join());
         expect(request.url).toBe(fixtures.apiBaseUrl + 'v2/calendars/123?include=' + fixtures.includesMulti.join());
         done();
-      }, 0);
-    }, 0);
+      });
+    });
 
   });
 
@@ -156,29 +146,25 @@ describe('API endpoints using dynamic includes', function() {
       response = res;
     });
 
-    setTimeout(function () {
+    utils.tick(function () {
       request = jasmine.Ajax.requests.mostRecent();
 
       request.respondWith({
         status: 200,
-        statusText: 'OK',
-        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
       });
 
-      setTimeout(function () {
+      utils.tick(function () {
         // Response data
         expect(response.status).toBe(200);
         expect(response.data).toBeDefined();
-        expect(typeof response.data.data.email).toBe('string');
+        expect(typeof response.data.email).toBe('string');
         // Dynamic include query params
         expect(response.config.params).toBeUndefined();
         expect(request.url).toBe(fixtures.apiBaseUrl + 'v2/users/me');
         done();
-      }, 0);
-    }, 0);
+      });
+    });
 
   });
 
@@ -195,33 +181,29 @@ describe('API endpoints using dynamic includes', function() {
       response = res;
     });
 
-    setTimeout(function () {
+    utils.tick(function () {
       request = jasmine.Ajax.requests.mostRecent();
 
       request.respondWith({
         status: 200,
-        statusText: 'OK',
-        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
       });
 
-      setTimeout(function () {
+      utils.tick(function () {
         // Response data
         expect(response.status).toBe(200);
         expect(response.data).toBeDefined();
-        expect(typeof response.data.data.email).toBe('string');
+        expect(typeof response.data.email).toBe('string');
         // Dynamic include query params
         expect(response.config.params).toBeDefined();
         expect(response.config.params.include).toBe(fixtures.includesMulti.join());
         expect(request.url).toBe(fixtures.apiBaseUrl + 'v2/users/me?include=' + fixtures.includesMulti.join());
-      }, 0);
-    }, 0);
+      });
+    });
 
     // Second request
 
-    setTimeout(function () {
+    utils.tick(function () {
 
       var response2, request2;
 
@@ -231,33 +213,29 @@ describe('API endpoints using dynamic includes', function() {
         response2 = res;
       });
 
-      setTimeout(function () {
+      utils.tick(function () {
         request2 = jasmine.Ajax.requests.mostRecent();
 
         request2.respondWith({
           status: 200,
-          statusText: 'OK',
-          responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
         });
 
-        setTimeout(function () {
+        utils.tick(function () {
           // Response2 data
           expect(response2.status).toBe(200);
           expect(response2.data).toBeDefined();
-          expect(typeof response2.data.data.email).toBe('string');
+          expect(typeof response2.data.email).toBe('string');
           // Dynamic include query params
           expect(response2.config.params).toBeUndefined();
           expect(request2.url).toBe(fixtures.apiBaseUrl + 'v2/users/me');
-        }, 0);
-      }, 0);
-    }, 10);
+        });
+      });
+    }, 50);
 
     // Third request
 
-    setTimeout(function () {
+    utils.tick(function () {
       var response3, request3;
 
       timekit
@@ -267,31 +245,27 @@ describe('API endpoints using dynamic includes', function() {
         response3 = res;
       });
 
-      setTimeout(function () {
+      utils.tick(function () {
         request3 = jasmine.Ajax.requests.mostRecent();
 
         request3.respondWith({
           status: 200,
-          statusText: 'OK',
-          responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
         });
 
-        setTimeout(function () {
+        utils.tick(function () {
           // Response3 data
           expect(response3.status).toBe(200);
           expect(response3.data).toBeDefined();
-          expect(typeof response3.data.data.email).toBe('string');
+          expect(typeof response3.data.email).toBe('string');
           // Dynamic include query params
           expect(response3.config.params).toBeDefined();
           expect(response3.config.params.include).toBe(fixtures.includesSingle.join());
           expect(request3.url).toBe(fixtures.apiBaseUrl + 'v2/users/me?include=' + fixtures.includesSingle.join());
           done();
-        }, 0);
-      }, 0);
-    }, 20);
+        });
+      });
+    }, 100);
 
   });
 
