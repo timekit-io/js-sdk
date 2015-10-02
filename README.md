@@ -20,6 +20,7 @@ The following libraries are bundled together with the SDK:
 
 - [axios](https://github.com/mzabriskie/axios) - a promise-based HTTP client for the browser (using [XMLHttpRequests](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)) and node.js (using [http](http://nodejs.org/api/http.html))
 - [base64](https://github.com/mathiasbynens/base64) - a robust base64 encoder/decoder, used for basic auth headers
+- [humps](https://github.com/domchristie/humps) - easy conversion from camelCase to snake_case and vice versa
 
 ## Module loading
 
