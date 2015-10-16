@@ -3,7 +3,7 @@
 [![Circle CI](https://img.shields.io/circleci/project/timekit-io/js-sdk.svg)](https://circleci.com/gh/timekit-io/js-sdk)
 [![Code Coverage](https://img.shields.io/badge/coverage-92%25-green.svg)](https://github.com/timekit-io/js-sdk)
 
-**Latest release:**  *v0.0.7*
+**Latest release:**  *v1.0.0*
 
 Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [developers.timekit.io](http://developers.timekit.io).
 
@@ -20,178 +20,190 @@ The following libraries are bundled together with the SDK:
 
 - [axios](https://github.com/mzabriskie/axios) - a promise-based HTTP client for the browser (using [XMLHttpRequests](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)) and node.js (using [http](http://nodejs.org/api/http.html))
 - [base64](https://github.com/mathiasbynens/base64) - a robust base64 encoder/decoder, used for basic auth headers
+- [humps](https://github.com/domchristie/humps) - easy conversion from camelCase to snake_case and vice versa
 
-## Installation
+## Module loading
 
-Comes in two flavours: minified (21.3 kb) and plain. See `/dist` folder.
+The SDK is UMD (Universal Module Definition) compatible, which means that it can be loaded in various module formats across both browsers and server.
 
-## Usage/module loading
+*Note: Use plain or minified builds in `/dist` when using in browser. In node, `/src/timekit.js` will be used through npm (or reference it manually in your require)*
 
-The SDK is UMD (Universal Module Definition) compatible, which means that it can be loaded in various module formats:
-See `/examples` for implementation examples.
 
-**AMD (with e.g. require.js)**
+**AMD (with e.g. require.js)**  
 ```javascript
-requirejs(['timekit'], function(timekit) {
+require(['timekit'], function(timekit) {
     console.log(timekit);
 });
 ```
 
-**CommonJS2 (in e.g. node.js)**
+**CommonJS2 (in e.g. node.js)**  
 ```javascript
 var timekit = require('timekit');
 console.log(timekit);
-
 ```
-*Note: use src/timekit.js directly in node.js for now, dist/timekit.js wont work*
 
-**As a global variable (old-school)**
-```html
+**As a global variable (in browsers)**  
+```javascript
 <script src="timekit.js"></script>
 <script>
     console.log(timekit);
 </script>
 ```
 
-## Endpoints and methods
+See `/examples` for implementation examples.
+
+## Usage (init)
+Using the SDK is easy. For default behaviour, you don't need to set any configuration. In case you need to, here's the available options:
 
 ```javascript
-// overwrites default config with supplied object, possible keys with default values below
+// Overwrites default config with supplied object, possible keys with default values below
 timekit.configure({
-    app:        'demo'                      // app name registered with timekit (get in touch)
-    apiBaseUrl: 'https://api.timekit.io/',  // API endpoint (do not change)
-    apiVersion: 'v2'                        // version of API to call (do not change)
-    inputTimestampFormat:  'Y-m-d h:ia',    // default timestamp format that you supply
-    outputTimestampFormat: 'Y-m-d h:ia',    // default timestamp format that you want the API to return
-    timezone:   'Europe/Copenhagen'         // override user's timezone for custom formatted timestamps in another timezone
+    app:                        'demo'                      // app name registered with timekit (get in touch)
+    apiBaseUrl:                 'https://api.timekit.io/',  // API endpoint (do not change)
+    apiVersion:                 'v2'                        // version of API to call (do not change)
+    inputTimestampFormat:       'Y-m-d h:ia',               // default timestamp format that you supply
+    outputTimestampFormat:      'Y-m-d h:ia',               // default timestamp format that you want the API to return
+    timezone:                   'Europe/Copenhagen',        // override user's timezone for custom formatted timestamps in another timezone
+    convertResponseToCamelcase: false                       // should keys in JSON response automatically be converted from snake_case to camelCase?
 });
 
-// returns current config object
+// Returns current config object
 timekit.getConfig(); 
 
-// set the user to auth with (gets automatically set after timekit.auth())
+// Set the user to auth with (gets automatically set after timekit.auth())
 timekit.setUser(
     email,      // [String] email of the user
     apiToken    // [String] access token retrieved from API
 );
 
-timekit.auth(
-    email,      // [String] email of the user
-    password    // [String] password of the user
-);
+// Returns current user that have been set previously (email and apiToken)
+timekit.getUser(); 
+```
 
-timekit.findTime(
-    emails,     // [Array] list of emails as strings for users
-    filters,    // [Mixed] specify advanced filters to slice data (see http://developers.timekit.io/v2/docs/find-time-filters)
-    future,     // [String] max time into the future, written as "3 months"
-    length,     // [String] length of the timeslots, written as "30 minutes"
-    sort        // [String] how should the resulting events be sorted (asc or desc)
-);
+## Usage (endpoints)
 
-timekit.getAccoutns();
+All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the `data` argument should be an object with keys named as referenced in the docs - see: http://developers.timekit.io
 
-timekit.accountGoogleSignup(
-    shouldRedirect // [Boolean] automatically redirect the browser to the google url?
-);
+If you supply keys as camelCased, they will automatically be converted to snake_case for you. Responses can also be converted to camelCase automatically if you set the config variable "convertResponseToCamelcase" to true.
 
+Endpoints/methods:
+
+```javascript
+// Accounts endpoints
+timekit.getAccounts();
+timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
 timekit.getAccountGoogleCalendars();
-
 timekit.accountSync();
 
+// Auth endpoints
+timekit.auth(data);
+
+// Apps endpoints
+timekit.getApps();
+timekit.getApp(data);
+timekit.createApp(data);
+timekit.updateApp(data);
+timekit.deleteApp(data);
+
+// Calendars endpoints
 timekit.getCalendars();
+timekit.getCalendar(data);
+timekit.createCalendar(data);
+timekit.deleteCalendar(data);
 
-timekit.getCalendar(
-    id          // [String] id of the calendar to fetch (get with timekit.getCalendars())
-);
-
+// Contacts endpoints
 timekit.getContacts();
 
-timekit.getEvents(
-    start,      // [Timestamp] which point in time to get events from
-    end         // [Timestamp] which point in time to get events to
-);
+// Events endpoints
+timekit.getEvents(data);
+timekit.getEvent(data);
+timekit.createEvent(data);
+timekit.getAvailability(data);
 
-timekit.getAvailability(
-    start,      // [Timestamp] which point in time to get events from
-    end,        // [Timestamp] which point in time to get events to
-    email       // [String] email of the user to get events from
-);
+// FindTime endpoints
+timekit.findTime(data);
+timekit.findTimeBulk(data);
 
+// Meetings endpoints
 timekit.getMeetings();
+timekit.getMeeting(data);
+timekit.createMeeting(data);
+timekit.updateMeeting(data);
+timekit.setMeetingAvailability(data);
+timekit.bookMeeting(data);
+timekit.inviteToMeeting(data);
 
-timekit.getMeeting(
-    id          // [String] the meeting id to fetch info for
-);
-
-timekit.createMeeting(
-    what,       // [String] the title of the meeting
-    where,      // [String] the location of the meeting
-    suggestions // [Array] time suggestions for the meeting, as object with 'start' and 'end' timestamps
-);
-
-timekit.updateMeeting(
-    id,         // [String] the meeting id
-    data        // [Object] meeting data to update (what & where as key value pairs)
-);
-
-timekit.setMeetingAvailability(
-    suggestionId, // [Number] the suggestion ID to update availability for
-    available   // [Boolean] is the user avaialable on the suggestion? true or false
-);
-
-timekit.bookMeeting(
-    suggestionId // [Number] which suggestion to book the meeting 
-);
-
-timekit.inviteToMeeting(
-    id,         // [String] the id of the meeting to invite to
-    emails      // [Array] which emails to send the invitiation to
-);
-
-timekit.createUser(
-    firstName,  // [String] first name of the user
-    lastName    // [String] last name of the user
-    email,      // [String] email of the user
-    password,   // [String] password of the user
-    timezone    // [String] timezone that the user is in (formatted as Europe/Copenhagen)
-);
-
+// Users endpoints
+timekit.createUser(data);
 timekit.getUserInfo();
+timekit.updateUser(data);
+timekit.resetUserPassword(data);
 
-timekit.updateUser(
-    data        // [Object] key value pair of user fields to update (e.g. first_name or timezone)
-);
-
+// User properties endpoints
 timekit.getUserProperties();
+timekit.getUserProperty(data);
+timekit.setUserProperties(data);
+```
 
-timekit.getUserProperty(
-    key         // [String] the user property key to get (can be any custom string)
-);
+Request example:
+```javascript
 
-timekit.setUserProperties(
-    data        // [Object] key value pairs with the user properties to set or overwrite
-);
+timekit.createEvent({
+  start:        '2015-10-26T15:45:00+00:07',
+  end:          '2015-10-26T17:30:00+00:07',
+  what:         'Coffee with the timelords',
+  where:        'Timekit HQ @ San Francisco',
+  participants: ['doc.brown@timekit.io', 'john@doe.com'],
+  invite:       true,
+  calendar_id:  '794f6cca-68b5-11e5-9d70-feff819cdc9f'
+}).then(function(response){
+  console.log(response);
+}).catch(function(response){
+  console.log(response);
+});
+```
 
-timekit.createApp(
-    name,        // [String] Human friendly name of the Timekit app (will be slugged automatically)
-    settings     // [Object] Contain key/value pairs of settings like 'contact_name', 'contact_email' & 'callback'
-);
+Response example:
+```javascript
 
-timekit.getApps();
+{
+  // data is the response that was provided by the server
+  data: {},
+  // status is the HTTP status code from the server response
+  status: 200,
+  // statusText is the HTTP status message from the server response
+  statusText: 'OK',
+  // headers the headers that the server responded with
+  headers: {},
+  // config is the config that was provided to `axios` for the request
+  config: {}
+}
+```
 
-timekit.getApp(
-    slug         // [String] Slug of the Timekit app you want to retrieve
-);
+## Usage (lowlevel API)
 
-timekit.updateApp(
-    slug,        // [String] Slug of the Timekit app you want to update
-    data         // [Object] Settings for the app you want to update (e.g. key 'callback')
-);
+If you, for some reason, would like direct access to axios's request API, you can call the `timekit.makeRequest()` method directly. We'll still set the correct config headers, base url and includes, but otherwise it supports all the settings that [axios](https://github.com/mzabriskie/axios) does.
+
+Example:
+```javascript
+
+timekit.makeRequest({
+  url: '/endpoint/goes/here',
+  method: 'post',
+  data: {
+    key: 'value'
+  },
+  timeout: 1000
+}).then(function(response){
+  console.log(response);
+}).catch(function(response){
+  console.log(response);
+});
 ```
 
 ## Dynamic includes
 
-The Timekit API have support for [dynamically including related objects](http://developers.timekit.io/docs/dynamic-includes) (aka. expand objects). We supports this functionality by providing a chainable/fluent method called `.include()` that can be called right before a request. 
+The Timekit API have support for [dynamically including related models](http://developers.timekit.io/docs/dynamic-includes) (aka. expand objects). We supports this functionality by providing a chainable/fluent method called `.include()` that can be called right before a request.
 
 The method takes unlimited string arguments, with each one being a model that you want included in the response. For nested data (e.g. events grouped by calendar), use the dot notation to dig into relations, like `calender.events`.
 
@@ -238,7 +250,5 @@ karma start
 ## Roadmap/todos
 
 Stuff to do, among others:
-- Support for dynamic includes (potentially restructure method arguments)
-- Add to bower and npm (when we hit v0.1.0)
+- Add to bower and npm (when we hit v1.0.0)
 - Make standalone version without dependencies bundled
-- Fix CommonJS2 webpack build (some Axios dependency error)

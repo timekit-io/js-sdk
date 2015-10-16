@@ -1,5 +1,7 @@
 'use strict';
 
+var utils = require('./helpers/utils');
+
 var fixtures = {
   app:            'demo',
   apiBaseUrl:     'http://api-localhost.timekit.io/',
@@ -10,7 +12,7 @@ var fixtures = {
 /**
  * Load the library using different UMD module loaders
  */
-describe('Library module loaders', function() {
+describe('Module loaders', function() {
   beforeEach(function(){
     jasmine.Ajax.install();
   });
@@ -19,25 +21,27 @@ describe('Library module loaders', function() {
     jasmine.Ajax.uninstall();
   });
 
-  it('should be able load via CommonjS2', function(done) {
-    var timekit = require('../dist/timekit.js');
+  it('should be able to load via CommonJS2', function(done) {
+    var timekitCommonJS = require('../dist/timekit.js');
 
-    expect(typeof timekit).toEqual('object');
-    expect(typeof timekit.auth).toEqual('function');
+    expect(typeof timekitCommonJS).toEqual('object');
+    expect(typeof timekitCommonJS.auth).toEqual('function');
 
-    timekit.configure({
+    timekitCommonJS.configure({
       app: fixtures.app,
       apiBaseUrl: fixtures.apiBaseUrl
     });
 
     var response, request;
 
-    timekit.auth(fixtures.userEmail, fixtures.userPassword)
-    .then(function(res) {
+    timekitCommonJS.auth({
+      email: fixtures.userEmail,
+      password: fixtures.userPassword
+    }).then(function(res) {
       response = res;
     });
 
-    setTimeout(function () {
+    utils.tick(function () {
       request = jasmine.Ajax.requests.mostRecent();
 
       request.respondWith({
@@ -49,37 +53,39 @@ describe('Library module loaders', function() {
         }
       });
 
-      setTimeout(function () {
-        expect(response.data.data.email).toBeDefined();
-        expect(typeof response.data.data.email).toBe('string');
-        expect(response.data.data.api_token).toBeDefined();
-        expect(typeof response.data.data.api_token).toBe('string');
+      utils.tick(function () {
+        expect(response.data.email).toBeDefined();
+        expect(typeof response.data.email).toBe('string');
+        expect(response.data.api_token).toBeDefined();
+        expect(typeof response.data.api_token).toBe('string');
         done();
-      }, 0);
-    }, 0);
+      });
+    });
 
   });
 
-  it('should be able load via AMD (Require.js)', function(done) {
+  it('should be able to load via AMD (Require.js)', function(done) {
 
-    require(['../dist/timekit.js'], function (timekit) {
+    require(['../dist/timekit.js'], function (timekitRequireJS) {
 
-      expect(typeof timekit).toEqual('object');
-      expect(typeof timekit.auth).toEqual('function');
+      expect(typeof timekitRequireJS).toEqual('object');
+      expect(typeof timekitRequireJS.auth).toEqual('function');
 
-      timekit.configure({
+      timekitRequireJS.configure({
         app: fixtures.app,
         apiBaseUrl: fixtures.apiBaseUrl
       });
 
       var request, response;
 
-      timekit.auth(fixtures.userEmail, fixtures.userPassword)
-      .then(function(res) {
+      timekitRequireJS.auth({
+        email: fixtures.userEmail,
+        password: fixtures.userPassword
+      }).then(function(res) {
         response = res;
       });
 
-      setTimeout(function () {
+      utils.tick(function () {
         request = jasmine.Ajax.requests.mostRecent();
 
         request.respondWith({
@@ -91,14 +97,14 @@ describe('Library module loaders', function() {
           }
         });
 
-        setTimeout(function () {
-          expect(response.data.data.email).toBeDefined();
-          expect(typeof response.data.data.email).toBe('string');
-          expect(response.data.data.api_token).toBeDefined();
-          expect(typeof response.data.data.api_token).toBe('string');
+        utils.tick(function () {
+          expect(response.data.email).toBeDefined();
+          expect(typeof response.data.email).toBe('string');
+          expect(response.data.api_token).toBeDefined();
+          expect(typeof response.data.api_token).toBe('string');
           done();
-        }, 0);
-      }, 0);
+        });
+      });
 
     });
 

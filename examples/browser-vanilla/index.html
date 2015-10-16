@@ -27,16 +27,23 @@
           });
         </code><br /><br />
         <code>
-          timekit.auth('doc.brown@timekit.io', 'DeLorean').then(function(response) {<br />
+          timekit.auth({<br />
+            &nbsp;&nbsp;email: 'doc.brown@timekit.io',<br />
+            &nbsp;&nbsp;password: 'DeLorean'<br />
+          }).then(function(response) {<br />
             &nbsp;&nbsp;console.log('user authenticated!');<br />
             &nbsp;&nbsp;console.log(response);<br />
-          }).catch(function(response) {
+          }).catch(function(response) {<br />
             &nbsp;&nbsp;console.log('an error occured!');<br />
             &nbsp;&nbsp;console.log(response);<br />
           });
         </code><br /><br />
         <code>
-          timekit.findTime(['doc.brown@timekit.io', 'marty.mcfly@timekit.io'], '3 days', '30 minutes').then(function(response) {<br />
+          timekit.findTime({<br />
+            &nbsp;&nbsp;emails: ['doc.brown@timekit.io', 'marty.mcfly@timekit.io'],<br />
+            &nbsp;&nbsp;future: '3 days',<br />
+            &nbsp;&nbsp;duration: '30 minutes'<br />
+          }).then(function(response) {<br />
             &nbsp;&nbsp;console.log('find time OK, heres the result:');<br />
             &nbsp;&nbsp;console.log(response);<br />
           });
