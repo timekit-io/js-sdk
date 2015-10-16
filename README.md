@@ -31,7 +31,7 @@ The SDK is UMD (Universal Module Definition) compatible, which means that it can
 
 **AMD (with e.g. require.js)**  
 ```javascript
-requirejs(['timekit'], function(timekit) {
+require(['timekit'], function(timekit) {
     console.log(timekit);
 });
 ```
