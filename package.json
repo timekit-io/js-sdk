@@ -1,7 +1,7 @@
 {
-  "name": "timekit-js-sdk",
+  "name": "timekit-sdk",
   "version": "1.0.0",
-  "description": "JavaScript SDK for the Timekit API",
+  "description": "JavaScript SDK for the Timekit API (timekit.io)",
   "main": "src/timekit.js",
   "repository": {
     "type": "git",
@@ -11,7 +11,7 @@
     "test": "./node_modules/karma/bin/karma start"
   },
   "keywords": [
-    "Timekit"
+    "Timekit", "timekit.io", "calendars", "calendar", "scheduling", "schedule", "book", "booking", "appointment", "appointments"
   ],
   "author": "Timekit Inc.",
   "license": "MIT",
