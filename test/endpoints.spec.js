@@ -112,6 +112,7 @@ describe('Endpoints', function() {
       'getUserInfo': 0,
       'updateUser': 1,
       'resetUserPassword': 1,
+      'getUserTimezone': 1,
 
       // User properties
       'getUserProperties': 0,

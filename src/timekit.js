@@ -2,7 +2,7 @@
 
 /*!
  * Timekit JavaScript SDK
- * Version: 1.0.0
+ * Version: 1.1.0
  * http://timekit.io
  *
  * Copyright 2015 Timekit, Inc.
@@ -407,10 +407,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getEvent = function(id) {
+  TK.getEvent = function(data) {
 
     return TK.makeRequest({
-      url: '/events/' + id,
+      url: '/events/' + data.id,
       method: 'get'
     });
 
@@ -436,10 +436,10 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.deleteEvent = function(id) {
+  TK.deleteEvent = function(data) {
 
     return TK.makeRequest({
-      url: '/events/' + id,
+      url: '/events/' + data.id,
       method: 'delete'
     });
 
@@ -654,6 +654,20 @@ function Timekit() {
       url: '/users/resetpassword',
       method: 'post',
       data: data
+    });
+
+  };
+
+  /**
+   * Get a specific users' timezone
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getUserTimezone = function(data) {
+
+    return TK.makeRequest({
+      url: '/users/timezone/' + data.email,
+      method: 'get'
     });
 
   };
