@@ -715,6 +715,21 @@ function Timekit() {
 
   };
 
+  /**
+   * Create a new pair of auth credentials
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createCredentials = function(data) {
+
+    return TK.makeRequest({
+      url: '/credentials',
+      method: 'post',
+      data: data
+    });
+
+  };
+
   return TK;
 
 }
