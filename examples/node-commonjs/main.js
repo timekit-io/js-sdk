@@ -2,7 +2,7 @@
 
 var timekit = require('../../src/timekit.js');
 
-console.log('timekit.js loaded!');
+console.log('timekit sdk loaded!');
 
 timekit.configure({
   app: 'demo',

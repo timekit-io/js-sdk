@@ -22,9 +22,9 @@
         <p>First we load require.js and then require timekit.js as a dependency - see the page source code. When loaded, we can perform calls using the SDK.</p>
         <script type="text/javascript" src="http://requirejs.org/docs/release/2.1.18/minified/require.js"></script>
         <script type="text/javascript">
-          requirejs(['../../dist/timekit.js'], function(timekit) {
+          requirejs(['../../dist/timekit-sdk.js'], function(timekit) {
 
-            console.log('timekit.js loaded!');
+            console.log('timekit sdk loaded!');
 
             timekit.configure({
               app: 'demo',

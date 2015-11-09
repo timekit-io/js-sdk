@@ -44,7 +44,7 @@ console.log(timekit);
 
 **As a global variable (in browsers)**  
 ```javascript
-<script src="timekit.js"></script>
+<script src="timekit-sdk.js"></script>
 <script>
     console.log(timekit);
 </script>
