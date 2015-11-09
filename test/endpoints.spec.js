@@ -112,11 +112,17 @@ describe('Endpoints', function() {
       'getUserInfo': 0,
       'updateUser': 1,
       'resetUserPassword': 1,
+      'getUserTimezone': 1,
 
       // User properties
       'getUserProperties': 0,
       'getUserProperty': 1,
-      'setUserProperties': 1
+      'setUserProperties': 1,
+
+      // Credentials
+      'getCredentials': 0,
+      'createCredential': 1,
+      'deleteCredential': 1
     }
 
     Object.keys(methods).forEach(function(key) {

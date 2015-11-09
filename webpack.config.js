@@ -7,7 +7,7 @@ module.exports = {
     devtool: "source-map",
     output: {
         path: "./dist",
-        filename: "timekit.js",
+        filename: "timekit-sdk.js",
         libraryTarget: "umd",
         library: "timekit"
     },

@@ -22,7 +22,7 @@ describe('Module loaders', function() {
   });
 
   it('should be able to load via CommonJS2', function(done) {
-    var timekitCommonJS = require('../dist/timekit.js');
+    var timekitCommonJS = require('../dist/timekit-sdk.js');
 
     expect(typeof timekitCommonJS).toEqual('object');
     expect(typeof timekitCommonJS.auth).toEqual('function');
@@ -66,7 +66,7 @@ describe('Module loaders', function() {
 
   it('should be able to load via AMD (Require.js)', function(done) {
 
-    require(['../dist/timekit.js'], function (timekitRequireJS) {
+    require(['../dist/timekit-sdk.js'], function (timekitRequireJS) {
 
       expect(typeof timekitRequireJS).toEqual('object');
       expect(typeof timekitRequireJS.auth).toEqual('function');

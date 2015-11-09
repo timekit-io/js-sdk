@@ -58,7 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*!
 	 * Timekit JavaScript SDK
-	 * Version: 1.0.0
+	 * Version: 1.1.0
 	 * http://timekit.io
 	 *
 	 * Copyright 2015 Timekit, Inc.
@@ -463,10 +463,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @type {Function}
 	   * @return {Promise}
 	   */
-	  TK.getEvent = function(id) {
+	  TK.getEvent = function(data) {
 	
 	    return TK.makeRequest({
-	      url: '/events/' + id,
+	      url: '/events/' + data.id,
 	      method: 'get'
 	    });
 	
@@ -492,10 +492,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @type {Function}
 	   * @return {Promise}
 	   */
-	  TK.deleteEvent = function(id) {
+	  TK.deleteEvent = function(data) {
 	
 	    return TK.makeRequest({
-	      url: '/events/' + id,
+	      url: '/events/' + data.id,
 	      method: 'delete'
 	    });
 	
@@ -715,6 +715,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
+	   * Get a specific users' timezone
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getUserTimezone = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/users/timezone/' + data.email,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
 	   * Get a user property by key
 	   * @type {Function}
 	   * @return {Promise}
@@ -753,6 +767,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	      url: '/properties',
 	      method: 'put',
 	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Get all user auth credentials
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getCredentials = function() {
+	
+	    return TK.makeRequest({
+	      url: '/credentials',
+	      method: 'get'
+	    });
+	
+	  };
+	
+	    /**
+	   * Create a new pair of auth credentials
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.createCredential = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/credentials',
+	      method: 'post',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Delete a pair of auth credentials
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.deleteCredential = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/credentials/' + data.id,
+	      method: 'delete'
 	    });
 	
 	  };
@@ -3148,4 +3205,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=timekit.js.map
+//# sourceMappingURL=timekit-sdk.js.map
