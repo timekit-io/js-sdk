@@ -144,6 +144,11 @@ timekit.getUserTimezone(data);
 timekit.getUserProperties();
 timekit.getUserProperty(data);
 timekit.setUserProperties(data);
+
+// Credentials endpoints
+timekit.getCredentials();
+timekit.createCredential(data);
+timekit.deleteCredential(data);
 ```
 
 Request example:
