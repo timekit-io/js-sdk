@@ -255,6 +255,4 @@ karma start
 
 ## Roadmap/todos
 
-Stuff to do, among others:
-- Add to bower and npm (when we hit v1.0.0)
-- Make standalone version without dependencies bundled
+See [Issues](https://github.com/timekit-io/js-sdk/issues) for feature requests, bugs etc.
