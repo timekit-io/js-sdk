@@ -9,10 +9,15 @@ module.exports = {
     output: {
         path: "./dist",
         filename: "timekit-sdk.parse.js",
-        libraryTarget: "commonjs",
+        libraryTarget: "commonjs2",
         library: "timekit"
     },
     plugins: [
         new webpack.IgnorePlugin(/vertx/)
-    ]
+    ],
+    module: {
+        loaders: [
+            { test: /\.json$/, loader: "json" },
+        ]
+    }
 };
