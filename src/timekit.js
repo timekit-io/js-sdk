@@ -729,7 +729,7 @@ function Timekit() {
 
   };
 
-    /**
+  /**
    * Create a new pair of auth credentials
    * @type {Function}
    * @return {Promise}
@@ -754,6 +754,42 @@ function Timekit() {
     return TK.makeRequest({
       url: '/credentials/' + data.id,
       method: 'delete'
+    });
+
+  };
+
+  /**
+   * Create a new booking
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createBooking = function(data) {
+
+    return TK.makeRequest({
+      url: '/booking',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Update an existing booking
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateBooking = function(data) {
+
+    var id = data.id;
+    delete data.id;
+
+    var action = data.action;
+    delete data.action;
+
+    return TK.makeRequest({
+      url: '/booking/' + id + '/' + action,
+      method: 'put',
+      data: data
     });
 
   };
