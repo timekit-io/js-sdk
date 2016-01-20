@@ -766,7 +766,7 @@ function Timekit() {
   TK.createBooking = function(data) {
 
     return TK.makeRequest({
-      url: '/booking',
+      url: '/bookings',
       method: 'post',
       data: data
     });
@@ -787,7 +787,7 @@ function Timekit() {
     delete data.action;
 
     return TK.makeRequest({
-      url: '/booking/' + id + '/' + action,
+      url: '/bookings/' + id + '/' + action,
       method: 'put',
       data: data
     });

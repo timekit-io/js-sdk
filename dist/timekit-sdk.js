@@ -785,7 +785,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  };
 	
-	    /**
+	  /**
 	   * Create a new pair of auth credentials
 	   * @type {Function}
 	   * @return {Promise}
@@ -810,6 +810,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return TK.makeRequest({
 	      url: '/credentials/' + data.id,
 	      method: 'delete'
+	    });
+	
+	  };
+	
+	  /**
+	   * Create a new booking
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.createBooking = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/bookings',
+	      method: 'post',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Update an existing booking
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.updateBooking = function(data) {
+	
+	    var id = data.id;
+	    delete data.id;
+	
+	    var action = data.action;
+	    delete data.action;
+	
+	    return TK.makeRequest({
+	      url: '/bookings/' + id + '/' + action,
+	      method: 'put',
+	      data: data
 	    });
 	
 	  };
