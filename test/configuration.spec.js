@@ -169,4 +169,46 @@ describe('Configuration', function() {
 
   });
 
+ fit('should support setting headers for next request only (fluent)', function(done) {
+    var response, request;
+
+    jasmine.Ajax.install();
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit
+    .headers({
+      MyTestHeader: 'test'
+    })
+    .getUserInfo()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+      });
+
+      console.log(request);
+
+      utils.tick(function () {
+        // Check for headers set
+        expect(response.config.headers.MyTestHeader).toBe('test');
+        expect(request.requestHeaders.MyTestHeader).toBe('test');
+        done();
+      });
+    });
+
+  });
+
 });

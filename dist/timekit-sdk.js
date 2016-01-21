@@ -77,7 +77,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  var userEmail;
 	  var userApiToken;
-	  var includes;
+	  var includes = [];
+	  var headers = [];
 	
 	  /**
 	   * Default config
@@ -127,11 +128,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    args.url = buildUrl(args.url);
 	
 	    // add http headers if applicable
-	    args.headers = { 'Timekit-App': config.app };
+	    args.headers = args.headers || headers[0] || {};
+	    args.headers['Timekit-App'] = config.app;
 	    if (userEmail && userApiToken) { args.headers.Authorization = 'Basic ' + encodeAuthHeader(); }
 	    if (config.inputTimestampFormat) { args.headers['Timekit-InputTimestampFormat'] = config.inputTimestampFormat; }
 	    if (config.outputTimestampFormat) { args.headers['Timekit-OutputTimestampFormat'] = config.outputTimestampFormat; }
 	    if (config.timezone) { args.headers['Timekit-Timezone'] = config.timezone; }
+	
+	    // reset headers
+	    if (headers && headers.length > 0) {
+	      headers = [];
+	    }
 	
 	    // add dynamic includes if applicable
 	    if (includes && includes.length > 0) {
@@ -212,6 +219,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  TK.include = function() {
 	    includes = Array.prototype.slice.call(arguments);
+	    return this;
+	  };
+	
+	  /**
+	   * Add supplied headers to the next request (fluent/chainable return)
+	   * @type {Function}
+	   * @return {Object}
+	   */
+	  TK.headers = function(data) {
+	    headers.push(data);
 	    return this;
 	  };
 	
