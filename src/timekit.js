@@ -776,6 +776,21 @@ function Timekit() {
   };
 
   /**
+   * Get all bookings
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getBookings = function() {
+
+    return TK.makeRequest({
+      url: '/bookings',
+      method: 'get'
+    });
+
+  };
+
+
+  /**
    * Create a new booking
    * @type {Function}
    * @return {Promise}
