@@ -282,11 +282,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @type {Function}
 	   * @return {Promise}
 	   */
-	  TK.accountSync = function() {
+	  TK.accountSync = function(data) {
 	
 	    return TK.makeRequest({
 	      url: '/accounts/sync',
-	      method: 'get'
+	      method: 'get',
+	      params: data
 	    });
 	
 	  };
@@ -830,6 +831,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	
 	  };
+	
+	  /**
+	   * Get all bookings
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getBookings = function() {
+	
+	    return TK.makeRequest({
+	      url: '/bookings',
+	      method: 'get'
+	    });
+	
+	  };
+	
 	
 	  /**
 	   * Create a new booking

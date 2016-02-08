@@ -226,11 +226,12 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.accountSync = function() {
+  TK.accountSync = function(data) {
 
     return TK.makeRequest({
       url: '/accounts/sync',
-      method: 'get'
+      method: 'get',
+      params: data
     });
 
   };
