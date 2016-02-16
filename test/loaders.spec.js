@@ -13,6 +13,7 @@ var fixtures = {
  * Load the library using different UMD module loaders
  */
 describe('Module loaders', function() {
+
   beforeEach(function(){
     jasmine.Ajax.install();
   });

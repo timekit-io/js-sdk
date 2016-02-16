@@ -22,7 +22,6 @@ describe('Endpoints', function() {
     var request, response;
 
     jasmine.Ajax.install();
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
     timekit.configure({
       app: fixtures.app,
@@ -66,7 +65,7 @@ describe('Endpoints', function() {
       'getAccounts': 0,
       'accountGoogleSignup': 2,
       'getAccountGoogleCalendars': 0,
-      'accountSync': 0,
+      'accountSync': 1,
 
       // Auth
       'auth': 1,
@@ -122,7 +121,13 @@ describe('Endpoints', function() {
       // Credentials
       'getCredentials': 0,
       'createCredential': 1,
-      'deleteCredential': 1
+      'deleteCredential': 1,
+
+      // Bookings
+      'getBookings': 0,
+      'getBooking': 1,
+      'createBooking': 1,
+      'updateBooking': 1
     }
 
     Object.keys(methods).forEach(function(key) {
