@@ -24,7 +24,6 @@ describe('Authentication', function() {
       app: fixtures.app,
       apiBaseUrl: fixtures.apiBaseUrl
     });
-
   });
 
   afterEach(function () {
