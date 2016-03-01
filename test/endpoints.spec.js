@@ -127,7 +127,10 @@ describe('Endpoints', function() {
       'getBookings': 0,
       'getBooking': 1,
       'createBooking': 1,
-      'updateBooking': 1
+      'updateBooking': 1,
+
+      // analytics
+      'getAnalytics': 1
     }
 
     Object.keys(methods).forEach(function(key) {

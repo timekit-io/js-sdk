@@ -853,6 +853,24 @@ function Timekit() {
 
   };
 
+  /**
+   * Get analytics data
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getAnalytics = function(data) {
+
+    var action = data.action;
+    delete data.action;
+
+    return TK.makeRequest({
+      url: '/analytics/' + action,
+      method: 'get',
+      params: data
+    });
+
+  };
+
   return TK;
 
 }
