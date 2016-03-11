@@ -20,8 +20,9 @@ function Timekit() {
    * @type {String}
    */
   var userEmail;
-  var userApiToken;
-  var includes;
+  var userToken;
+  var includes = [];
+  var headers = {};
 
   /**
    * Default config
@@ -40,8 +41,8 @@ function Timekit() {
    * @return {String}
    */
 
-  var encodeAuthHeader = function() {
-    return base64.encode(userEmail + ':' + userApiToken);
+  var encodeAuthHeader = function(email, token) {
+    return base64.encode(email + ':' + token);
   };
 
   /**
@@ -71,11 +72,21 @@ function Timekit() {
     args.url = buildUrl(args.url);
 
     // add http headers if applicable
-    args.headers = { 'Timekit-App': config.app };
-    if (userEmail && userApiToken) { args.headers.Authorization = 'Basic ' + encodeAuthHeader(); }
+    args.headers = args.headers || headers || {};
+    args.headers['Timekit-App'] = config.app;
     if (config.inputTimestampFormat) { args.headers['Timekit-InputTimestampFormat'] = config.inputTimestampFormat; }
     if (config.outputTimestampFormat) { args.headers['Timekit-OutputTimestampFormat'] = config.outputTimestampFormat; }
     if (config.timezone) { args.headers['Timekit-Timezone'] = config.timezone; }
+
+    // add auth headers if not being overwritten by request/asUser
+    if (!args.headers['Authorization'] && userEmail && userToken) {
+      args.headers['Authorization'] = 'Basic ' + encodeAuthHeader(userEmail, userToken);
+    }
+
+    // reset headers
+    if (Object.keys(headers).length > 0) {
+      headers = {};
+    }
 
     // add dynamic includes if applicable
     if (includes && includes.length > 0) {
@@ -129,12 +140,21 @@ function Timekit() {
   };
 
   /**
-   * Set the active user manuallt (happens automatically on timekit.auth())
+   * Set the active user manually (happens automatically on timekit.auth())
    * @type {Function}
    */
   TK.setUser = function(email, apiToken) {
     userEmail = email;
-    userApiToken = apiToken;
+    userToken = apiToken;
+  };
+
+  /**
+   * Set the active user temporarily for the next request (fluent/chainable return)
+   * @type {Function}
+   */
+  TK.asUser = function(email, apiToken) {
+    headers['Authorization'] = 'Basic ' + encodeAuthHeader(email, apiToken);
+    return this;
   };
 
   /**
@@ -145,7 +165,7 @@ function Timekit() {
   TK.getUser = function() {
     return {
       email: userEmail,
-      apiToken: userApiToken
+      apiToken: userToken
     };
   };
 
@@ -156,6 +176,16 @@ function Timekit() {
    */
   TK.include = function() {
     includes = Array.prototype.slice.call(arguments);
+    return this;
+  };
+
+  /**
+   * Add supplied headers to the next request (fluent/chainable return)
+   * @type {Function}
+   * @return {Object}
+   */
+  TK.headers = function(data) {
+    headers = data;
     return this;
   };
 
@@ -209,11 +239,12 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.accountSync = function() {
+  TK.accountSync = function(data) {
 
     return TK.makeRequest({
       url: '/accounts/sync',
-      method: 'get'
+      method: 'get',
+      params: data
     });
 
   };
@@ -426,6 +457,24 @@ function Timekit() {
     return TK.makeRequest({
       url: '/events',
       method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Update an existing event
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateEvent = function(data) {
+
+    var id = data.id;
+    delete data.id;
+
+    return TK.makeRequest({
+      url: '/events/' + id,
+      method: 'put',
       data: data
     });
 
@@ -729,7 +778,7 @@ function Timekit() {
 
   };
 
-    /**
+  /**
    * Create a new pair of auth credentials
    * @type {Function}
    * @return {Promise}
@@ -754,6 +803,70 @@ function Timekit() {
     return TK.makeRequest({
       url: '/credentials/' + data.id,
       method: 'delete'
+    });
+
+  };
+
+  /**
+   * Get all bookings
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getBookings = function() {
+
+    return TK.makeRequest({
+      url: '/bookings',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get specific booking
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getBooking = function(data) {
+
+    return TK.makeRequest({
+      url: '/bookings/' + data.id,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Create a new booking
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createBooking = function(data) {
+
+    return TK.makeRequest({
+      url: '/bookings',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Update an existing booking
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateBooking = function(data) {
+
+    var id = data.id;
+    delete data.id;
+
+    var action = data.action;
+    delete data.action;
+
+    return TK.makeRequest({
+      url: '/bookings/' + id + '/' + action,
+      method: 'put',
+      data: data
     });
 
   };

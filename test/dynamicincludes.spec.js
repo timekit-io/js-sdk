@@ -20,7 +20,6 @@ describe('Dynamic includes', function() {
 
   beforeEach(function() {
     jasmine.Ajax.install();
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
     timekit.configure({
       app: fixtures.app,

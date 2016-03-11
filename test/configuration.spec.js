@@ -2,13 +2,16 @@
 
 var timekit = require('../src/timekit.js');
 var utils = require('./helpers/utils');
+var base64 = require('base-64');
 
 var fixtures = {
-  app:            'demo',
-  apiBaseUrl:     'http://api-localhost.timekit.io/',
+  app:              'demo',
+  apiBaseUrl:       'http://api-localhost.timekit.io/',
   inputTimestampFormat: 'Y-m-d H:i',
-  userEmail:      'timebirdcph@gmail.com',
-  userApiToken:   'password',
+  userEmail:        'timebirdcph@gmail.com',
+  userApiToken:     'password',
+  userEmailTemp:    'timebirdcph2@gmail.com',
+  userApiTokenTemp: 'password2',
   convertResponseToCamelcase: true,
   createApp: {
     name:         'TestApplication',
@@ -23,6 +26,14 @@ var fixtures = {
  * Intilialise the library
  */
 describe('Configuration', function() {
+
+  beforeEach(function() {
+    jasmine.Ajax.install();
+  });
+
+  afterEach(function() {
+    jasmine.Ajax.uninstall();
+  });
 
   it('should be able initialize the library', function() {
 
@@ -80,9 +91,6 @@ describe('Configuration', function() {
   it('should be able to convert response data to camelCase', function(done) {
     var response, request;
 
-    jasmine.Ajax.install();
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
-
     timekit.configure({
       app: fixtures.app,
       apiBaseUrl: fixtures.apiBaseUrl,
@@ -112,7 +120,6 @@ describe('Configuration', function() {
         // camelCase conversion
         expect(response.data.contactEmail).toBeDefined();
         expect(response.data.contact_email).toBeUndefined();
-        jasmine.Ajax.uninstall();
         done();
       });
     });
@@ -121,9 +128,6 @@ describe('Configuration', function() {
 
   it('should be able to make a request and convert POST data to snake_case', function(done) {
     var response, request;
-
-    jasmine.Ajax.install();
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
     timekit.configure({
       app: fixtures.app,
@@ -162,8 +166,112 @@ describe('Configuration', function() {
         expect(response.status).toBe(201);
         expect(response.data).toBeDefined();
         expect(typeof response.data.slug).toBe('string');
-        jasmine.Ajax.uninstall();
         done();
+      });
+    });
+
+  });
+
+  it('should support setting headers for next request only (fluent)', function(done) {
+    var response, request;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit
+    .headers({
+      MyTestHeader: 'test',
+      MyTestHeader2: 'test2'
+    })
+    .getUserInfo()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+      });
+
+      utils.tick(function () {
+        // Check for headers set
+        expect(response.config.headers.MyTestHeader).toBe('test');
+        expect(request.requestHeaders.MyTestHeader).toBe('test');
+        expect(response.config.headers.MyTestHeader2).toBe('test2');
+        expect(request.requestHeaders.MyTestHeader2).toBe('test2');
+        done();
+      });
+    });
+
+  });
+
+  it('should support setting user for next request only (fluent)', function(done) {
+    var response, request;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit
+    .asUser(fixtures.userEmailTemp, fixtures.userApiTokenTemp)
+    .getUserInfo()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+      });
+
+      utils.tick(function () {
+
+        // Check that the temp user is set as auth header
+        var userAuthHeaderTemp = 'Basic ' + base64.encode(fixtures.userEmailTemp + ':' + fixtures.userApiTokenTemp);
+        expect(response.config.headers['Authorization']).toBe(userAuthHeaderTemp);
+        expect(request.requestHeaders['Authorization']).toBe(userAuthHeaderTemp);
+
+        var newUser = timekit.getUser();
+        expect(newUser.email).toEqual(fixtures.userEmail);
+        expect(newUser.apiToken).toEqual(fixtures.userApiToken);
+
+        timekit
+        .getUserInfo()
+        .then(function(res) {
+          response = res;
+        });
+
+        utils.tick(function () {
+          request = jasmine.Ajax.requests.mostRecent();
+
+          request.respondWith({
+            status: 200,
+            responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+          });
+
+          utils.tick(function () {
+
+            // Check that the temp user is not set as auth header
+            var userAuthHeader = 'Basic ' + base64.encode(fixtures.userEmail + ':' + fixtures.userApiToken);
+            expect(response.config.headers['Authorization']).toBe(userAuthHeader);
+            expect(request.requestHeaders['Authorization']).toBe(userAuthHeader);
+
+            done();
+          })
+        });
       });
     });
 
