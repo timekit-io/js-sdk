@@ -93,7 +93,7 @@ Endpoints/methods:
 timekit.getAccounts();
 timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
 timekit.getAccountGoogleCalendars();
-timekit.accountSync();
+timekit.accountSync(data);
 
 // Auth endpoints
 timekit.auth(data);
@@ -118,6 +118,7 @@ timekit.getContacts();
 timekit.getEvents(data);
 timekit.getEvent(data);
 timekit.createEvent(data);
+timekit.updateEvent(data);
 timekit.getAvailability(data);
 
 // FindTime endpoints
@@ -149,6 +150,12 @@ timekit.setUserProperties(data);
 timekit.getCredentials();
 timekit.createCredential(data);
 timekit.deleteCredential(data);
+
+// Bookings endpoints
+timekit.getBookings();
+timekit.getBooking(data);
+timekit.createBooking(data);
+timekit.updateBooking(data);
 ```
 
 Request example:
