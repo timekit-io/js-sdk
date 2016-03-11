@@ -2,7 +2,7 @@
 
 /*!
  * Timekit JavaScript SDK
- * Version: 1.1.0
+ * Version: 1.2.0
  * http://timekit.io
  *
  * Copyright 2015 Timekit, Inc.

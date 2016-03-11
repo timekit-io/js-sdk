@@ -3,7 +3,7 @@
 [![Circle CI](https://img.shields.io/circleci/project/timekit-io/js-sdk.svg)](https://circleci.com/gh/timekit-io/js-sdk)
 [![Code Coverage](https://img.shields.io/badge/coverage-92%25-green.svg)](https://github.com/timekit-io/js-sdk)
 
-**Latest release:**  *v1.1.0*
+**Latest release:**  *v1.2.0*
 
 Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [developers.timekit.io](http://developers.timekit.io).
 
@@ -68,7 +68,7 @@ timekit.configure({
 });
 
 // Returns current config object
-timekit.getConfig(); 
+timekit.getConfig();
 
 // Set the user to auth with (gets automatically set after timekit.auth())
 timekit.setUser(
@@ -77,7 +77,7 @@ timekit.setUser(
 );
 
 // Returns current user that have been set previously (email and apiToken)
-timekit.getUser(); 
+timekit.getUser();
 ```
 
 ## Usage (endpoints)
@@ -236,7 +236,7 @@ npm install
 # build plain
 webpack
 # build minified
-webpack --config webpack.config.min.js 
+webpack --config webpack.config.min.js
 ```
 
 ## Running tests
@@ -249,7 +249,7 @@ To run the test suite, simply do:
 npm install
 # install karma as global
 npm install -g karma
-# start karma and run 
+# start karma and run
 karma start
 ```
 
