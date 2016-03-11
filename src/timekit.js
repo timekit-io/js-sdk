@@ -463,6 +463,24 @@ function Timekit() {
   };
 
   /**
+   * Update an existing event
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateEvent = function(data) {
+
+    var id = data.id;
+    delete data.id;
+
+    return TK.makeRequest({
+      url: '/events/' + id,
+      method: 'put',
+      data: data
+    });
+
+  };
+
+  /**
    * Delete a user's event by ID
    * @type {Function}
    * @return {Promise}

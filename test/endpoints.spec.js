@@ -90,6 +90,7 @@ describe('Endpoints', function() {
       'getEvents': 1,
       'getEvent': 1,
       'createEvent': 1,
+      'updateEvent': 1,
       'deleteEvent': 1,
       'getAvailability': 1,
 
