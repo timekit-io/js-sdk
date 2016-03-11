@@ -58,7 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*!
 	 * Timekit JavaScript SDK
-	 * Version: 1.1.0
+	 * Version: 1.2.0
 	 * http://timekit.io
 	 *
 	 * Copyright 2015 Timekit, Inc.
@@ -76,9 +76,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @type {String}
 	   */
 	  var userEmail;
-	  var userApiToken;
+	  var userToken;
 	  var includes = [];
-	  var headers = [];
+	  var headers = {};
 	
 	  /**
 	   * Default config
@@ -97,8 +97,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @return {String}
 	   */
 	
-	  var encodeAuthHeader = function() {
-	    return base64.encode(userEmail + ':' + userApiToken);
+	  var encodeAuthHeader = function(email, token) {
+	    return base64.encode(email + ':' + token);
 	  };
 	
 	  /**
@@ -128,16 +128,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    args.url = buildUrl(args.url);
 	
 	    // add http headers if applicable
-	    args.headers = args.headers || headers[0] || {};
+	    args.headers = args.headers || headers || {};
 	    args.headers['Timekit-App'] = config.app;
-	    if (userEmail && userApiToken) { args.headers.Authorization = 'Basic ' + encodeAuthHeader(); }
 	    if (config.inputTimestampFormat) { args.headers['Timekit-InputTimestampFormat'] = config.inputTimestampFormat; }
 	    if (config.outputTimestampFormat) { args.headers['Timekit-OutputTimestampFormat'] = config.outputTimestampFormat; }
 	    if (config.timezone) { args.headers['Timekit-Timezone'] = config.timezone; }
 	
+	    // add auth headers if not being overwritten by request/asUser
+	    if (!args.headers['Authorization'] && userEmail && userToken) {
+	      args.headers['Authorization'] = 'Basic ' + encodeAuthHeader(userEmail, userToken);
+	    }
+	
 	    // reset headers
-	    if (headers && headers.length > 0) {
-	      headers = [];
+	    if (Object.keys(headers).length > 0) {
+	      headers = {};
 	    }
 	
 	    // add dynamic includes if applicable
@@ -192,12 +196,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
-	   * Set the active user manuallt (happens automatically on timekit.auth())
+	   * Set the active user manually (happens automatically on timekit.auth())
 	   * @type {Function}
 	   */
 	  TK.setUser = function(email, apiToken) {
 	    userEmail = email;
-	    userApiToken = apiToken;
+	    userToken = apiToken;
+	  };
+	
+	  /**
+	   * Set the active user temporarily for the next request (fluent/chainable return)
+	   * @type {Function}
+	   */
+	  TK.asUser = function(email, apiToken) {
+	    headers['Authorization'] = 'Basic ' + encodeAuthHeader(email, apiToken);
+	    return this;
 	  };
 	
 	  /**
@@ -208,7 +221,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  TK.getUser = function() {
 	    return {
 	      email: userEmail,
-	      apiToken: userApiToken
+	      apiToken: userToken
 	    };
 	  };
 	
@@ -228,7 +241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @return {Object}
 	   */
 	  TK.headers = function(data) {
-	    headers.push(data);
+	    headers = data;
 	    return this;
 	  };
 	
@@ -500,6 +513,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return TK.makeRequest({
 	      url: '/events',
 	      method: 'post',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Update an existing event
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.updateEvent = function(data) {
+	
+	    var id = data.id;
+	    delete data.id;
+	
+	    return TK.makeRequest({
+	      url: '/events/' + id,
+	      method: 'put',
 	      data: data
 	    });
 	
@@ -846,6 +877,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  };
 	
+	  /**
+	   * Get specific booking
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getBooking = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/bookings/' + data.id,
+	      method: 'get'
+	    });
+	
+	  };
 	
 	  /**
 	   * Create a new booking
