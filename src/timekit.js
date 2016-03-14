@@ -871,6 +871,19 @@ function Timekit() {
 
   };
 
+  TK.getWidget = function() {
+
+    var id = data.id;
+    delete data.id;
+
+    return TK.makeRequest({
+      url: '/widgets/' + id,
+      method: 'get'
+    });
+
+  };
+
+
   return TK;
 
 }
