@@ -871,18 +871,97 @@ function Timekit() {
 
   };
 
-  TK.getWidget = function() {
-
-    var id = data.id;
-    delete data.id;
+  /**
+   * Get widgets
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getWidgets = function() {
 
     return TK.makeRequest({
-      url: '/widgets/' + id,
+      url: '/widgets',
       method: 'get'
     });
 
   };
 
+  /**
+   * Get a specific widget
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getWidget = function(data) {
+
+    return TK.makeRequest({
+      url: '/widgets/' + data.id,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get public widget by slug
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getPublicWidget = function(data) {
+
+    return TK.makeRequest({
+      url: '/widgets/public/' + data.slug,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Create a new widget
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createWidget = function(data) {
+
+    return TK.makeRequest({
+      url: '/widgets',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Update an existing widget
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateWidget = function(data) {
+
+    var id = data.id;
+    delete data.id;
+
+    return TK.makeRequest({
+      url: '/widgets/' + data.id,
+      method: 'put',
+      data: data
+    });
+
+  };
+
+  /**
+   * Delete a widget
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.deleteWidget = function(data) {
+
+    var id = data.id;
+    delete data.id;
+
+    return TK.makeRequest({
+      url: '/widgets/' + data.id,
+      method: 'delete'
+    });
+
+  };
 
   return TK;
 
