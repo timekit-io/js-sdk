@@ -939,7 +939,7 @@ function Timekit() {
     delete data.id;
 
     return TK.makeRequest({
-      url: '/widgets/' + data.id,
+      url: '/widgets/' + id,
       method: 'put',
       data: data
     });
@@ -952,9 +952,6 @@ function Timekit() {
    * @return {Promise}
    */
   TK.deleteWidget = function(data) {
-
-    var id = data.id;
-    delete data.id;
 
     return TK.makeRequest({
       url: '/widgets/' + data.id,
