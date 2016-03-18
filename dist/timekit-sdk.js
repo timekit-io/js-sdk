@@ -927,6 +927,109 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  };
 	
+	  /**
+	   * Get widgets
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getWidgets = function() {
+	
+	    return TK.makeRequest({
+	      url: '/widgets',
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get a specific widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/' + data.id,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get public widget by slug
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getHostedWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/hosted/' + data.slug,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get public widget by slug
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getEmbedWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/embed/' + data.id,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Create a new widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.createWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets',
+	      method: 'post',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Update an existing widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.updateWidget = function(data) {
+	
+	    var id = data.id;
+	    delete data.id;
+	
+	    return TK.makeRequest({
+	      url: '/widgets/' + id,
+	      method: 'put',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Delete a widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.deleteWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/' + data.id,
+	      method: 'delete'
+	    });
+	
+	  };
+	
 	  return TK;
 	
 	}

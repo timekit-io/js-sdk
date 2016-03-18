@@ -904,10 +904,24 @@ function Timekit() {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getPublicWidget = function(data) {
+  TK.getHostedWidget = function(data) {
 
     return TK.makeRequest({
-      url: '/widgets/public/' + data.slug,
+      url: '/widgets/hosted/' + data.slug,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get public widget by slug
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getEmbedWidget = function(data) {
+
+    return TK.makeRequest({
+      url: '/widgets/embed/' + data.id,
       method: 'get'
     });
 
