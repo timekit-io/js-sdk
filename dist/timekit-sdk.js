@@ -291,7 +291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
-	   * Initiate a server sync on all the users accounts
+	   * Initiate an account sync
 	   * @type {Function}
 	   * @return {Promise}
 	   */
@@ -299,6 +299,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return TK.makeRequest({
 	      url: '/accounts/sync',
+	      method: 'get',
+	      params: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Initiate an account sync where only calendar models are synced
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.accountSyncCalendars = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/accounts/sync/calendars',
 	      method: 'get',
 	      params: data
 	    });
