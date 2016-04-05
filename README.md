@@ -64,7 +64,8 @@ timekit.configure({
     inputTimestampFormat:       'Y-m-d h:ia',               // default timestamp format that you supply
     outputTimestampFormat:      'Y-m-d h:ia',               // default timestamp format that you want the API to return
     timezone:                   'Europe/Copenhagen',        // override user's timezone for custom formatted timestamps in another timezone
-    convertResponseToCamelcase: false                       // should keys in JSON response automatically be converted from snake_case to camelCase?
+    convertResponseToCamelcase: false,                      // should keys in JSON response automatically be converted from snake_case to camelCase?
+    convertRequestToSnakecase:  true                        // should keys in JSON requests automatically be converted from camelCase to snake_case?
 });
 
 // Returns current config object

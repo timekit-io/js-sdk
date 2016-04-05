@@ -88,7 +88,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    app: 'demo',
 	    apiBaseUrl: 'https://api.timekit.io/',
 	    apiVersion: 'v2',
-	    convertResponseToCamelcase: false
+	    convertResponseToCamelcase: false,
+	    convertRequestToSnakecase: true
 	  };
 	
 	  /**
@@ -152,11 +153,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // decamelize keys in data objects
-	    if (args.data) { args.data = humps.decamelizeKeys(args.data); }
+	    if (args.data && config.convertRequestToSnakecase) { args.data = humps.decamelizeKeys(args.data); }
 	
 	    // register response interceptor for data manipulation
 	    var interceptor = axios.interceptors.response.use(function (response) {
-	      if(response.data && response.data.data) {
+	      if (response.data && response.data.data) {
 	        response.data = response.data.data;
 	        if (config.convertResponseToCamelcase) {
 	          response.data = humps.camelizeKeys(response.data);
