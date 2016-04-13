@@ -131,7 +131,7 @@ describe('Endpoints', function() {
       'createBooking': 1,
       'updateBooking': 1,
 
-      // Bookings
+      // Widgets
       'getWidgets': 0,
       'getWidget': 1,
       'getHostedWidget': 1,
