@@ -58,7 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*!
 	 * Timekit JavaScript SDK
-	 * Version: 1.2.0
+	 * Version: 1.3.0
 	 * http://timekit.io
 	 *
 	 * Copyright 2015 Timekit, Inc.
