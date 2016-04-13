@@ -66,6 +66,7 @@ describe('Endpoints', function() {
       'accountGoogleSignup': 2,
       'getAccountGoogleCalendars': 0,
       'accountSync': 1,
+      'accountSyncCalendars': 1,
 
       // Auth
       'auth': 1,
@@ -128,7 +129,17 @@ describe('Endpoints', function() {
       'getBookings': 0,
       'getBooking': 1,
       'createBooking': 1,
-      'updateBooking': 1
+      'updateBooking': 1,
+
+      // Bookings
+      'getWidgets': 0,
+      'getWidget': 1,
+      'getHostedWidget': 1,
+      'getEmbedWidget': 1,
+      'createWidget': 1,
+      'updateWidget': 1,
+      'deleteWidget': 1
+
     }
 
     Object.keys(methods).forEach(function(key) {
