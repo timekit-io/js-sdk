@@ -58,7 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*!
 	 * Timekit JavaScript SDK
-	 * Version: 1.2.0
+	 * Version: 1.3.0
 	 * http://timekit.io
 	 *
 	 * Copyright 2015 Timekit, Inc.
@@ -88,7 +88,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    app: 'demo',
 	    apiBaseUrl: 'https://api.timekit.io/',
 	    apiVersion: 'v2',
-	    convertResponseToCamelcase: false
+	    convertResponseToCamelcase: false,
+	    convertRequestToSnakecase: true
 	  };
 	
 	  /**
@@ -152,11 +153,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    // decamelize keys in data objects
-	    if (args.data) { args.data = humps.decamelizeKeys(args.data); }
+	    if (args.data && config.convertRequestToSnakecase) { args.data = humps.decamelizeKeys(args.data); }
 	
 	    // register response interceptor for data manipulation
 	    var interceptor = axios.interceptors.response.use(function (response) {
-	      if(response.data && response.data.data) {
+	      if (response.data && response.data.data) {
 	        response.data = response.data.data;
 	        if (config.convertResponseToCamelcase) {
 	          response.data = humps.camelizeKeys(response.data);
@@ -291,7 +292,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
-	   * Initiate a server sync on all the users accounts
+	   * Initiate an account sync
 	   * @type {Function}
 	   * @return {Promise}
 	   */
@@ -299,6 +300,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return TK.makeRequest({
 	      url: '/accounts/sync',
+	      method: 'get',
+	      params: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Initiate an account sync where only calendar models are synced
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.accountSyncCalendars = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/accounts/sync/calendars',
 	      method: 'get',
 	      params: data
 	    });
@@ -923,6 +939,109 @@ return /******/ (function(modules) { // webpackBootstrap
 	      url: '/bookings/' + id + '/' + action,
 	      method: 'put',
 	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Get widgets
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getWidgets = function() {
+	
+	    return TK.makeRequest({
+	      url: '/widgets',
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get a specific widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/' + data.id,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get public widget by slug
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getHostedWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/hosted/' + data.slug,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get public widget by slug
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getEmbedWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/embed/' + data.id,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Create a new widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.createWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets',
+	      method: 'post',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Update an existing widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.updateWidget = function(data) {
+	
+	    var id = data.id;
+	    delete data.id;
+	
+	    return TK.makeRequest({
+	      url: '/widgets/' + id,
+	      method: 'put',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Delete a widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.deleteWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/' + data.id,
+	      method: 'delete'
 	    });
 	
 	  };
