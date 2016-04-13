@@ -95,6 +95,7 @@ timekit.getAccounts();
 timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
 timekit.getAccountGoogleCalendars();
 timekit.accountSync(data);
+timekit.accountSyncCalendars(data);
 
 // Auth endpoints
 timekit.auth(data);
@@ -157,6 +158,15 @@ timekit.getBookings();
 timekit.getBooking(data);
 timekit.createBooking(data);
 timekit.updateBooking(data);
+
+// Widget endpoints
+timekit.getWidgets();
+timekit.getWidget(data);
+timekit.getHostedWidget(data);
+timekit.getEmbedWidget(data);
+timekit.createWidget(data);
+timekit.updateWidget();
+timekit.deleteWidget();
 ```
 
 Request example:
