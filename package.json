@@ -5,7 +5,7 @@
   "main": "src/timekit.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/timekit/js-sdk.git"
+    "url": "https://github.com/timekit-io/js-sdk.git"
   },
   "scripts": {
     "test": "./node_modules/karma/bin/karma start"
