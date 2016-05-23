@@ -82,6 +82,7 @@ describe('Endpoints', function() {
       'getCalendars': 0,
       'getCalendar': 1,
       'createCalendar': 1,
+      'updateCalendar': 1,
       'deleteCalendar': 1,
 
       // Contacts

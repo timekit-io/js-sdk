@@ -2,7 +2,7 @@
 
 /*!
  * Timekit JavaScript SDK
- * Version: 1.3.0
+ * Version: 1.4.0
  * http://timekit.io
  *
  * Copyright 2015 Timekit, Inc.
@@ -401,6 +401,24 @@ function Timekit() {
     return TK.makeRequest({
       url: '/calendars/',
       method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Update a calendar for current user
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateCalendar = function(data) {
+
+    var id = data.id;
+    delete data.id;
+
+    return TK.makeRequest({
+      url: '/calendars/' + id,
+      method: 'put',
       data: data
     });
 
