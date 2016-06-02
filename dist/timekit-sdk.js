@@ -58,7 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*!
 	 * Timekit JavaScript SDK
-	 * Version: 1.4.0
+	 * Version: 1.5.0
 	 * http://timekit.io
 	 *
 	 * Copyright 2015 Timekit, Inc.
@@ -117,7 +117,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  var TK = {};
 	
-	
 	  /**
 	   * Prepare and make HTTP request to API
 	   * @type {Object}
@@ -130,7 +129,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // add http headers if applicable
 	    args.headers = args.headers || headers || {};
-	    args.headers['Timekit-App'] = config.app;
+	
+	    if (!args.headers['Timekit-App']) args.headers['Timekit-App'] = config.app;
 	    if (config.inputTimestampFormat) { args.headers['Timekit-InputTimestampFormat'] = config.inputTimestampFormat; }
 	    if (config.outputTimestampFormat) { args.headers['Timekit-OutputTimestampFormat'] = config.outputTimestampFormat; }
 	    if (config.timezone) { args.headers['Timekit-Timezone'] = config.timezone; }
@@ -206,15 +206,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
-	   * Set the active user temporarily for the next request (fluent/chainable return)
-	   * @type {Function}
-	   */
-	  TK.asUser = function(email, apiToken) {
-	    headers['Authorization'] = 'Basic ' + encodeAuthHeader(email, apiToken);
-	    return this;
-	  };
-	
-	  /**
 	   * Returns the current active user
 	   * @type {Function}
 	   * @return {Object}
@@ -224,6 +215,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      email: userEmail,
 	      apiToken: userToken
 	    };
+	  };
+	
+	  /**
+	   * Set the active user temporarily for the next request (fluent/chainable return)
+	   * @type {Function}
+	   */
+	  TK.asUser = function(email, apiToken) {
+	    headers['Authorization'] = 'Basic ' + encodeAuthHeader(email, apiToken);
+	    return this;
+	  };
+	
+	  /**
+	  * Set the timekit app slug temporarily for the next request (fluent/chainable return)
+	  * @type {Function}
+	  */
+	  TK.asApp = function(slug) {
+	    headers['Timekit-App'] = slug;
+	    return this;
 	  };
 	
 	  /**
@@ -242,7 +251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @return {Object}
 	   */
 	  TK.headers = function(data) {
-	    headers = data;
+	    for (var attr in data) { headers[attr] = data[attr]; }
 	    return this;
 	  };
 	
