@@ -6,6 +6,7 @@ var base64 = require('base-64');
 
 var fixtures = {
   app:              'demo',
+  app2:             'demo2',
   apiBaseUrl:       'http://api-localhost.timekit.io/',
   inputTimestampFormat: 'Y-m-d H:i',
   userEmail:        'timebirdcph@gmail.com',
@@ -268,6 +269,69 @@ describe('Configuration', function() {
             var userAuthHeader = 'Basic ' + base64.encode(fixtures.userEmail + ':' + fixtures.userApiToken);
             expect(response.config.headers['Authorization']).toBe(userAuthHeader);
             expect(request.requestHeaders['Authorization']).toBe(userAuthHeader);
+
+            done();
+          })
+        });
+      });
+    });
+
+  });
+
+  it('should support setting app for next request only (fluent)', function(done) {
+    var response, request;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit
+    .asApp(fixtures.app2)
+    .getUserInfo()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+      });
+
+      utils.tick(function () {
+
+        // Check that the temp app is set as auth header
+        expect(response.config.headers['Timekit-App']).toBe(fixtures.app2);
+        expect(request.requestHeaders['Timekit-App']).toBe(fixtures.app2);
+
+        // Make sure that the old configued app slug is still set
+        var config = timekit.getConfig();
+        expect(config.app).toEqual(fixtures.app);
+
+        timekit
+        .getUserInfo()
+        .then(function(res) {
+          response = res;
+        });
+
+        utils.tick(function () {
+          request = jasmine.Ajax.requests.mostRecent();
+
+          request.respondWith({
+            status: 200,
+            responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+          });
+
+          utils.tick(function () {
+
+            // Check that the temp user is not set as auth header
+            expect(response.config.headers['Timekit-App']).toBe(fixtures.app);
+            expect(request.requestHeaders['Timekit-App']).toBe(fixtures.app);
 
             done();
           })
