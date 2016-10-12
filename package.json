@@ -1,6 +1,6 @@
 {
   "name": "timekit-sdk",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "JavaScript SDK for the Timekit API (timekit.io)",
   "main": "src/timekit.js",
   "repository": {
@@ -11,7 +11,16 @@
     "test": "./node_modules/karma/bin/karma start"
   },
   "keywords": [
-    "Timekit", "timekit.io", "calendars", "calendar", "scheduling", "schedule", "book", "booking", "appointment", "appointments"
+    "Timekit",
+    "timekit.io",
+    "calendars",
+    "calendar",
+    "scheduling",
+    "schedule",
+    "book",
+    "booking",
+    "appointment",
+    "appointments"
   ],
   "author": "Timekit Inc.",
   "license": "MIT",
@@ -35,8 +44,9 @@
     "webpack": "^1.11.0"
   },
   "dependencies": {
-    "axios": "^0.5.4",
+    "axios": "^0.12.0",
     "base-64": "^0.1.0",
+    "es6-promise-promise": "^1.0.0",
     "humps": "^0.7.0"
   }
 }

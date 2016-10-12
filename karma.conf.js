@@ -1,5 +1,7 @@
 'use strict';
 
+var webpack = require('webpack');
+
 module.exports = function(config) {
 
   config.set({
@@ -40,6 +42,11 @@ module.exports = function(config) {
           loader: 'istanbul-instrumenter'
         } ]
       },
+      plugins: [
+        new webpack.ProvidePlugin({
+          Promise: 'es6-promise-promise'
+        })
+      ]
     },
 
     webpackServer: {
