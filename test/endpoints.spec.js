@@ -100,26 +100,12 @@ describe('Endpoints', function() {
       'findTime': 1,
       'findTimeBulk': 1,
 
-      // Meetings
-      'getMeetings': 0,
-      'getMeeting': 1,
-      'createMeeting': 1,
-      'updateMeeting': 1,
-      'setMeetingAvailability': 1,
-      'bookMeeting': 1,
-      'inviteToMeeting': 1,
-
       // Users
       'createUser': 1,
       'getUserInfo': 0,
       'updateUser': 1,
       'resetUserPassword': 1,
       'getUserTimezone': 1,
-
-      // User properties
-      'getUserProperties': 0,
-      'getUserProperty': 1,
-      'setUserProperties': 1,
 
       // Credentials
       'getCredentials': 0,

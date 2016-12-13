@@ -128,26 +128,12 @@ timekit.getAvailability(data);
 timekit.findTime(data);
 timekit.findTimeBulk(data);
 
-// Meetings endpoints
-timekit.getMeetings();
-timekit.getMeeting(data);
-timekit.createMeeting(data);
-timekit.updateMeeting(data);
-timekit.setMeetingAvailability(data);
-timekit.bookMeeting(data);
-timekit.inviteToMeeting(data);
-
 // Users endpoints
 timekit.createUser(data);
 timekit.getUserInfo();
 timekit.updateUser(data);
 timekit.resetUserPassword(data);
 timekit.getUserTimezone(data);
-
-// User properties endpoints
-timekit.getUserProperties();
-timekit.getUserProperty(data);
-timekit.setUserProperties(data);
 
 // Credentials endpoints
 timekit.getCredentials();
