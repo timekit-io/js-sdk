@@ -223,7 +223,7 @@ Example:
 ```javascript
 
 timekit
-.include('meetings', 'calendars.events')
+.include('calendars.events', 'users')
 .getUserInfo()
 .then(function(response) {
     // Response contains JSON data with nested info on the user's calendars, events and meetings
