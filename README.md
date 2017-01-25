@@ -22,6 +22,12 @@ The following libraries are bundled together with the SDK:
 - [base64](https://github.com/mathiasbynens/base64) - a robust base64 encoder/decoder, used for basic auth headers
 - [humps](https://github.com/domchristie/humps) - easy conversion from camelCase to snake_case and vice versa
 
+## Installation
+
+The library is hosted on NPM, so you can simply go:  
+
+`npm install timekit-sdk --save`
+
 ## Module loading
 
 The SDK is UMD (Universal Module Definition) compatible, which means that it can be loaded in various module formats across both browsers and server.
