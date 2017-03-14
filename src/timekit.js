@@ -33,7 +33,8 @@ function Timekit() {
     apiBaseUrl: 'https://api.timekit.io/',
     apiVersion: 'v2',
     convertResponseToCamelcase: false,
-    convertRequestToSnakecase: true
+    convertRequestToSnakecase: true,
+    autoFlattenResponse: true
   };
 
   /**
@@ -102,7 +103,9 @@ function Timekit() {
     // register response interceptor for data manipulation
     var interceptor = axios.interceptors.response.use(function (response) {
       if (response.data && response.data.data) {
-        response.data = response.data.data;
+        if (config.autoFlattenResponse) {
+          response.data = response.data.data;
+        }
         if (config.convertResponseToCamelcase) {
           response.data = humps.camelizeKeys(response.data);
         }
