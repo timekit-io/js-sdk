@@ -104,7 +104,10 @@ function Timekit() {
     var interceptor = axios.interceptors.response.use(function (response) {
       if (response.data && response.data.data) {
         if (config.autoFlattenResponse) {
-          response.data = response.data.data;
+          var responseCopy = Object.assign({}, response);
+          response.data = responseCopy.data.data;
+          delete responseCopy.data.data;
+          response.metaData = responseCopy.data;
         }
         if (config.convertResponseToCamelcase) {
           response.data = humps.camelizeKeys(response.data);
