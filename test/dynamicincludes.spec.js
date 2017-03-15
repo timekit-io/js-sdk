@@ -10,7 +10,7 @@ var fixtures = {
   userEmail:      'timebirdcph@gmail.com',
   userApiToken:   'password',
   includesSingle: ['calendars.events'],
-  includesMulti:  ['meetings','calendars.events']
+  includesMulti:  ['calendars.events', 'users']
 }
 
 /**
