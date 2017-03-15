@@ -56,6 +56,14 @@ function Timekit() {
     return config.apiBaseUrl + config.apiVersion + endpoint;
   };
 
+  var copyResponseMetaData = function(response) {
+    if (Object.keys(response.data).length < 2) return
+    response.metaData = {}
+    Object.keys(response.data).forEach(function(key) {
+      if (key !== 'data') response.metaData[key] = response.data[key]
+    })
+  }
+
   /**
    * Root Object that holds methods to expose for API consumption
    * @type {Object}
@@ -104,10 +112,8 @@ function Timekit() {
     var interceptor = axios.interceptors.response.use(function (response) {
       if (response.data && response.data.data) {
         if (config.autoFlattenResponse) {
-          var responseCopy = Object.assign({}, response);
-          response.data = responseCopy.data.data;
-          delete responseCopy.data.data;
-          response.metaData = responseCopy.data;
+          copyResponseMetaData(response)
+          response.data = response.data.data;
         }
         if (config.convertResponseToCamelcase) {
           response.data = humps.camelizeKeys(response.data);
