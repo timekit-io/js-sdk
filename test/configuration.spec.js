@@ -20,7 +20,8 @@ var fixtures = {
       contactName: 'John Doe',
       contactEmail: 'john@doe.com'
     }
-  }
+  },
+  autoFlattenResponse: true
 }
 
 /**
@@ -336,6 +337,43 @@ describe('Configuration', function() {
             done();
           })
         });
+      });
+    });
+
+  });
+
+  it('should be able to flatten response data and maintain metaData', function(done) {
+    var response, request;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl,
+      autoFlattenResponse: fixtures.autoFlattenResponse
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit.getApps()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 201,
+        responseText: '{ "data": { "slug": "testapplication", "contact_email": "2312312312@timekit.io", "contact_name": "John Doe", "id": "k3FXhXOAvF0BcT2cpSbQUhp5kHZmHoEe", "settings": { "name": "TestApplication" } }, "other_meta_key": "other_meta_value" }'
+      });
+
+      utils.tick(function () {
+        // Response
+        expect(response.status).toBe(201);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.slug).toBe('string');
+        expect(response.metaData).toBeDefined();
+        expect(response.metaData.other_meta_key).toBe('other_meta_value');
+        done();
       });
     });
 
