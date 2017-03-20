@@ -58,7 +58,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*!
 	 * Timekit JavaScript SDK
-	 * Version: 1.5.1
 	 * http://timekit.io
 	 *
 	 * Copyright 2015 Timekit, Inc.
@@ -639,115 +638,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
-	   * Get a user's meetings
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getMeetings = function() {
-	
-	    return TK.makeRequest({
-	      url: '/meetings',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a user's specific meeting
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getMeeting = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/meetings/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a user's specific meeting
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createMeeting = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/meetings',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a user's specific meeting
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.updateMeeting = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/meetings/' + id,
-	      method: 'put',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Set availability (true/faalse) on a meeting's suggestion
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.setMeetingAvailability = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/meetings/availability',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Book/finalize the meeting, sending out meeting invites to all participants
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.bookMeeting = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/meetings/book',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Invite users/emails to a meeting, sending out invite emails to the supplied addresses
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.inviteToMeeting = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/meetings/' + id + '/invite',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
 	   * Create a new user with the given properties
 	   * @type {Function}
 	   * @return {Promise}
@@ -816,49 +706,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return TK.makeRequest({
 	      url: '/users/timezone/' + data.email,
 	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a user property by key
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getUserProperties = function() {
-	
-	    return TK.makeRequest({
-	      url: '/properties',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a user property by key
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getUserProperty = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/properties/' + data.key,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Set or update user properties
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.setUserProperties = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/properties',
-	      method: 'put',
-	      data: data
 	    });
 	
 	  };
@@ -2253,14 +2100,103 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-	
 	var process = module.exports = {};
+	
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+	
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+	
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
+	(function () {
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
+	    }
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+	
+	
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+	
+	
+	
+	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
 	var queueIndex = -1;
 	
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -2276,7 +2212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = setTimeout(cleanUpNextTick);
+	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
 	
 	    var len = queue.length;
@@ -2293,7 +2229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    clearTimeout(timeout);
+	    runClearTimeout(timeout);
 	}
 	
 	process.nextTick = function (fun) {
@@ -2305,7 +2241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
+	        runTimeout(drainQueue);
 	    }
 	};
 	
