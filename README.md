@@ -71,7 +71,8 @@ timekit.configure({
     outputTimestampFormat:      'Y-m-d h:ia',               // default timestamp format that you want the API to return
     timezone:                   'Europe/Copenhagen',        // override user's timezone for custom formatted timestamps in another timezone
     convertResponseToCamelcase: false,                      // should keys in JSON response automatically be converted from snake_case to camelCase?
-    convertRequestToSnakecase:  true                        // should keys in JSON requests automatically be converted from camelCase to snake_case?
+    convertRequestToSnakecase:  true,                       // should keys in JSON requests automatically be converted from camelCase to snake_case?
+    autoFlattenResponse: true                               // if you keep this set to true, then responses with a "data" key will automatically be flattened to response.data (otherwise you need to access response.data.data). Note that pagination meta data is lost though.
 });
 
 // Returns current config object
