@@ -88,7 +88,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    apiBaseUrl: 'https://api.timekit.io/',
 	    apiVersion: 'v2',
 	    convertResponseToCamelcase: false,
-	    convertRequestToSnakecase: true
+	    convertRequestToSnakecase: true,
+	    autoFlattenResponse: true
 	  };
 	
 	  /**
@@ -109,6 +110,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var buildUrl = function(endpoint) {
 	    return config.apiBaseUrl + config.apiVersion + endpoint;
 	  };
+	
+	  var copyResponseMetaData = function(response) {
+	    if (Object.keys(response.data).length < 2) return
+	    response.metaData = {}
+	    Object.keys(response.data).forEach(function(key) {
+	      if (key !== 'data') response.metaData[key] = response.data[key]
+	    })
+	  }
 	
 	  /**
 	   * Root Object that holds methods to expose for API consumption
@@ -157,7 +166,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // register response interceptor for data manipulation
 	    var interceptor = axios.interceptors.response.use(function (response) {
 	      if (response.data && response.data.data) {
-	        response.data = response.data.data;
+	        if (config.autoFlattenResponse) {
+	          copyResponseMetaData(response)
+	          response.data = response.data.data;
+	        }
 	        if (config.convertResponseToCamelcase) {
 	          response.data = humps.camelizeKeys(response.data);
 	        }
