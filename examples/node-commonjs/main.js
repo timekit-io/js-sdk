@@ -5,7 +5,7 @@ var timekit = require('../../src/timekit.js');
 console.log('timekit sdk loaded!');
 
 timekit.configure({
-  app: 'demo',
+  app: 'back-to-the-future',
   inputTimestampFormat: 'l h:i a Y-m-d'
 });
 
