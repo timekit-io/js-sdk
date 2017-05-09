@@ -59,7 +59,9 @@ console.log(timekit);
 See `/examples` for implementation examples.
 
 ## Usage (init)
-Using the SDK is easy. For default behaviour, you don't need to set any configuration. In case you need to, here's the available options:
+The only required configuration is that you set the "app" key to your registered app slug on Timekit.
+
+Here's all the available options:
 
 ```javascript
 // Overwrites default config with supplied object, possible keys with default values below
