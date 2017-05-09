@@ -242,20 +242,6 @@ function Timekit() {
   };
 
   /**
-   * Get user's Google calendars
-   * @type {Function
-   * @return {Promise}
-   */
-  TK.getAccountGoogleCalendars = function() {
-
-    return TK.makeRequest({
-      url: '/accounts/google/calendars',
-      method: 'get'
-    });
-
-  };
-
-  /**
    * Initiate an account sync
    * @type {Function}
    * @return {Promise}
@@ -264,21 +250,6 @@ function Timekit() {
 
     return TK.makeRequest({
       url: '/accounts/sync',
-      method: 'get',
-      params: data
-    });
-
-  };
-
-  /**
-   * Initiate an account sync where only calendar models are synced
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.accountSyncCalendars = function(data) {
-
-    return TK.makeRequest({
-      url: '/accounts/sync/calendars',
       method: 'get',
       params: data
     });
@@ -459,20 +430,6 @@ function Timekit() {
   };
 
   /**
-   * Get users contacts that are present on Timekit (synced from providers)
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.getContacts = function() {
-
-    return TK.makeRequest({
-      url: '/contacts/',
-      method: 'get'
-    });
-
-  };
-
-  /**
    * Get all user's events
    * @type {Function}
    * @return {Promise}
@@ -549,21 +506,6 @@ function Timekit() {
   };
 
   /**
-   * Get a user's anonymized availability (other user's on Timekit can be queryied by supplying their email)
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.getAvailability = function(data) {
-
-    return TK.makeRequest({
-      url: '/events/availability',
-      method: 'get',
-      params: data
-    });
-
-  };
-
-  /**
    * Find mutual availability across multiple users/calendars
    * @type {Function}
    * @return {Promise}
@@ -579,7 +521,7 @@ function Timekit() {
   };
 
   /**
-   * Find mutual availability across multiple users/calendars
+   * Find bulk availability across multiple users/calendars
    * @type {Function}
    * @return {Promise}
    */
@@ -588,6 +530,68 @@ function Timekit() {
     return TK.makeRequest({
       url: '/findtime/bulk',
       method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Find team availability across multiple users/calendars
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.findTimeTeam = function(data) {
+
+    return TK.makeRequest({
+      url: '/findtime/team',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Create a findtime filtercollection
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createFindTimeFilterCollection = function(data) {
+
+    return TK.makeRequest({
+      url: '/findtime/filtercollections',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Get findtime filtercollections
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getFindTimeFilterCollections = function() {
+
+    return TK.makeRequest({
+      url: '/findtime/filtercollections',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Update a findtime filtercollections
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateFindTimeFilterCollection = function(data) {
+
+    var id = data.id;
+    delete data.id;
+
+    return TK.makeRequest({
+      url: '/findtime/filtercollections/' + id,
+      method: 'get',
       data: data
     });
 
@@ -769,6 +773,34 @@ function Timekit() {
       url: '/bookings/' + id + '/' + action,
       method: 'put',
       data: data
+    });
+
+  };
+
+  /**
+   * Get all bookings
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getGroupBookings = function() {
+
+    return TK.makeRequest({
+      url: '/bookings/groups',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Get specific booking
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getGroupBooking = function(data) {
+
+    return TK.makeRequest({
+      url: '/bookings/' + data.id + '/groups',
+      method: 'get'
     });
 
   };
