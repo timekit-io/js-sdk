@@ -100,9 +100,7 @@ Endpoints/methods:
 // Accounts endpoints
 timekit.getAccounts();
 timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
-timekit.getAccountGoogleCalendars();
 timekit.accountSync(data);
-timekit.accountSyncCalendars(data);
 
 // Auth endpoints
 timekit.auth(data);
@@ -121,19 +119,19 @@ timekit.createCalendar(data);
 timekit.updateCalendar(data);
 timekit.deleteCalendar(data);
 
-// Contacts endpoints
-timekit.getContacts();
-
 // Events endpoints
 timekit.getEvents(data);
 timekit.getEvent(data);
 timekit.createEvent(data);
 timekit.updateEvent(data);
-timekit.getAvailability(data);
 
 // FindTime endpoints
 timekit.findTime(data);
 timekit.findTimeBulk(data);
+timekit.findTimeTeam(data);
+timekit.createFindTimeFilterCollection(data);
+timekit.getFindTimeFilterCollections();
+timekit.updateFindTimeFilterCollection(data);
 
 // Users endpoints
 timekit.createUser(data);
@@ -152,6 +150,8 @@ timekit.getBookings();
 timekit.getBooking(data);
 timekit.createBooking(data);
 timekit.updateBooking(data);
+timekit.getGroupBookings();
+timekit.getGroupBooking(data);
 
 // Widget endpoints
 timekit.getWidgets();

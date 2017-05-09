@@ -64,9 +64,7 @@ describe('Endpoints', function() {
       // Accounts
       'getAccounts': 0,
       'accountGoogleSignup': 2,
-      'getAccountGoogleCalendars': 0,
       'accountSync': 1,
-      'accountSyncCalendars': 1,
 
       // Auth
       'auth': 1,
@@ -85,20 +83,20 @@ describe('Endpoints', function() {
       'updateCalendar': 1,
       'deleteCalendar': 1,
 
-      // Contacts
-      'getContacts': 0,
-
       // Events
       'getEvents': 1,
       'getEvent': 1,
       'createEvent': 1,
       'updateEvent': 1,
       'deleteEvent': 1,
-      'getAvailability': 1,
 
       // FindTime
       'findTime': 1,
       'findTimeBulk': 1,
+      'findTimeTeam': 1,
+      'createFindTimeFilterCollection': 1,
+      'getFindTimeFilterCollections': 0,
+      'updateFindTimeFilterCollection': 1,
 
       // Users
       'createUser': 1,
@@ -117,6 +115,8 @@ describe('Endpoints', function() {
       'getBooking': 1,
       'createBooking': 1,
       'updateBooking': 1,
+      'getGroupBookings': 0,
+      'getGroupBooking': 1,
 
       // Widgets
       'getWidgets': 0,
