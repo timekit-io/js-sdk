@@ -239,7 +239,15 @@ function Timekit() {
    */
   TK.accountGoogleSignup = function(data, shouldAutoRedirect) {
 
-    var url = buildUrl('/accounts/google/signup') + '?Timekit-App=' + config.app + (data && data.callback ? '&callback=' + data.callback : '');
+    var app = config.app;
+
+    // If app header exists (using .asApp() function), use that
+    if (headers['Timekit-App']) {
+      app = headers['Timekit-App'];
+      delete headers['Timekit-App'];
+    }
+
+    var url = buildUrl('/accounts/google/signup') + '?Timekit-App=' + app + (data && data.callback ? '&callback=' + data.callback : '');
 
     if(shouldAutoRedirect && window) {
       window.location.href = url;
