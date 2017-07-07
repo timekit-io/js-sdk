@@ -379,4 +379,24 @@ describe('Configuration', function() {
 
   });
 
+  it('should support setting app for next Google Signup request only (fluent)', function(done) {
+    var response, request;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    var googleUrl = timekit
+    .asApp(fixtures.app2)
+    .accountGoogleSignup();
+
+    expect(googleUrl).toBe(fixtures.apiBaseUrl + 'v2/accounts/google/signup?Timekit-App=' + fixtures.app2);
+
+    done();
+
+  });
+
 });
