@@ -59,12 +59,14 @@ console.log(timekit);
 See `/examples` for implementation examples.
 
 ## Usage (init)
-Using the SDK is easy. For default behaviour, you don't need to set any configuration. In case you need to, here's the available options:
+The only required configuration is that you set the "app" key to your registered app slug on Timekit.
+
+Here's all the available options:
 
 ```javascript
 // Overwrites default config with supplied object, possible keys with default values below
 timekit.configure({
-    app:                        'demo'                      // app name registered with timekit (get in touch)
+    app:                        'back-to-the-future'        // your registered app name (visit timekit.io)
     apiBaseUrl:                 'https://api.timekit.io/',  // API endpoint (do not change)
     apiVersion:                 'v2'                        // version of API to call (do not change)
     inputTimestampFormat:       'Y-m-d h:ia',               // default timestamp format that you supply
@@ -72,7 +74,7 @@ timekit.configure({
     timezone:                   'Europe/Copenhagen',        // override user's timezone for custom formatted timestamps in another timezone
     convertResponseToCamelcase: false,                      // should keys in JSON response automatically be converted from snake_case to camelCase?
     convertRequestToSnakecase:  true,                       // should keys in JSON requests automatically be converted from camelCase to snake_case?
-    autoFlattenResponse: true                               // if you keep this set to true, then responses with a "data" key will automatically be flattened to response.data (otherwise you need to access response.data.data). Note that pagination meta data is lost though.
+    autoFlattenResponse: true                               // if you keep this set to true, then responses with a "data" key will automatically be flattened to response.data (otherwise you need to access response.data.data). Pagination meta data can be found on response.metaData)
 });
 
 // Returns current config object
