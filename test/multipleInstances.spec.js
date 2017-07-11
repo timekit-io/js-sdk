@@ -29,7 +29,7 @@ describe('Multiple instances', function() {
     });
 
     instance2.configure({
-      app: fixtures.app
+      app: fixtures.app2
     });
 
     var instance1App = instance1.getConfig().app;
