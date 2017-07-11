@@ -924,6 +924,15 @@ function Timekit() {
 
   };
 
+  /**
+   * Return a new instance of the SDK
+   * @type {Function}
+   * @return {Object}
+   */
+  TK.newInstance = function() {
+    return new Timekit();
+  }
+
   return TK;
 
 }
