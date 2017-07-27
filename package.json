@@ -8,8 +8,13 @@
     "url": "https://github.com/timekit-io/js-sdk.git"
   },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start",
-    "build": "webpack && webpack --config webpack.config.min.js"
+    "build": "webpack && webpack --config webpack.config.min.js --bail",
+    "release:patch": "../flux/flux timekit:release patch js-sdk",
+    "release:minor": "../flux/flux timekit:release minor js-sdk",
+    "release:major": "../flux/flux timekit:release major js-sdk",
+    "deploy:prod": "../flux/flux timekit:deploy prod js-sdk",
+    "deploy:staging": "../flux/flux timekit:deploy staging js-sdk",
+    "test": "./node_modules/karma/bin/karma start"
   },
   "keywords": [
     "Timekit",
