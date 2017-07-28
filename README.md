@@ -270,3 +270,4 @@ karma start
 ## Roadmap/todos
 
 See [Issues](https://github.com/timekit-io/js-sdk/issues) for feature requests, bugs etc.
+ 
