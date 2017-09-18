@@ -74,7 +74,8 @@ timekit.configure({
     timezone:                   'Europe/Copenhagen',        // override user's timezone for custom formatted timestamps in another timezone
     convertResponseToCamelcase: false,                      // should keys in JSON response automatically be converted from snake_case to camelCase?
     convertRequestToSnakecase:  true,                       // should keys in JSON requests automatically be converted from camelCase to snake_case?
-    autoFlattenResponse: true                               // if you keep this set to true, then responses with a "data" key will automatically be flattened to response.data (otherwise you need to access response.data.data). Pagination meta data can be found on response.metaData)
+    autoFlattenResponse: true,                              // if you keep this set to true, then responses with a "data" key will automatically be flattened to response.data (otherwise you need to access response.data.data). Pagination meta data can be found on response.metaData)
+    resolvePaths: false                                     // allows you to add named path parameters to the url (e.g. /calendars/:id) when using makeRequest and fill them by passing a dict (e.g. path: { id: 123 })
 });
 
 // Returns current config object
@@ -213,6 +214,9 @@ timekit.makeRequest({
   data: {
     key: 'value'
   },
+  params: {
+    limit: 50
+  },
   timeout: 1000
 }).then(function(response){
   console.log(response);
@@ -270,4 +274,3 @@ karma start
 ## Roadmap/todos
 
 See [Issues](https://github.com/timekit-io/js-sdk/issues) for feature requests, bugs etc.
- 
