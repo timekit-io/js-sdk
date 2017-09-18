@@ -11,6 +11,7 @@
 var axios = require('axios');
 var base64 = require('base-64');
 var humps = require('humps');
+var pathToRegexp = require('path-to-regexp')
 
 function Timekit() {
 
@@ -33,7 +34,8 @@ function Timekit() {
     apiVersion: 'v2',
     convertResponseToCamelcase: false,
     convertRequestToSnakecase: true,
-    autoFlattenResponse: true
+    autoFlattenResponse: true,
+    resolvePaths: false
   };
 
   /**
@@ -55,12 +57,31 @@ function Timekit() {
     return config.apiBaseUrl + config.apiVersion + endpoint;
   };
 
+  /**
+   * Copy response metadata into own key to seperate from main payload
+   * @type {Function}
+   */
   var copyResponseMetaData = function(response) {
     if (Object.keys(response.data).length < 2) return
     response.metaData = {}
     Object.keys(response.data).forEach(function(key) {
       if (key !== 'data') response.metaData[key] = response.data[key]
     })
+  }
+
+  /**
+   * Compile a new url with named paths
+   * @type {Function}
+   * @return {String}
+   */
+  var resolvePaths = function(request) {
+    if (!request.path) return request
+    try {
+      var toPath = pathToRegexp.compile(request.url)
+      return toPath(request.path)
+    } catch (e) {
+      return request.url
+    }
   }
 
   /**
@@ -75,6 +96,11 @@ function Timekit() {
    * @return {Promise}
    */
   TK.makeRequest = function(args) {
+
+    // Resolve a path with named paths if enabled
+    if (config.resolvePaths) {
+      args.url = resolvePaths(args)
+    }
 
     // construct URL with base, version and endpoint
     args.url = buildUrl(args.url);

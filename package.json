@@ -53,6 +53,7 @@
     "axios": "^0.12.0",
     "base-64": "^0.1.0",
     "es6-promise-promise": "^1.0.0",
-    "humps": "^0.7.0"
+    "humps": "^0.7.0",
+    "path-to-regexp": "^2.0.0"
   }
 }
