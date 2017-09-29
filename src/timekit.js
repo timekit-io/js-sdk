@@ -11,6 +11,7 @@
 var axios = require('axios');
 var base64 = require('base-64');
 var humps = require('humps');
+var merge = require('deepmerge');
 
 function Timekit() {
 
@@ -22,6 +23,7 @@ function Timekit() {
   var userToken;
   var includes = [];
   var headers = {};
+  var nextPayload = {};
 
   /**
    * Default config
@@ -64,6 +66,27 @@ function Timekit() {
   }
 
   /**
+   * Add the carried payload for next request to the actual payload
+   * @type {Function}
+   * @return {String}
+   */
+  var mergeNextPayload = function (args) {
+    if (Object.keys(nextPayload).length === 0) return args
+    // Merge potential query string params manually
+    if (nextPayload.params && args.params) {
+      var nextParams = nextPayload.params
+      for (var param in nextParams) {
+        if (typeof args.params[param] !== 'undefined') {
+          args.params[param] += (';' + nextParams[param])
+        }
+      }
+    }
+    args = merge(nextPayload, args)
+    nextPayload = {};
+    return args
+  }
+
+  /**
    * Root Object that holds methods to expose for API consumption
    * @type {Object}
    */
@@ -75,6 +98,9 @@ function Timekit() {
    * @return {Promise}
    */
   TK.makeRequest = function(args) {
+
+    // Handle chained payload data if applicable
+    args = mergeNextPayload(args)
 
     // construct URL with base, version and endpoint
     args.url = buildUrl(args.url);
@@ -214,7 +240,17 @@ function Timekit() {
    * @return {Object}
    */
   TK.headers = function(data) {
-    for (var attr in data) { headers[attr] = data[attr]; }
+    headers = merge(headers, data)
+    return this;
+  };
+
+  /**
+   * Add supplied payload to the next request only
+   * @type {Function}
+   * @return {Object}
+   */
+  TK.carry = function(data) {
+    nextPayload = merge(nextPayload, data)
     return this;
   };
 

@@ -399,4 +399,122 @@ describe('Configuration', function() {
 
   });
 
+  it('should support carrying payload data for next only (fluent), query param', function(done) {
+    var request;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit
+    .carry({
+      params: {
+        q: 'something'
+      }
+    })
+    .getUserInfo()
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      expect(request.url).toBe(fixtures.apiBaseUrl + 'v2/users/me?q=something')
+
+      timekit
+      .getUserInfo()
+
+      utils.tick(function () {
+        request = jasmine.Ajax.requests.mostRecent();
+
+        expect(request.url).toBe(fixtures.apiBaseUrl + 'v2/users/me')
+
+        done();
+      })
+    })
+  });
+
+  it('should support carrying payload data for next only (fluent), body param', function(done) {
+    var request;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit
+    .carry({
+      data: {
+        last_name: 'doe'
+      }
+    })
+    .updateUser({
+      first_name: 'john'
+    })
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      var bodyData = request.data()
+
+      expect(bodyData.first_name).toBe('john')
+      expect(bodyData.last_name).toBe('doe')
+
+      timekit
+      .updateUser({
+        first_name: 'peter'
+      })
+
+      utils.tick(function () {
+        request = jasmine.Ajax.requests.mostRecent();
+
+        var bodyData = request.data()
+
+        expect(bodyData.first_name).toBe('peter')
+        expect(bodyData.last_name).toBeUndefined()
+
+        done();
+      })
+    })
+  });
+
+  it('should support carrying payload data for next only (fluent), merging query params', function(done) {
+    var request;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit
+    .carry({
+      params: {
+        q: 'bar',
+        z: 'bar'
+      }
+    })
+    .makeRequest({
+      method: 'get',
+      url: '/somewhere',
+      params: {
+        q: 'foo',
+        x: 'foo'
+      }
+    })
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      var resultQuery = 'v2/somewhere?q=foo%3Bbar&z=bar&x=foo'
+      expect(request.url).toBe(fixtures.apiBaseUrl + resultQuery)
+
+      done();
+    })
+  });
+
 });
