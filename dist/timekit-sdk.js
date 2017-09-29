@@ -67,6 +67,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var axios = __webpack_require__(4);
 	var base64 = __webpack_require__(23);
 	var humps = __webpack_require__(25);
+	var merge = __webpack_require__(26);
 	
 	function Timekit() {
 	
@@ -78,6 +79,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var userToken;
 	  var includes = [];
 	  var headers = {};
+	  var nextPayload = {};
 	
 	  /**
 	   * Default config
@@ -120,6 +122,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  /**
+	   * Add the carried payload for next request to the actual payload
+	   * @type {Function}
+	   * @return {String}
+	   */
+	  var mergeNextPayload = function (args) {
+	    if (Object.keys(nextPayload).length === 0) return args
+	    // Merge potential query string params manually
+	    if (nextPayload.params && args.params) {
+	      var nextParams = nextPayload.params
+	      for (var param in nextParams) {
+	        if (typeof args.params[param] !== 'undefined') {
+	          args.params[param] += (';' + nextParams[param])
+	        }
+	      }
+	    }
+	    args = merge(nextPayload, args)
+	    nextPayload = {};
+	    return args
+	  }
+	
+	  /**
 	   * Root Object that holds methods to expose for API consumption
 	   * @type {Object}
 	   */
@@ -131,6 +154,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @return {Promise}
 	   */
 	  TK.makeRequest = function(args) {
+	
+	    // Handle chained payload data if applicable
+	    args = mergeNextPayload(args)
 	
 	    // construct URL with base, version and endpoint
 	    args.url = buildUrl(args.url);
@@ -270,7 +296,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @return {Object}
 	   */
 	  TK.headers = function(data) {
-	    for (var attr in data) { headers[attr] = data[attr]; }
+	    headers = merge(headers, data)
+	    return this;
+	  };
+	
+	  /**
+	   * Add supplied payload to the next request only
+	   * @type {Function}
+	   * @return {Object}
+	   */
+	  TK.carry = function(data) {
+	    nextPayload = merge(nextPayload, data)
 	    return this;
 	  };
 	
@@ -3888,6 +3924,109 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	})(this);
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	var isMergeableObject = function isMergeableObject(value) {
+		return isNonNullObject(value)
+			&& !isSpecial(value)
+	};
+	
+	function isNonNullObject(value) {
+		return !!value && typeof value === 'object'
+	}
+	
+	function isSpecial(value) {
+		var stringValue = Object.prototype.toString.call(value);
+	
+		return stringValue === '[object RegExp]'
+			|| stringValue === '[object Date]'
+			|| isReactElement(value)
+	}
+	
+	// see https://github.com/facebook/react/blob/b5ac963fb791d1298e7f396236383bc955f916c1/src/isomorphic/classic/element/ReactElement.js#L21-L25
+	var canUseSymbol = typeof Symbol === 'function' && Symbol.for;
+	var REACT_ELEMENT_TYPE = canUseSymbol ? Symbol.for('react.element') : 0xeac7;
+	
+	function isReactElement(value) {
+		return value.$$typeof === REACT_ELEMENT_TYPE
+	}
+	
+	function emptyTarget(val) {
+	    return Array.isArray(val) ? [] : {}
+	}
+	
+	function cloneIfNecessary(value, optionsArgument) {
+	    var clone = optionsArgument && optionsArgument.clone === true;
+	    return (clone && isMergeableObject(value)) ? deepmerge(emptyTarget(value), value, optionsArgument) : value
+	}
+	
+	function defaultArrayMerge(target, source, optionsArgument) {
+	    var destination = target.slice();
+	    source.forEach(function(e, i) {
+	        if (typeof destination[i] === 'undefined') {
+	            destination[i] = cloneIfNecessary(e, optionsArgument);
+	        } else if (isMergeableObject(e)) {
+	            destination[i] = deepmerge(target[i], e, optionsArgument);
+	        } else if (target.indexOf(e) === -1) {
+	            destination.push(cloneIfNecessary(e, optionsArgument));
+	        }
+	    });
+	    return destination
+	}
+	
+	function mergeObject(target, source, optionsArgument) {
+	    var destination = {};
+	    if (isMergeableObject(target)) {
+	        Object.keys(target).forEach(function(key) {
+	            destination[key] = cloneIfNecessary(target[key], optionsArgument);
+	        });
+	    }
+	    Object.keys(source).forEach(function(key) {
+	        if (!isMergeableObject(source[key]) || !target[key]) {
+	            destination[key] = cloneIfNecessary(source[key], optionsArgument);
+	        } else {
+	            destination[key] = deepmerge(target[key], source[key], optionsArgument);
+	        }
+	    });
+	    return destination
+	}
+	
+	function deepmerge(target, source, optionsArgument) {
+	    var sourceIsArray = Array.isArray(source);
+	    var targetIsArray = Array.isArray(target);
+	    var options = optionsArgument || { arrayMerge: defaultArrayMerge };
+	    var sourceAndTargetTypesMatch = sourceIsArray === targetIsArray;
+	
+	    if (!sourceAndTargetTypesMatch) {
+	        return cloneIfNecessary(source, optionsArgument)
+	    } else if (sourceIsArray) {
+	        var arrayMerge = options.arrayMerge || defaultArrayMerge;
+	        return arrayMerge(target, source, optionsArgument)
+	    } else {
+	        return mergeObject(target, source, optionsArgument)
+	    }
+	}
+	
+	deepmerge.all = function deepmergeAll(array, optionsArgument) {
+	    if (!Array.isArray(array) || array.length < 2) {
+	        throw new Error('first argument should be an array with at least two elements')
+	    }
+	
+	    // we are sure there are at least 2 values, so it is safe to have no initial value
+	    return array.reduce(function(prev, next) {
+	        return deepmerge(prev, next, optionsArgument)
+	    })
+	};
+	
+	var deepmerge_1 = deepmerge;
+	
+	module.exports = deepmerge_1;
 
 
 /***/ })
