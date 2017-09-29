@@ -481,7 +481,7 @@ describe('Configuration', function() {
     })
   });
 
-  fit('should support carrying payload data for next only (fluent), merging query params', function(done) {
+  it('should support carrying payload data for next only (fluent), merging query params', function(done) {
     var request;
 
     timekit.configure({
