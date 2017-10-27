@@ -66,9 +66,9 @@ Here's all the available options:
 ```javascript
 // Overwrites default config with supplied object, possible keys with default values below
 timekit.configure({
-    app:                        'back-to-the-future'        // your registered app name (visit timekit.io)
+    app:                        'back-to-the-future',       // your registered app name (visit timekit.io)
     apiBaseUrl:                 'https://api.timekit.io/',  // API endpoint (do not change)
-    apiVersion:                 'v2'                        // version of API to call (do not change)
+    apiVersion:                 'v2',                       // version of API to call (do not change)
     inputTimestampFormat:       'Y-m-d h:ia',               // default timestamp format that you supply
     outputTimestampFormat:      'Y-m-d h:ia',               // default timestamp format that you want the API to return
     timezone:                   'Europe/Copenhagen',        // override user's timezone for custom formatted timestamps in another timezone
