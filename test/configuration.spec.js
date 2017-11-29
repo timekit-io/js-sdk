@@ -219,7 +219,7 @@ describe('Configuration', function() {
 
     timekit.configure({
       headers: {
-        MyTestHeader: 'test'
+        'MyTestHeader': 'test'
       }
     });
 
@@ -239,12 +239,14 @@ describe('Configuration', function() {
         responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
       });
 
+      // make another request, without configuring headers - headers should stick
       utils.tick(function () {
         // Check for headers set
-        expect(response.config.headers.MyTestHeader.toBe('test');
-        expect(request.requestHeaders.MyTestHeader.toBe('test');
+        expect(response.config.headers['MyTestHeader']).toBe('test');
+        expect(request.requestHeaders['MyTestHeader']).toBe('test');
 
-        // make another request, without configuring headers - headers should stick
+
+        // new try..
         timekit
         .getUserInfo()
         .then(function(res) {
@@ -261,11 +263,12 @@ describe('Configuration', function() {
 
           utils.tick(function () {
             // Check for headers set
-            expect(response.config.headers.MyTestHeader.toBe('test');
-            expect(request.requestHeaders.MyTestHeader.toBe('test');
+            expect(response.config.headers['MyTestHeader']).toBe('test');
+            expect(request.requestHeaders['MyTestHeader']).toBe('test');
             done();
           });
         });
+
       });
     });
 
