@@ -241,7 +241,6 @@ describe('Configuration', function() {
 
       utils.tick(function () {
         // Check for headers set
-        console.log(response.config.headers);
         expect(response.config.headers.MyTestHeader.toBe('test');
         expect(request.requestHeaders.MyTestHeader.toBe('test');
 
@@ -262,7 +261,6 @@ describe('Configuration', function() {
 
           utils.tick(function () {
             // Check for headers set
-            console.log(response.config.headers);
             expect(response.config.headers.MyTestHeader.toBe('test');
             expect(request.requestHeaders.MyTestHeader.toBe('test');
             done();
