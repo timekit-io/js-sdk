@@ -214,6 +214,104 @@ describe('Configuration', function() {
 
   });
 
+  it('should support setting header for future requests', function(done) {
+    var response, request;
+
+    timekit.configure({
+      headers: {
+        'MyTestHeader': 'test'
+      }
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit
+    .getUserInfo()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+      });
+
+      // make another request, without configuring headers - headers should stick
+      utils.tick(function () {
+        // Check for headers set
+        expect(response.config.headers['MyTestHeader']).toBe('test');
+        expect(request.requestHeaders['MyTestHeader']).toBe('test');
+
+
+        // new try..
+        timekit
+        .getUserInfo()
+        .then(function(res) {
+          response = res;
+        });
+
+        utils.tick(function () {
+          request = jasmine.Ajax.requests.mostRecent();
+
+          request.respondWith({
+            status: 200,
+            responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+          });
+
+          utils.tick(function () {
+            // Check for headers set
+            expect(response.config.headers['MyTestHeader']).toBe('test');
+            expect(request.requestHeaders['MyTestHeader']).toBe('test');
+            done();
+          });
+        });
+
+      });
+    });
+
+  });
+
+  it('headers should be overridden when specifically set', function(done) {
+    var response, request;
+
+    timekit.configure({
+      headers: {
+        'MyTestHeader': 'test'
+      }
+    });
+
+    timekit.setUser(fixtures.userEmail, fixtures.userApiToken);
+
+    timekit
+    .headers({
+      MyTestHeader: 'test2',
+    })
+    .getUserInfo()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+      });
+
+      utils.tick(function () {
+        // Check for headers set
+        expect(response.config.headers['MyTestHeader']).toBe('test2');
+        expect(request.requestHeaders['MyTestHeader']).toBe('test2');
+        done();
+      });
+    });
+
+  });
+
   it('should support setting user for next request only (fluent)', function(done) {
     var response, request;
 

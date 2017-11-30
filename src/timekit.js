@@ -108,6 +108,9 @@ function Timekit() {
     // add http headers if applicable
     args.headers = args.headers || headers || {};
 
+    if (config.headers) {
+      args.headers = merge(config.headers, args.headers)
+    }
     if (!args.headers['Timekit-App'] && config.app) {
       args.headers['Timekit-App'] = config.app;
     }
