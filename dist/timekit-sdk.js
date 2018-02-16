@@ -381,7 +381,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	
 	    r.then(function(response) {
-	      TK.setUser(response.data.email, response.data.api_token);
+	
+	      var token = response.data.api_token || response.data.apiToken;
+	
+	      TK.setUser(response.data.email, token);
+	      
 	    }).catch(function(){
 	      TK.setUser('','');
 	    });
