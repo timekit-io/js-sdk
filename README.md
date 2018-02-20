@@ -5,7 +5,7 @@
 
 [**Releases & changelog**](https://github.com/timekit-io/js-sdk/releases)
 
-Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [developers.timekit.io](http://developers.timekit.io).
+Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all our endpoints as documented on [https://reference.timekit.io/](https://reference.timekit.io/).
 
 Visit [timekit.io](http://timekit.io) to learn more and don't hesitate to contact Lasse Boisen Andersen ([la@timekit.io](mailto:la@timekit.io) or create an Issue) for questions. PR's are more than welcome!
 
@@ -92,7 +92,7 @@ timekit.getUser();
 
 ## Usage (endpoints)
 
-All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the `data` argument should be an object with keys named as referenced in the docs - see: http://developers.timekit.io
+All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the `data` argument should be an object with keys named as referenced in the docs - see: https://reference.timekit.io/
 
 If you supply keys as camelCased, they will automatically be converted to snake_case for you. Responses can also be converted to camelCase automatically if you set the config variable "convertResponseToCamelcase" to true.
 
@@ -223,7 +223,7 @@ timekit.makeRequest({
 
 ## Dynamic includes
 
-The Timekit API have support for [dynamically including related models](http://developers.timekit.io/docs/dynamic-includes) (aka. expand objects). We supports this functionality by providing a chainable/fluent method called `.include()` that can be called right before a request.
+The Timekit API have support for [dynamically including related models](https://reference.timekit.io/reference#dynamic-includes) (aka. expand objects). We supports this functionality by providing a chainable/fluent method called `.include()` that can be called right before a request.
 
 The method takes unlimited string arguments, with each one being a model that you want included in the response. For nested data (e.g. events grouped by calendar), use the dot notation to dig into relations, like `calender.events`.
 
