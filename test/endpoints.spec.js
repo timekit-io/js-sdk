@@ -1,9 +1,10 @@
 'use strict';
 
 var moment = require('moment');
-var timekit = require('../src/timekit.js');
+var timekitSdk = require('../src/timekit.js');
 var utils = require('./helpers/utils');
 
+var timekit = {}
 var fixtures = {
   app:            'demo',
   apiBaseUrl:     'http://api-localhost.timekit.io/',
@@ -18,10 +19,17 @@ var fixtures = {
  */
 describe('Endpoints', function() {
 
+  beforeEach(function() {
+    timekit = timekitSdk.newInstance()
+    jasmine.Ajax.install();
+  });
+
+  afterEach(function() {
+    jasmine.Ajax.uninstall();
+  });
+
   it('should be able to call an endpoint through a method', function(done) {
     var request, response;
-
-    jasmine.Ajax.install();
 
     timekit.configure({
       app: fixtures.app,
@@ -50,7 +58,6 @@ describe('Endpoints', function() {
       utils.tick(function () {
         expect(response.data).toBeDefined();
         expect(Object.prototype.toString.call(response.data)).toBe('[object Array]');
-        jasmine.Ajax.uninstall();
         done();
       });
     });
