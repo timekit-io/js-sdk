@@ -19,8 +19,6 @@ function Timekit() {
    * Auth variables for login gated API methods
    * @type {String}
    */
-  var userEmail;
-  var userToken;
   var includes = [];
   var headers = {};
   var nextPayload = {};
@@ -35,7 +33,10 @@ function Timekit() {
     apiVersion: 'v2',
     convertResponseToCamelcase: false,
     convertRequestToSnakecase: true,
-    autoFlattenResponse: true
+    autoFlattenResponse: true,
+    resourceEmail: null,
+    resourceKey: null,
+    appKey: null,
   };
 
   /**
@@ -124,9 +125,14 @@ function Timekit() {
       args.headers['Timekit-Timezone'] = config.timezone;
     }
 
-    // add auth headers if not being overwritten by request/asUser
-    if (!args.headers['Authorization'] && userEmail && userToken) {
-      args.headers['Authorization'] = 'Basic ' + encodeAuthHeader(userEmail, userToken);
+    // add auth headers (personal token) if not being overwritten by request/asUser
+    if (!args.headers['Authorization'] && config.resourceEmail && config.resourceKey) {
+      args.headers['Authorization'] = 'Basic ' + encodeAuthHeader(config.resourceEmail, config.resourceKey);
+    }
+
+    // add auth headers (app token)
+    if (!args.headers['Authorization'] && config.appKey) {
+      args.headers['Authorization'] = 'Basic ' + encodeAuthHeader('', config.appKey);
     }
 
     // reset headers
@@ -192,9 +198,9 @@ function Timekit() {
    * Set the active user manually (happens automatically on timekit.auth())
    * @type {Function}
    */
-  TK.setUser = function(email, apiToken) {
-    userEmail = email;
-    userToken = apiToken;
+  TK.setUser = function(email, apiKey) {
+    config.resourceEmail = email;
+    config.resourceKey = apiKey;
   };
 
   /**
@@ -204,17 +210,34 @@ function Timekit() {
    */
   TK.getUser = function() {
     return {
-      email: userEmail,
-      apiToken: userToken
+      email: config.resourceEmail,
+      apiToken: config.resourceKey
     };
+  };
+
+  /**
+   * Set app token (happens automatically on timekit.auth())
+   * @type {Function}
+   */
+  TK.setAppKey = function(apiKey) {
+    config.appKey = apiKey;
+  };
+
+  /**
+   * Returns the app token
+   * @type {Function}
+   * @return {Object}
+   */
+  TK.getAppKey = function() {
+    return config.appKey
   };
 
   /**
    * Set the active user temporarily for the next request (fluent/chainable return)
    * @type {Function}
    */
-  TK.asUser = function(email, apiToken) {
-    headers['Authorization'] = 'Basic ' + encodeAuthHeader(email, apiToken);
+  TK.asUser = function(email, apiKey) {
+    headers['Authorization'] = 'Basic ' + encodeAuthHeader(email, apiKey);
     return this;
   };
 
@@ -327,9 +350,8 @@ function Timekit() {
     r.then(function(response) {
 
       var token = response.data.api_token || response.data.apiToken;
-
       TK.setUser(response.data.email, token);
-      
+
     }).catch(function(){
       TK.setUser('','');
     });

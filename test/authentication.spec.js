@@ -1,16 +1,19 @@
 'use strict';
 
 var moment = require('moment');
-var timekit = require('../src/timekit.js');
+var timekitSdk = require('../src/timekit.js');
 var utils = require('./helpers/utils');
+var base64 = require('base-64');
 
+var timekit = {}
 var fixtures = {
   app:            'demo',
   apiBaseUrl:     'http://api-localhost.timekit.io/',
   userEmail:      'doc.brown@timekit.io',
   userInvalidEmail: 'invaliduser@gmail.com',
   userPassword:   'password',
-  userApiToken:   'password'
+  userApiToken:   'password',
+  appKey:         '123'
 }
 
 /**
@@ -19,11 +22,8 @@ var fixtures = {
 describe('Authentication', function() {
 
   beforeEach(function() {
+    timekit = timekitSdk.newInstance()
     jasmine.Ajax.install();
-    timekit.configure({
-      app: fixtures.app,
-      apiBaseUrl: fixtures.apiBaseUrl
-    });
   });
 
   afterEach(function () {
@@ -32,6 +32,11 @@ describe('Authentication', function() {
 
   it('should be able to authenticate by calling [GET] /auth', function(done) {
     var response, request;
+
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
 
     timekit.auth({
       email: fixtures.userEmail,
@@ -68,6 +73,11 @@ describe('Authentication', function() {
   it('should be able to fail authentication with wrong credentials by calling [GET] /auth', function(done) {
     var response, request;
 
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
     timekit.auth({
       email: fixtures.userInvalidEmail,
       password: fixtures.userPassword
@@ -98,10 +108,88 @@ describe('Authentication', function() {
 
   it('should be able to call [GET] /accounts/google/signup endpoint', function() {
 
+    timekit.configure({
+      app: fixtures.app,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
     var result = timekit.accountGoogleSignup();
 
     // should match a valid HTTP(S) url
     expect(result).toMatch(/^((https?:)(\/\/\/?)([\w]*(?::[\w]*)?@)?([\d\w\.-]+)(?::(\d+))?)?([\/\\\w\.()-]*)?(?:([?][^#]*)?(#.*)?)*/gmi);
+
+  });
+
+  it('should be able to use resource key auth (app, email, key)', function(done) {
+    var response, request;
+
+    timekit.configure({
+      app: fixtures.app,
+      resourceEmail: fixtures.userEmail,
+      resourceKey: fixtures.userApiToken
+    });
+
+    var newConfig = timekit.getConfig();
+    expect(newConfig.resourceEmail).toEqual(fixtures.userEmail);
+    expect(newConfig.resourceKey).toEqual(fixtures.userApiToken);
+
+    timekit.getBookings()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        responseText: '{ "data": [] }'
+      });
+
+      utils.tick(function () {
+        var authHeader = request.requestHeaders.Authorization;
+        var authToken = authHeader.split('Basic ')[1]
+        var decodedToken = base64.decode(authToken);
+        expect(decodedToken).toEqual(fixtures.userEmail + ':' + fixtures.userApiToken);
+        expect(request.requestHeaders['Timekit-App']).toEqual(fixtures.app);
+        done();
+      });
+    });
+
+  });
+
+  it('should be able to use app key auth', function(done) {
+    var response, request;
+
+    timekit.configure({
+      appKey: fixtures.appKey,
+      apiBaseUrl: fixtures.apiBaseUrl
+    });
+
+    var newConfig = timekit.getConfig();
+    expect(newConfig.appKey).toEqual(fixtures.appKey);
+
+    timekit.getBookings()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        responseText: '{ "data": [] }'
+      });
+
+      utils.tick(function () {
+        var authHeader = request.requestHeaders.Authorization;
+        var authToken = authHeader.split('Basic ')[1]
+        var decodedToken = base64.decode(authToken);
+        expect(decodedToken).toEqual(':' + fixtures.appKey);
+        done();
+      });
+    });
 
   });
 

@@ -1,9 +1,10 @@
 'use strict';
 
 var moment = require('moment');
-var timekit = require('../src/timekit.js');
+var timekitSdk = require('../src/timekit.js');
 var utils = require('./helpers/utils');
 
+var timekit = {}
 var fixtures = {
   app:            'timebird',
   apiBaseUrl:     'http://api-localhost.timekit.io/',
@@ -19,6 +20,7 @@ var fixtures = {
 describe('Dynamic includes', function() {
 
   beforeEach(function() {
+    timekit = timekitSdk.newInstance()
     jasmine.Ajax.install();
 
     timekit.configure({

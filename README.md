@@ -10,7 +10,8 @@ Make API calls to Timekit with our easy-to-use JavaScript SDK. It supports all o
 Visit [timekit.io](http://timekit.io) to learn more and don't hesitate to contact Lasse Boisen Andersen ([la@timekit.io](mailto:la@timekit.io) or create an Issue) for questions. PR's are more than welcome!
 
 Features:
-- Returns ES-6/A+ style promises
+- Supports API auth with both app keys and resource keys
+- Returns ES6/A+ style promises
 - Works in both node.js and in the browser (>=IE8 and evergreen)
 - Supports custom timestamp formats and timezones
 
@@ -34,6 +35,11 @@ The SDK is UMD (Universal Module Definition) compatible, which means that it can
 
 *Note: Use plain or minified builds in `/dist` when using in browser. In node, `/src/timekit.js` will be used through npm (or reference it manually in your require)*
 
+**ES6 module**  
+```javascript
+import timekit from 'timekit-sdk'
+console.log(timekit);
+```
 
 **AMD (with e.g. require.js)**  
 ```javascript
@@ -58,6 +64,38 @@ console.log(timekit);
 
 See `/examples` for implementation examples.
 
+## Authentication
+
+### App key
+*Only for server-side integrations!*  
+
+With app keys, your capabilities are scoped on an app-level which mean that you can access data (e.g. bookings) across all resources. It's essential that you only use this for server-side integrations as the key grants full access to your whole timekit app data.
+
+```javascript
+timekit.configure({
+  appKey: 'live_api_key_4cY2KWMggw95mAdx51eYUO2CyIWI2xup'
+})
+```
+
+Your app key can be found in the Timekit admin panel (https://admin.timekit.io)
+
+### Resource keys
+*For client-side integrations!*  
+
+Resource keys are scoped by the resource and the data that they have access to. The primary use-case is together with our booking.js widget that only acts as a single resource at a time.
+
+Resource keys needs to be accompanied by the resource's email and the app attribute. Note that two types of keys exist: `server-token` and `client-token`, where only the latter should be used. Please refer to the [API reference](https://developers.timekit.io/reference#credentials).
+
+```javascript
+timekit.configure({
+  app: 'back-to-the-future',
+  resourceEmail: 'marty.mcfly@timekit.io',
+  resourceKey: '4cY2KWMggw95mAdx51eYUO2CyIWI2xup'
+})
+```
+
+🚨 **Important!** Resource keys are being phased out as a supported authentication mechanism. We encourage you to use app keys for new Timekit integrations.
+
 ## Usage (init)
 The only required configuration is that you set the "app" key to your registered app slug on Timekit.
 
@@ -66,7 +104,6 @@ Here's all the available options:
 ```javascript
 // Overwrites default config with supplied object, possible keys with default values below
 timekit.configure({
-    app:                        'back-to-the-future',       // your registered app name (visit timekit.io)
     apiBaseUrl:                 'https://api.timekit.io/',  // API endpoint (do not change)
     apiVersion:                 'v2',                       // version of API to call (do not change)
     inputTimestampFormat:       'Y-m-d h:ia',               // default timestamp format that you supply
@@ -79,15 +116,6 @@ timekit.configure({
 
 // Returns current config object
 timekit.getConfig();
-
-// Set the user to auth with (gets automatically set after timekit.auth())
-timekit.setUser(
-    email,      // [String] email of the user
-    apiToken    // [String] access token retrieved from API
-);
-
-// Returns current user that have been set previously (email and apiToken)
-timekit.getUser();
 ```
 
 ## Usage (endpoints)
@@ -200,7 +228,7 @@ Response example:
 }
 ```
 
-## Usage (lowlevel API)
+## Usage (low-level API)
 
 If you, for some reason, would like direct access to axios's request API, you can call the `timekit.makeRequest()` method directly. We'll still set the correct config headers, base url and includes, but otherwise it supports all the settings that [axios](https://github.com/mzabriskie/axios) does.
 
@@ -221,22 +249,39 @@ timekit.makeRequest({
 });
 ```
 
-## Dynamic includes
+## Usage (carry)
+
+If you want to inject specific params/query string or data into the next API request, you can use the `carry` method. It's handy for e.g. filtering result (`search`) or adding pagination (`limit`).
+
+Example:
+```javascript
+timekit
+  .carry({
+    params: {
+      search: 'graph:confirm_decline',
+      limit: 10
+    }
+  })
+  .getBookings()
+  .then(function(response) {
+    // Response is filtered by the search query and limited to only 10 items
+  });
+```
+
+## Usage (dynamic includes)
 
 The Timekit API have support for [dynamically including related models](https://reference.timekit.io/reference#dynamic-includes) (aka. expand objects). We supports this functionality by providing a chainable/fluent method called `.include()` that can be called right before a request.
 
 The method takes unlimited string arguments, with each one being a model that you want included in the response. For nested data (e.g. events grouped by calendar), use the dot notation to dig into relations, like `calender.events`.
 
 Example:
-
 ```javascript
-
 timekit
-.include('calendars.events', 'users')
-.getUserInfo()
-.then(function(response) {
+  .include('calendars.events', 'users')
+  .getUserInfo()
+  .then(function(response) {
     // Response contains JSON data with nested info on the user's calendars, events and meetings
-});
+  });
 ```
 
 This is super powerful because it means that you can avoid unnecessary extra requests compared to fetching each resource sequentially.
@@ -270,4 +315,3 @@ karma start
 ## Roadmap/todos
 
 See [Issues](https://github.com/timekit-io/js-sdk/issues) for feature requests, bugs etc.
- 
