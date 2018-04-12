@@ -134,6 +134,96 @@ module.exports = function (TK) {
   };
 
   /**
+   * Fetch current resource data from server
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getResources = function() {
+
+    return TK.makeRequest({
+      url: '/resources',
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Fetch current resource data from server
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getResource = function(data) {
+
+    return TK.makeRequest({
+      url: '/resources/' + data.id,
+      method: 'get'
+    });
+
+  };
+
+  /**
+   * Create a new resource with the given properties
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.createResource = function(data) {
+
+    return TK.makeRequest({
+      url: '/resources',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Fetch current resource data from server
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.updateResource = function(data) {
+
+    var id = data.id;
+    delete data.id;
+
+    return TK.makeRequest({
+      url: '/resources/' + id,
+      method: 'put',
+      data: data
+    });
+
+  };
+
+  /**
+   * Reset password for a resource
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.resetResourcePassword = function(data) {
+
+    return TK.makeRequest({
+      url: '/resources/resetpassword',
+      method: 'post',
+      data: data
+    });
+
+  };
+
+  /**
+   * Get a specific resource's timezone
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.getResourceTimezone = function(data) {
+
+    return TK.makeRequest({
+      url: '/resources/timezone/' + data.email,
+      method: 'get'
+    });
+
+  };
+
+  /**
    * Get users calendars that are present on Timekit (synced from providers)
    * @type {Function}
    * @return {Promise}

@@ -76,6 +76,14 @@ describe('Endpoints', function() {
       'updateApp': 1,
       'deleteApp': 1,
 
+      // Resources
+      'getResources': 0,
+      'getResource': 1,
+      'createResource': 1,
+      'updateResource': 1,
+      'resetResourcePassword': 1,
+      'getResourceTimezone': 1,
+
       // Calendars
       'getCalendars': 0,
       'getCalendar': 1,

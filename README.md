@@ -92,56 +92,30 @@ timekit.getUser();
 
 ## Usage (endpoints)
 
-All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the `data` argument should be an object with keys named as referenced in the docs - see: https://reference.timekit.io/
+All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the `data` argument should be an object with keys named as referenced in the docs - see: https://reference.timekit.io/reference/
 
 If you supply keys as camelCased, they will automatically be converted to snake_case for you. Responses can also be converted to camelCase automatically if you set the config variable "convertResponseToCamelcase" to true.
 
 Endpoints/methods:
 
 ```javascript
-// Auth endpoints
-timekit.auth(data);
-
-// Apps endpoints
+// App endpoints
 timekit.getApp(data);
 
-// Accounts endpoints
-timekit.getAccounts();
-timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
-timekit.accountSync(data);
-
-// Calendars endpoints
-timekit.getCalendars();
-timekit.getCalendar(data);
-timekit.createCalendar(data);
-timekit.updateCalendar(data);
-timekit.deleteCalendar(data);
-
-// Events endpoints
-timekit.getEvents(data);
-timekit.getEvent(data);
-timekit.createEvent(data);
-timekit.updateEvent(data);
-timekit.deleteEvent(data);
+// Resource endpoints
+timekit.getResources();
+timekit.getResource(data);
+timekit.createResource(data);
+timekit.updateResource(data);
+timekit.resetResourcePassword(data);
+timekit.getResourceTimezone(data);
 
 // FindTime endpoints
 timekit.findTime(data);
 timekit.findTimeBulk(data);
 timekit.findTimeTeam(data);
 
-// Users endpoints
-timekit.createUser(data);
-timekit.getUserInfo();
-timekit.updateUser(data);
-timekit.resetUserPassword(data);
-timekit.getUserTimezone(data);
-
-// Credentials endpoints
-timekit.getCredentials();
-timekit.createCredential(data);
-timekit.deleteCredential(data);
-
-// Bookings endpoints
+// Booking endpoints
 timekit.getBookings();
 timekit.getBooking(data);
 timekit.createBooking(data);
@@ -150,6 +124,33 @@ timekit.updateBooking(data);
 timekit.updateBookingsBulk(data);
 timekit.getGroupBookings();
 timekit.getGroupBooking(data);
+
+// Auth endpoints (Note: only used to fetch a resource key)
+timekit.auth(data);
+
+// Account endpoints
+timekit.getAccounts();
+timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
+timekit.accountSync(data);
+
+// Calendar endpoints
+timekit.getCalendars();
+timekit.getCalendar(data);
+timekit.createCalendar(data);
+timekit.updateCalendar(data);
+timekit.deleteCalendar(data);
+
+// Event endpoints
+timekit.getEvents(data);
+timekit.getEvent(data);
+timekit.createEvent(data);
+timekit.updateEvent(data);
+timekit.deleteEvent(data);
+
+// Credential endpoints (Note: only used manage resource keys)
+timekit.getCredentials();
+timekit.createCredential(data);
+timekit.deleteCredential(data);
 ```
 
 Request example:
@@ -195,7 +196,7 @@ Example:
 ```javascript
 
 timekit.makeRequest({
-  url: '/endpoint/goes/here',
+  url: '/bookings',
   method: 'post',
   data: {
     key: 'value'
