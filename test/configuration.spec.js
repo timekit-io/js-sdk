@@ -1,9 +1,10 @@
 'use strict';
 
-var timekit = require('../src/timekit.js');
+var timekitSdk = require('../src/timekit.js');
 var utils = require('./helpers/utils');
 var base64 = require('base-64');
 
+var timekit = {}
 var fixtures = {
   app:              'demo',
   app2:             'demo2',
@@ -30,6 +31,7 @@ var fixtures = {
 describe('Configuration', function() {
 
   beforeEach(function() {
+    timekit = timekitSdk.newInstance()
     jasmine.Ajax.install();
   });
 

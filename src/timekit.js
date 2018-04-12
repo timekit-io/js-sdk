@@ -34,9 +34,9 @@ function Timekit() {
     convertResponseToCamelcase: false,
     convertRequestToSnakecase: true,
     autoFlattenResponse: true,
-    userEmail: null,
-    userToken: null,
-    appToken: null,
+    resourceEmail: null,
+    resourceKey: null,
+    appKey: null,
   };
 
   /**
@@ -126,13 +126,13 @@ function Timekit() {
     }
 
     // add auth headers (personal token) if not being overwritten by request/asUser
-    if (!args.headers['Authorization'] && config.userEmail && config.userToken) {
-      args.headers['Authorization'] = 'Basic ' + encodeAuthHeader(config.userEmail, config.userToken);
+    if (!args.headers['Authorization'] && config.resourceEmail && config.resourceKey) {
+      args.headers['Authorization'] = 'Basic ' + encodeAuthHeader(config.resourceEmail, config.resourceKey);
     }
 
     // add auth headers (app token)
-    if (!args.headers['Authorization'] && config.appToken) {
-      args.headers['Authorization'] = 'Basic ' + encodeAuthHeader('', config.appToken);
+    if (!args.headers['Authorization'] && config.appKey) {
+      args.headers['Authorization'] = 'Basic ' + encodeAuthHeader('', config.appKey);
     }
 
     // reset headers
@@ -198,17 +198,9 @@ function Timekit() {
    * Set the active user manually (happens automatically on timekit.auth())
    * @type {Function}
    */
-  TK.setUser = function(email, apiToken) {
-    config.userEmail = email;
-    config.userToken = apiToken;
-  };
-
-  /**
-   * Set app token (happens automatically on timekit.auth())
-   * @type {Function}
-   */
-  TK.setAppToken = function(apiToken) {
-    config.appToken = apiToken;
+  TK.setUser = function(email, apiKey) {
+    config.resourceEmail = email;
+    config.resourceKey = apiKey;
   };
 
   /**
@@ -218,9 +210,17 @@ function Timekit() {
    */
   TK.getUser = function() {
     return {
-      email: config.userEmail,
-      apiToken: config.userToken
+      email: config.resourceEmail,
+      apiToken: config.resourceKey
     };
+  };
+
+  /**
+   * Set app token (happens automatically on timekit.auth())
+   * @type {Function}
+   */
+  TK.setAppKey = function(apiKey) {
+    config.appKey = apiKey;
   };
 
   /**
@@ -228,16 +228,16 @@ function Timekit() {
    * @type {Function}
    * @return {Object}
    */
-  TK.getAppToken = function() {
-    return config.appToken
+  TK.getAppKey = function() {
+    return config.appKey
   };
 
   /**
    * Set the active user temporarily for the next request (fluent/chainable return)
    * @type {Function}
    */
-  TK.asUser = function(email, apiToken) {
-    headers['Authorization'] = 'Basic ' + encodeAuthHeader(email, apiToken);
+  TK.asUser = function(email, apiKey) {
+    headers['Authorization'] = 'Basic ' + encodeAuthHeader(email, apiKey);
     return this;
   };
 
