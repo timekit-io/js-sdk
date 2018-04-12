@@ -2,4 +2,4 @@
 node_modules
 test/coverage
 .env
-.yarn-error.log
+yarn-error.log
