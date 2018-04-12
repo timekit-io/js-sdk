@@ -57,21 +57,21 @@ describe('Endpoints', function() {
 
   });
 
-  it('should support all API endpoints as methods', function() {
+  it('should support all API current endpoints as methods', function() {
 
     var methods = {
+
+      // Auth
+      'auth': 1,
 
       // Accounts
       'getAccounts': 0,
       'accountGoogleSignup': 2,
       'accountSync': 1,
 
-      // Auth
-      'auth': 1,
-
       // Apps
       'getApps': 0,
-      'getApp': 1,
+      'getApp': 0,
       'createApp': 1,
       'updateApp': 1,
       'deleteApp': 1,
@@ -94,16 +94,6 @@ describe('Endpoints', function() {
       'findTime': 1,
       'findTimeBulk': 1,
       'findTimeTeam': 1,
-      'createFindTimeFilterCollection': 1,
-      'getFindTimeFilterCollections': 0,
-      'updateFindTimeFilterCollection': 1,
-
-      // Users
-      'createUser': 1,
-      'getUserInfo': 0,
-      'updateUser': 1,
-      'resetUserPassword': 1,
-      'getUserTimezone': 1,
 
       // Credentials
       'getCredentials': 0,
@@ -114,7 +104,9 @@ describe('Endpoints', function() {
       'getBookings': 0,
       'getBooking': 1,
       'createBooking': 1,
+      'createBookingsBulk': 1,
       'updateBooking': 1,
+      'updateBookingsBulk': 1,
       'getGroupBookings': 0,
       'getGroupBooking': 1,
 
@@ -126,6 +118,34 @@ describe('Endpoints', function() {
       'createWidget': 1,
       'updateWidget': 1,
       'deleteWidget': 1
+
+    }
+
+    Object.keys(methods).forEach(function(key) {
+
+      expect(typeof timekit[key]).toBe('function');
+      expect(timekit[key]).toBeDefined();
+      expect(timekit[key].length).toEqual(methods[key]);
+
+    });
+
+  });
+
+  it('should support all API deprecated endpoints as methods', function() {
+
+    var methods = {
+
+      // Users
+      'createUser': 1,
+      'getUserInfo': 0,
+      'updateUser': 1,
+      'resetUserPassword': 1,
+      'getUserTimezone': 1,
+
+      // Filter collections
+      'createFindTimeFilterCollection': 1,
+      'getFindTimeFilterCollections': 0,
+      'updateFindTimeFilterCollection': 1,
 
     }
 

@@ -99,20 +99,16 @@ If you supply keys as camelCased, they will automatically be converted to snake_
 Endpoints/methods:
 
 ```javascript
-// Accounts endpoints
-timekit.getAccounts();
-timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
-timekit.accountSync(data);
-
 // Auth endpoints
 timekit.auth(data);
 
 // Apps endpoints
-timekit.getApps();
 timekit.getApp(data);
-timekit.createApp(data);
-timekit.updateApp(data);
-timekit.deleteApp(data);
+
+// Accounts endpoints
+timekit.getAccounts();
+timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
+timekit.accountSync(data);
 
 // Calendars endpoints
 timekit.getCalendars();
@@ -126,14 +122,12 @@ timekit.getEvents(data);
 timekit.getEvent(data);
 timekit.createEvent(data);
 timekit.updateEvent(data);
+timekit.deleteEvent(data);
 
 // FindTime endpoints
 timekit.findTime(data);
 timekit.findTimeBulk(data);
 timekit.findTimeTeam(data);
-timekit.createFindTimeFilterCollection(data);
-timekit.getFindTimeFilterCollections();
-timekit.updateFindTimeFilterCollection(data);
 
 // Users endpoints
 timekit.createUser(data);
@@ -151,18 +145,11 @@ timekit.deleteCredential(data);
 timekit.getBookings();
 timekit.getBooking(data);
 timekit.createBooking(data);
+timekit.createBookingsBulk(data);
 timekit.updateBooking(data);
+timekit.updateBookingsBulk(data);
 timekit.getGroupBookings();
 timekit.getGroupBooking(data);
-
-// Widget endpoints
-timekit.getWidgets();
-timekit.getWidget(data);
-timekit.getHostedWidget(data);
-timekit.getEmbedWidget(data);
-timekit.createWidget(data);
-timekit.updateWidget();
-timekit.deleteWidget();
 ```
 
 Request example:
@@ -270,4 +257,3 @@ karma start
 ## Roadmap/todos
 
 See [Issues](https://github.com/timekit-io/js-sdk/issues) for feature requests, bugs etc.
- 
