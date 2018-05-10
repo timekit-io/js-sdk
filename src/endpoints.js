@@ -849,7 +849,7 @@ module.exports = function (TK) {
   TK.removeProjectResource = function(data) {
 
     return TK.makeRequest({
-      url: '/projects/' + data.id + '/resources/' + data.resourceId
+      url: '/projects/' + data.id + '/resources/' + data.resourceId,
       method: 'delete'
     });
 
