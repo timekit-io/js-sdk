@@ -110,6 +110,9 @@ describe('Endpoints', function() {
       'findTimeBulk': 1,
       'findTimeTeam': 1,
 
+      // Availability
+      'fetchAvailability': 1,
+
       // Credentials
       'getCredentials': 0,
       'createCredential': 1,
@@ -132,7 +135,19 @@ describe('Endpoints', function() {
       'getEmbedWidget': 1,
       'createWidget': 1,
       'updateWidget': 1,
-      'deleteWidget': 1
+      'deleteWidget': 1,
+
+      // Projects
+      'getProjects': 0,
+      'getProject': 1,
+      'getHostedProject': 1,
+      'getEmbedProject': 1,
+      'createProject': 1,
+      'updateProject': 1,
+      'deleteProject': 1,
+      'addProjectResource': 1,
+      'setProjectResources': 1,
+      'removeProjectResource': 1
 
     }
 

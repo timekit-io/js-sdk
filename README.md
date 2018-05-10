@@ -132,9 +132,9 @@ timekit.getApp(data);
 
 // Resource endpoints
 timekit.getResources();
-timekit.getResource(data);
-timekit.createResource(data);
-timekit.updateResource(data);
+timekit.getResource({ id });
+timekit.createResource({ ... });
+timekit.updateResource({ id, ... });
 timekit.resetResourcePassword(data);
 timekit.getResourceTimezone(data);
 
@@ -142,6 +142,9 @@ timekit.getResourceTimezone(data);
 timekit.findTime(data);
 timekit.findTimeBulk(data);
 timekit.findTimeTeam(data);
+
+// Availability endpoints
+timekit.fetchAvailability(data);
 
 // Booking endpoints
 timekit.getBookings();
@@ -179,6 +182,18 @@ timekit.deleteEvent(data);
 timekit.getCredentials();
 timekit.createCredential(data);
 timekit.deleteCredential(data);
+
+// Project endpoints
+timekit.getProjects();
+timekit.getProject(data);
+timekit.getHostedProject(data);
+timekit.getEmbedProject(data);
+timekit.createProject(data);
+timekit.updateProject(data);
+timekit.deleteProject(data);
+timekit.addProjectResource(data);
+timekit.setProjectResources(data);
+timekit.removeProjectResource(data);
 ```
 
 Request example:
