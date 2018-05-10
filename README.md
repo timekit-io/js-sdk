@@ -120,9 +120,9 @@ timekit.getConfig();
 
 ## Usage (endpoints)
 
-All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the `data` argument should be an object with keys named as referenced in the docs - see: https://reference.timekit.io/reference/
+All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the method argument should be an object with keys named as referenced in the docs - see: https://developers.timekit.io/reference/
 
-If you supply keys as camelCased, they will automatically be converted to snake_case for you. Responses can also be converted to camelCase automatically if you set the config variable "convertResponseToCamelcase" to true.
+If you supply keys as camelCased, they will automatically be converted to snake_case for you. Responses can also be converted to camelCase automatically if you set the config variable `convertResponseToCamelcase` to true.
 
 Endpoints/methods:
 
@@ -198,20 +198,30 @@ timekit.removeProjectResource({ id, resourceId })
 
 Request example:
 ```javascript
-
-timekit.createEvent({
-  start:        '2018-10-26T15:45:00+00:07',
-  end:          '2018-10-26T17:30:00+00:07',
-  what:         'Coffee with the timelords',
-  where:        'Timekit HQ @ San Francisco',
-  participants: ['doc.brown@timekit.io', 'john@doe.com'],
-  invite:       true,
-  calendar_id:  '794f6cca-68b5-11e5-9d70-feff819cdc9f'
+// Using promises
+timekit.createBooking({
+  resource_id: 'd187d6e0-d6cb-409a-ae60-45a8fd0ec879',
+  graph: 'confirm_decline',
+  start: '1955-11-12T21:30:00-07:00',
+  end: '1955-11-12T22:15:00-07:00',
+  what: 'Catch the lightning',
+  where: 'Courthouse, Hill Valley, CA 95420, USA',
+  description: 'The lightning strikes at 10:04 PM exactly! I need you to be there Doc!',
+  customer: {
+    name: 'Marty McFly',
+    email: 'marty.mcfly@timekit.io',
+    phone: '(916) 555-4385',
+    voip: 'McFly',
+    timezone: 'America/Los_Angeles'
+  }
 }).then(function(response){
   console.log(response);
 }).catch(function(response){
   console.log(response);
 });
+
+// Using async/await
+const response = await timekit.createBooking({ ... })
 ```
 
 Response example:
