@@ -128,80 +128,80 @@ Endpoints/methods:
 
 ```javascript
 // App endpoints
-timekit.getApp(data);
+timekit.getApp()
 
 // Resource endpoints
-timekit.getResources();
-timekit.getResource({ id });
-timekit.createResource({ ... });
-timekit.updateResource({ id, ... });
-timekit.resetResourcePassword(data);
-timekit.getResourceTimezone(data);
+timekit.getResources()
+timekit.getResource({ id })
+timekit.createResource({ ... })
+timekit.updateResource({ id, ... })
+timekit.resetResourcePassword({ ... })
+timekit.getResourceTimezone({ email })
 
 // FindTime endpoints
-timekit.findTime(data);
-timekit.findTimeBulk(data);
-timekit.findTimeTeam(data);
+timekit.findTime({ ... })
+timekit.findTimeBulk({ ... })
+timekit.findTimeTeam({ ... })
 
 // Availability endpoints
-timekit.fetchAvailability(data);
+timekit.fetchAvailability({ ... })
 
 // Booking endpoints
-timekit.getBookings();
-timekit.getBooking(data);
-timekit.createBooking(data);
-timekit.createBookingsBulk(data);
-timekit.updateBooking(data);
-timekit.updateBookingsBulk(data);
-timekit.getGroupBookings();
-timekit.getGroupBooking(data);
+timekit.getBookings()
+timekit.getBooking({ id })
+timekit.createBooking({ ... })
+timekit.createBookingsBulk({ ... })
+timekit.updateBooking({ id, action, ... })
+timekit.updateBookingsBulk({ ... })
+timekit.getGroupBookings()
+timekit.getGroupBooking({ id })
 
 // Auth endpoints (Note: only used to fetch a resource key)
-timekit.auth(data);
+timekit.auth({ ... })
 
 // Account endpoints
-timekit.getAccounts();
-timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
-timekit.accountSync(data);
+timekit.getAccounts()
+timekit.accountGoogleSignup({ callback }, shouldAutoRedirect)
+timekit.accountSync({ ... })
 
 // Calendar endpoints
-timekit.getCalendars();
-timekit.getCalendar(data);
-timekit.createCalendar(data);
-timekit.updateCalendar(data);
-timekit.deleteCalendar(data);
+timekit.getCalendars()
+timekit.getCalendar({ id })
+timekit.createCalendar({ ... })
+timekit.updateCalendar({ id, ... })
+timekit.deleteCalendar({ id })
 
 // Event endpoints
-timekit.getEvents(data);
-timekit.getEvent(data);
-timekit.createEvent(data);
-timekit.updateEvent(data);
-timekit.deleteEvent(data);
+timekit.getEvents({ ... })
+timekit.getEvent({ id })
+timekit.createEvent({ ... })
+timekit.updateEvent({ id, ... })
+timekit.deleteEvent({ id })
 
 // Credential endpoints (Note: only used manage resource keys)
-timekit.getCredentials();
-timekit.createCredential(data);
-timekit.deleteCredential(data);
+timekit.getCredentials()
+timekit.createCredential({ ... })
+timekit.deleteCredential({ id })
 
 // Project endpoints
-timekit.getProjects();
-timekit.getProject(data);
-timekit.getHostedProject(data);
-timekit.getEmbedProject(data);
-timekit.createProject(data);
-timekit.updateProject(data);
-timekit.deleteProject(data);
-timekit.addProjectResource(data);
-timekit.setProjectResources(data);
-timekit.removeProjectResource(data);
+timekit.getProjects()
+timekit.getProject({ id })
+timekit.getHostedProject({ slug })
+timekit.getEmbedProject({ id })
+timekit.createProject({ ... })
+timekit.updateProject({ id, ... })
+timekit.deleteProject({ id })
+timekit.addProjectResource({ id, ... })
+timekit.setProjectResources({ id, resources })
+timekit.removeProjectResource({ id, resourceId })
 ```
 
 Request example:
 ```javascript
 
 timekit.createEvent({
-  start:        '2015-10-26T15:45:00+00:07',
-  end:          '2015-10-26T17:30:00+00:07',
+  start:        '2018-10-26T15:45:00+00:07',
+  end:          '2018-10-26T17:30:00+00:07',
   what:         'Coffee with the timelords',
   where:        'Timekit HQ @ San Francisco',
   participants: ['doc.brown@timekit.io', 'john@doe.com'],
