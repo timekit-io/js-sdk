@@ -159,7 +159,7 @@ describe('Endpoints', function() {
     var methods = {
 
       // Accounts
-      'accountGoogleSync': 1,
+      'accountSync': 1,
 
       // Widgets
       'getWidgets': 0,
