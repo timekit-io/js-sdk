@@ -74,7 +74,9 @@ describe('Endpoints', function() {
       // Accounts
       'getAccounts': 0,
       'accountGoogleSignup': 2,
-      'accountSync': 1,
+      'accountGoogleSync': 0,
+      'accountMicrosoftSignup': 2,
+      'accountMicrosoftSync': 0,
 
       // Apps
       'getApps': 0,
@@ -128,15 +130,6 @@ describe('Endpoints', function() {
       'getGroupBookings': 0,
       'getGroupBooking': 1,
 
-      // Widgets
-      'getWidgets': 0,
-      'getWidget': 1,
-      'getHostedWidget': 1,
-      'getEmbedWidget': 1,
-      'createWidget': 1,
-      'updateWidget': 1,
-      'deleteWidget': 1,
-
       // Projects
       'getProjects': 0,
       'getProject': 1,
@@ -164,6 +157,18 @@ describe('Endpoints', function() {
   it('should support all API deprecated endpoints as methods', function() {
 
     var methods = {
+
+      // Accounts
+      'accountGoogleSync': 1,
+
+      // Widgets
+      'getWidgets': 0,
+      'getWidget': 1,
+      'getHostedWidget': 1,
+      'getEmbedWidget': 1,
+      'createWidget': 1,
+      'updateWidget': 1,
+      'deleteWidget': 1,
 
       // Users
       'createUser': 1,

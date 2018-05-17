@@ -156,13 +156,12 @@ timekit.updateBookingsBulk({ ... })
 timekit.getGroupBookings()
 timekit.getGroupBooking({ id })
 
-// Auth endpoints (Note: only used to fetch a resource key)
-timekit.auth({ ... })
-
 // Account endpoints
 timekit.getAccounts()
 timekit.accountGoogleSignup({ callback }, shouldAutoRedirect)
-timekit.accountSync({ ... })
+timekit.accountGoogleSync()
+timekit.accountMicrosoftSignup({ callback }, shouldAutoRedirect)
+timekit.accountMicrosoftSync()
 
 // Calendar endpoints
 timekit.getCalendars()
@@ -170,18 +169,6 @@ timekit.getCalendar({ id })
 timekit.createCalendar({ ... })
 timekit.updateCalendar({ id, ... })
 timekit.deleteCalendar({ id })
-
-// Event endpoints
-timekit.getEvents({ ... })
-timekit.getEvent({ id })
-timekit.createEvent({ ... })
-timekit.updateEvent({ id, ... })
-timekit.deleteEvent({ id })
-
-// Credential endpoints (Note: only used manage resource keys)
-timekit.getCredentials()
-timekit.createCredential({ ... })
-timekit.deleteCredential({ id })
 
 // Project endpoints
 timekit.getProjects()
@@ -194,6 +181,21 @@ timekit.deleteProject({ id })
 timekit.addProjectResource({ id, ... })
 timekit.setProjectResources({ id, resources })
 timekit.removeProjectResource({ id, resourceId })
+
+// Event endpoints
+timekit.getEvents({ ... })
+timekit.getEvent({ id })
+timekit.createEvent({ ... })
+timekit.updateEvent({ id, ... })
+timekit.deleteEvent({ id })
+
+// Auth endpoints (Note: only used to fetch a resource key)
+timekit.auth({ ... })
+
+// Credential endpoints (Note: only used to manage resource keys)
+timekit.getCredentials()
+timekit.createCredential({ ... })
+timekit.deleteCredential({ id })
 ```
 
 Request example:

@@ -270,6 +270,32 @@ function Timekit() {
   };
 
   /**
+   * Redirect to the Microsoft signup/login page
+   * Kept this in this file (not endpoints.js) because of internal dependencies to headers, config etc.
+   * @type {Function}
+   * @return {String}
+   */
+  TK.accountMicrosoftSignup = function(data, shouldAutoRedirect) {
+
+    var app = config.app;
+
+    // If app header exists (using .asApp() function), use that
+    if (headers['Timekit-App']) {
+      app = headers['Timekit-App'];
+    }
+
+    var baseUrl = utils.buildUrl('/accounts/microsoft/signup', config);
+    var finalUrl = baseUrl + '?Timekit-App=' + app + (data && data.callback ? '&callback=' + data.callback : '')
+
+    if(shouldAutoRedirect && window) {
+      window.location.href = finalUrl;
+    } else {
+      return finalUrl;
+    }
+
+  };
+
+  /**
    * Import endpoint defintions
    */
   TK = endpoints(TK)

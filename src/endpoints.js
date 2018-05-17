@@ -17,16 +17,29 @@ module.exports = function (TK) {
   };
 
   /**
-   * Initiate an account sync
+   * Initiate a Google account sync
    * @type {Function}
    * @return {Promise}
    */
-  TK.accountSync = function(data) {
+  TK.accountGoogleSync = function() {
 
     return TK.makeRequest({
       url: '/accounts/sync',
-      method: 'get',
-      params: data
+      method: 'post'
+    });
+
+  };
+
+  /**
+   * Initiate a Microsoft account sync
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.accountMicrosoftSync = function() {
+
+    return TK.makeRequest({
+      url: '/accounts/microsoft/sync',
+      method: 'post'
     });
 
   };
@@ -595,109 +608,6 @@ module.exports = function (TK) {
     return TK.makeRequest({
       url: '/bookings/' + data.id + '/groups',
       method: 'get'
-    });
-
-  };
-
-  /**
-   * Get widgets
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.getWidgets = function() {
-
-    return TK.makeRequest({
-      url: '/widgets',
-      method: 'get'
-    });
-
-  };
-
-  /**
-   * Get a specific widget
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.getWidget = function(data) {
-
-    return TK.makeRequest({
-      url: '/widgets/' + data.id,
-      method: 'get'
-    });
-
-  };
-
-  /**
-   * Get public widget by slug
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.getHostedWidget = function(data) {
-
-    return TK.makeRequest({
-      url: '/widgets/hosted/' + data.slug,
-      method: 'get'
-    });
-
-  };
-
-  /**
-   * Get public widget by id
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.getEmbedWidget = function(data) {
-
-    return TK.makeRequest({
-      url: '/widgets/embed/' + data.id,
-      method: 'get'
-    });
-
-  };
-
-  /**
-   * Create a new widget
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.createWidget = function(data) {
-
-    return TK.makeRequest({
-      url: '/widgets',
-      method: 'post',
-      data: data
-    });
-
-  };
-
-  /**
-   * Update an existing widget
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.updateWidget = function(data) {
-
-    var id = data.id;
-    delete data.id;
-
-    return TK.makeRequest({
-      url: '/widgets/' + id,
-      method: 'put',
-      data: data
-    });
-
-  };
-
-  /**
-   * Delete a widget
-   * @type {Function}
-   * @return {Promise}
-   */
-  TK.deleteWidget = function(data) {
-
-    return TK.makeRequest({
-      url: '/widgets/' + data.id,
-      method: 'delete'
     });
 
   };
