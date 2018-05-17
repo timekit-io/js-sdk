@@ -120,83 +120,110 @@ timekit.getConfig();
 
 ## Usage (endpoints)
 
-All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the `data` argument should be an object with keys named as referenced in the docs - see: https://reference.timekit.io/reference/
+All the Timekit API endpoints are supported as methods. For endpoints taking parameters/data, the method argument should be an object with keys named as referenced in the docs - see: https://developers.timekit.io/reference/
 
-If you supply keys as camelCased, they will automatically be converted to snake_case for you. Responses can also be converted to camelCase automatically if you set the config variable "convertResponseToCamelcase" to true.
+If you supply keys as camelCased, they will automatically be converted to snake_case for you. Responses can also be converted to camelCase automatically if you set the config variable `convertResponseToCamelcase` to true.
 
 Endpoints/methods:
 
 ```javascript
 // App endpoints
-timekit.getApp(data);
+timekit.getApp()
 
 // Resource endpoints
-timekit.getResources();
-timekit.getResource(data);
-timekit.createResource(data);
-timekit.updateResource(data);
-timekit.resetResourcePassword(data);
-timekit.getResourceTimezone(data);
+timekit.getResources()
+timekit.getResource({ id })
+timekit.createResource({ ... })
+timekit.updateResource({ id, ... })
+timekit.resetResourcePassword({ ... })
+timekit.getResourceTimezone({ email })
 
 // FindTime endpoints
-timekit.findTime(data);
-timekit.findTimeBulk(data);
-timekit.findTimeTeam(data);
+timekit.findTime({ ... })
+timekit.findTimeBulk({ ... })
+timekit.findTimeTeam({ ... })
+
+// Availability endpoints
+timekit.fetchAvailability({ ... })
 
 // Booking endpoints
-timekit.getBookings();
-timekit.getBooking(data);
-timekit.createBooking(data);
-timekit.createBookingsBulk(data);
-timekit.updateBooking(data);
-timekit.updateBookingsBulk(data);
-timekit.getGroupBookings();
-timekit.getGroupBooking(data);
-
-// Auth endpoints (Note: only used to fetch a resource key)
-timekit.auth(data);
+timekit.getBookings()
+timekit.getBooking({ id })
+timekit.createBooking({ ... })
+timekit.createBookingsBulk({ ... })
+timekit.updateBooking({ id, action, ... })
+timekit.updateBookingsBulk({ ... })
+timekit.getGroupBookings()
+timekit.getGroupBooking({ id })
 
 // Account endpoints
-timekit.getAccounts();
-timekit.accountGoogleSignup(data, shouldAutoRedirect:Boolean);
-timekit.accountSync(data);
+timekit.getAccounts()
+timekit.accountGoogleSignup({ callback }, shouldAutoRedirect)
+timekit.accountGoogleSync()
+timekit.accountMicrosoftSignup({ callback }, shouldAutoRedirect)
+timekit.accountMicrosoftSync()
 
 // Calendar endpoints
-timekit.getCalendars();
-timekit.getCalendar(data);
-timekit.createCalendar(data);
-timekit.updateCalendar(data);
-timekit.deleteCalendar(data);
+timekit.getCalendars()
+timekit.getCalendar({ id })
+timekit.createCalendar({ ... })
+timekit.updateCalendar({ id, ... })
+timekit.deleteCalendar({ id })
+
+// Project endpoints
+timekit.getProjects()
+timekit.getProject({ id })
+timekit.getHostedProject({ slug })
+timekit.getEmbedProject({ id })
+timekit.createProject({ ... })
+timekit.updateProject({ id, ... })
+timekit.deleteProject({ id })
+timekit.addProjectResource({ id, ... })
+timekit.setProjectResources({ id, resources })
+timekit.removeProjectResource({ id, resourceId })
 
 // Event endpoints
-timekit.getEvents(data);
-timekit.getEvent(data);
-timekit.createEvent(data);
-timekit.updateEvent(data);
-timekit.deleteEvent(data);
+timekit.getEvents({ ... })
+timekit.getEvent({ id })
+timekit.createEvent({ ... })
+timekit.updateEvent({ id, ... })
+timekit.deleteEvent({ id })
 
-// Credential endpoints (Note: only used manage resource keys)
-timekit.getCredentials();
-timekit.createCredential(data);
-timekit.deleteCredential(data);
+// Auth endpoints (Note: only used to fetch a resource key)
+timekit.auth({ ... })
+
+// Credential endpoints (Note: only used to manage resource keys)
+timekit.getCredentials()
+timekit.createCredential({ ... })
+timekit.deleteCredential({ id })
 ```
 
 Request example:
 ```javascript
-
-timekit.createEvent({
-  start:        '2015-10-26T15:45:00+00:07',
-  end:          '2015-10-26T17:30:00+00:07',
-  what:         'Coffee with the timelords',
-  where:        'Timekit HQ @ San Francisco',
-  participants: ['doc.brown@timekit.io', 'john@doe.com'],
-  invite:       true,
-  calendar_id:  '794f6cca-68b5-11e5-9d70-feff819cdc9f'
+// Using promises
+timekit.createBooking({
+  resource_id: 'd187d6e0-d6cb-409a-ae60-45a8fd0ec879',
+  graph: 'confirm_decline',
+  start: '1955-11-12T21:30:00-07:00',
+  end: '1955-11-12T22:15:00-07:00',
+  what: 'Catch the lightning',
+  where: 'Courthouse, Hill Valley, CA 95420, USA',
+  description: 'The lightning strikes at 10:04 PM exactly! I need you to be there Doc!',
+  customer: {
+    name: 'Marty McFly',
+    email: 'marty.mcfly@timekit.io',
+    phone: '(916) 555-4385',
+    voip: 'McFly',
+    timezone: 'America/Los_Angeles'
+  }
 }).then(function(response){
   console.log(response);
 }).catch(function(response){
   console.log(response);
 });
+
+// Using async/await
+const response = await timekit.createBooking({ ... })
 ```
 
 Response example:
