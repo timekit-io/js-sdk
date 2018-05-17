@@ -326,6 +326,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
+	   * Redirect to the Microsoft signup/login page
+	   * Kept this in this file (not endpoints.js) because of internal dependencies to headers, config etc.
+	   * @type {Function}
+	   * @return {String}
+	   */
+	  TK.accountMicrosoftSignup = function(data, shouldAutoRedirect) {
+	
+	    var app = config.app;
+	
+	    // If app header exists (using .asApp() function), use that
+	    if (headers['Timekit-App']) {
+	      app = headers['Timekit-App'];
+	    }
+	
+	    var baseUrl = utils.buildUrl('/accounts/microsoft/signup', config);
+	    var finalUrl = baseUrl + '?Timekit-App=' + app + (data && data.callback ? '&callback=' + data.callback : '')
+	
+	    if(shouldAutoRedirect && window) {
+	      window.location.href = finalUrl;
+	    } else {
+	      return finalUrl;
+	    }
+	
+	  };
+	
+	  /**
 	   * Import endpoint defintions
 	   */
 	  TK = endpoints(TK)
@@ -3428,16 +3454,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
-	   * Initiate an account sync
+	   * Initiate a Google account sync
 	   * @type {Function}
 	   * @return {Promise}
 	   */
-	  TK.accountSync = function(data) {
+	  TK.accountGoogleSync = function() {
 	
 	    return TK.makeRequest({
 	      url: '/accounts/sync',
-	      method: 'get',
-	      params: data
+	      method: 'post'
+	    });
+	
+	  };
+	
+	  /**
+	   * Initiate a Microsoft account sync
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.accountMicrosoftSync = function() {
+	
+	    return TK.makeRequest({
+	      url: '/accounts/microsoft/sync',
+	      method: 'post'
 	    });
 	
 	  };
@@ -4011,109 +4050,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
-	   * Get widgets
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getWidgets = function() {
-	
-	    return TK.makeRequest({
-	      url: '/widgets',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a specific widget
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getWidget = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/widgets/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get public widget by slug
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getHostedWidget = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/widgets/hosted/' + data.slug,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get public widget by id
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getEmbedWidget = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/widgets/embed/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Create a new widget
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createWidget = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/widgets',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Update an existing widget
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.updateWidget = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/widgets/' + id,
-	      method: 'put',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Delete a widget
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.deleteWidget = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/widgets/' + data.id,
-	      method: 'delete'
-	    });
-	
-	  };
-	
-	  /**
 	   * Get all projects
 	   * @type {Function}
 	   * @return {Promise}
@@ -4276,6 +4212,124 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports) {
 
 	module.exports = function (TK) {
+	
+	  /**
+	   * Initiate an account sync
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.accountSync = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/accounts/sync',
+	      method: 'get',
+	      params: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Get widgets
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getWidgets = function() {
+	
+	    return TK.makeRequest({
+	      url: '/widgets',
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get a specific widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/' + data.id,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get public widget by slug
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getHostedWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/hosted/' + data.slug,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Get public widget by id
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getEmbedWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/embed/' + data.id,
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
+	   * Create a new widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.createWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets',
+	      method: 'post',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Update an existing widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.updateWidget = function(data) {
+	
+	    var id = data.id;
+	    delete data.id;
+	
+	    return TK.makeRequest({
+	      url: '/widgets/' + id,
+	      method: 'put',
+	      data: data
+	    });
+	
+	  };
+	
+	  /**
+	   * Delete a widget
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.deleteWidget = function(data) {
+	
+	    return TK.makeRequest({
+	      url: '/widgets/' + data.id,
+	      method: 'delete'
+	    });
+	
+	  };
 	
 	  /**
 	   * Create a new user with the given properties
