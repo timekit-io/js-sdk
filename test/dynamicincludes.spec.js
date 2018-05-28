@@ -102,6 +102,39 @@ describe('Dynamic includes', function() {
 
   });
 
+  it('should support requests with dynamic includes set as array', function(done) {
+    var response, request;
+
+    timekit
+    .include([fixtures.includesMulti[0], fixtures.includesMulti[1]])
+    .getUserInfo()
+    .then(function(res) {
+      response = res;
+    });
+
+    utils.tick(function () {
+      request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 200,
+        responseText: '{ "data": { "first_name": "Dr. Emmett", "last_name": "Brown", "name": "Dr. Emmett Brown", "email": "doc.brown@timekit.io", "image": "http:\/\/www.gravatar.com\/avatar\/7a613e5348d6347627693502580f5aad", "activated": true, "timezone": "America\/Los_Angeles", "token": "UZpl3v3PTP1PRwqIrU0DSVpbJkNKl5gN", "last_sync": null, "token_generated_at": null } }'
+      });
+
+      utils.tick(function () {
+        // Response data
+        expect(response.status).toBe(200);
+        expect(response.data).toBeDefined();
+        expect(typeof response.data.email).toBe('string');
+        // Dynamic include query params
+        expect(response.config.params).toBeDefined();
+        expect(response.config.params.include).toBe(fixtures.includesMulti.join());
+        expect(request.url).toBe(fixtures.apiBaseUrl + 'v2/users/me?include=' + fixtures.includesMulti.join());
+        done();
+      });
+    });
+
+  });
+
   it('should support resource-specific GET requests with dynamic includes', function(done) {
     var response, request;
 

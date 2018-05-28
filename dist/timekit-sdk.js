@@ -265,8 +265,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @type {Function}
 	   * @return {Object}
 	   */
-	  TK.include = function() {
-	    includes = Array.prototype.slice.call(arguments);
+	  TK.include = function(arg) {
+	    if (Array.isArray(arg)) includes = arg
+	    else includes = Array.prototype.slice.call(arguments);
 	    return this;
 	  };
 	
