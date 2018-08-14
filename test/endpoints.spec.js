@@ -90,6 +90,7 @@ describe('Endpoints', function() {
       'getResource': 1,
       'createResource': 1,
       'updateResource': 1,
+      'deleteResource': 1,
       'resetResourcePassword': 1,
       'getResourceTimezone': 1,
 

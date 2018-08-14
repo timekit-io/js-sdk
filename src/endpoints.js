@@ -208,6 +208,21 @@ module.exports = function (TK) {
   };
 
   /**
+   * Delete a resource with the given properties
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.deleteResource = function(data) {
+
+    return TK.makeRequest({
+      url: '/resources/' + data.id,
+      method: 'delete',
+      data: data
+    });
+
+  };
+
+  /**
    * Reset password for a resource
    * @type {Function}
    * @return {Promise}
