@@ -621,7 +621,7 @@ module.exports = function (TK) {
   TK.getGroupBooking = function(data) {
 
     return TK.makeRequest({
-      url: '/bookings/' + data.id + '/groups',
+      url: '/bookings/groups/' + data.id,
       method: 'get'
     });
 
