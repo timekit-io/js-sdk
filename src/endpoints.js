@@ -510,10 +510,15 @@ module.exports = function (TK) {
    * @type {Function}
    * @return {Promise}
    */
-  TK.getBookings = function() {
+  TK.getBookings = function(data) {
+    var queryString = '';
+
+    if (Array.isArray(data)) {
+      queryString = '?include='+data.join(','),
+    }
 
     return TK.makeRequest({
-      url: '/bookings',
+      url: '/bookings'+queryString,
       method: 'get'
     });
 

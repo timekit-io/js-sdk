@@ -147,7 +147,7 @@ timekit.findTimeTeam({ ... })
 timekit.fetchAvailability({ ... })
 
 // Booking endpoints
-timekit.getBookings()
+timekit.getBookings([ include ])
 timekit.getBooking({ id })
 timekit.createBooking({ ... })
 timekit.createBookingsBulk({ ... })
