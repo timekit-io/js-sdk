@@ -128,6 +128,7 @@ describe('Endpoints', function() {
       'createBookingsBulk': 1,
       'updateBooking': 1,
       'updateBookingsBulk': 1,
+      'deleteBooking': 1,
       'getGroupBookings': 0,
       'getGroupBooking': 1,
 

@@ -153,6 +153,7 @@ timekit.createBooking({ ... })
 timekit.createBookingsBulk({ ... })
 timekit.updateBooking({ id, action, ... })
 timekit.updateBookingsBulk({ ... })
+timekit.deleteBooking({ id })
 timekit.getGroupBookings()
 timekit.getGroupBooking({ id })
 
