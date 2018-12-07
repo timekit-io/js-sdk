@@ -585,6 +585,22 @@ module.exports = function (TK) {
   };
 
   /**
+   * Delete specific booking
+   * @type {Function}
+   * @return {Promise}
+   */
+  TK.deleteBooking = function(data) {
+    
+    var id = data.id
+    delete data.id;
+
+    return TK.makeRequest({
+      url: '/bookings/' + id,
+      method: 'delete'
+    })
+  };
+
+  /**
    * Update an bookings in bulk
    * @type {Function}
    * @return {Promise}
