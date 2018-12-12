@@ -140,6 +140,7 @@ describe('Endpoints', function() {
       'createProject': 1,
       'updateProject': 1,
       'deleteProject': 1,
+      'getProjectResources': 1,
       'addProjectResource': 1,
       'setProjectResources': 1,
       'removeProjectResource': 1
