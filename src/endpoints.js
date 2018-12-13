@@ -776,7 +776,7 @@ module.exports = function (TK) {
 
     return TK.makeRequest({
       url: '/projects/' + id + '/resources',
-      method: 'get',
+      method: 'get'
     });
 
   };
