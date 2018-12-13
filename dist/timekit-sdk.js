@@ -4203,6 +4203,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
+	   * Get resources for a project
+	   * @type {Function}
+	   * @return {Promise}
+	   */
+	  TK.getProjectResources = function(data) {
+	
+	    var id = data.id;
+	    delete data.id;
+	
+	    return TK.makeRequest({
+	      url: '/projects/' + id + '/resources',
+	      method: 'get'
+	    });
+	
+	  };
+	
+	  /**
 	   * Set resources for a project
 	   * @type {Function}
 	   * @return {Promise}
