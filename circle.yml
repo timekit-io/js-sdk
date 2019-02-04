@@ -1,6 +1,6 @@
 machine:
   node:
-    version: 6.11.1
+    version: 8.15.0
   environment:
     # Make sure that bins are available to yarn
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
