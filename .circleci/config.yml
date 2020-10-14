@@ -19,8 +19,9 @@ jobs:
             node -v
             npm -v
             yarn -v
-            yarn install --pure-lockfile
             yarn global add karma
+            yarn global add phantomjs
+            yarn install --pure-lockfile
     # Save dependency cache
     - save_cache:
         key: v1-dep-{{ .Branch }}-{{ .Revision }}
