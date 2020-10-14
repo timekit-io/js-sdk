@@ -20,7 +20,7 @@ jobs:
             npm -v
             yarn -v
             yarn install --pure-lockfile
-            npm rebuild node-sass
+            yarn global add karma
     # Save dependency cache
     - save_cache:
         key: v1-dep-{{ .Branch }}-{{ .Revision }}
