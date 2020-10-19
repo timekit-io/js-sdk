@@ -14,13 +14,20 @@ jobs:
         # Default branch if not
         - v1-dep-master-
     - run:
+        name: Install PhantomJS
+        command: |
+            sudo apt-get install build-essential chrpath libssl-dev libxft-dev libfreetype6-dev libfreetype6 libfontconfig1-dev libfontconfig1 -y
+            sudo wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
+            sudo tar xvjf phantomjs-2.1.1-linux-x86_64.tar.bz2 -C /usr/local/share/
+            sudo ln -s /usr/local/share/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin/
+            phantomjs --version
+    - run:
         name: Install dependencies
         command: |
             node -v
             npm -v
             yarn -v
             yarn global add karma
-            npm install phantomjs-prebuilt@2.1.13 --unsafe-perm
             yarn install --pure-lockfile
     # Save dependency cache
     - save_cache:
