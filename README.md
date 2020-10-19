@@ -1,6 +1,6 @@
 # Timekit JS SDK
 
-[![Circle CI](https://img.shields.io/circleci/build/github/timekit-io/js-sdk/update-deps-2020)](https://circleci.com/gh/timekit-io/js-sdk)
+[![Circle CI](https://img.shields.io/circleci/build/github/timekit-io/js-sdk)](https://circleci.com/gh/timekit-io/js-sdk)
 [![Code Coverage](https://img.shields.io/badge/coverage-92%25-green.svg)](https://github.com/timekit-io/js-sdk)
 
 [**Releases & changelog**](https://github.com/timekit-io/js-sdk/releases)
