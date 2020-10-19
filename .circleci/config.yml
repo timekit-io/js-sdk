@@ -39,7 +39,7 @@ jobs:
     - run:
         name: Test unit suite
         command: |
-            yarn run test
+            yarn run test --single-run
     - run:
         name: Build prod
         command: |
