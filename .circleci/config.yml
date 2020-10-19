@@ -20,7 +20,7 @@ jobs:
             npm -v
             yarn -v
             yarn global add karma
-            sudo npm install phantomjs-prebuilt@2.1.13 --unsafe-perm
+            npm install phantomjs-prebuilt@2.1.13 --unsafe-perm
             yarn install --pure-lockfile
     # Save dependency cache
     - save_cache:
