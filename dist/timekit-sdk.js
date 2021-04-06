@@ -65,305 +65,329 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 */
 	var axios = __webpack_require__(4);
-	var humps = __webpack_require__(23);
-	var merge = __webpack_require__(24);
-	var utils = __webpack_require__(25);
-	var endpoints = __webpack_require__(28);
-	var deprecatedEndpoints = __webpack_require__(29);
+	var humps = __webpack_require__(31);
+	var merge = __webpack_require__(32);
+	var utils = __webpack_require__(33);
+	var endpoints = __webpack_require__(36);
+	var deprecatedEndpoints = __webpack_require__(37);
 	
 	function Timekit() {
+		/**
+		 * Auth variables for login gated API methods
+		 * @type {String}
+		 */
+		var includes = [];
+		var headers = {};
+		var nextPayload = {};
 	
-	  /**
-	   * Auth variables for login gated API methods
-	   * @type {String}
-	   */
-	  var includes = [];
-	  var headers = {};
-	  var nextPayload = {};
+		/**
+		 * Default config
+		 * @type {Object}
+		 */
+		var config = {
+			app: '',
+			apiBaseUrl: 'https://api.timekit.io/',
+			apiVersion: 'v2',
+			convertResponseToCamelcase: false,
+			convertRequestToSnakecase: true,
+			autoFlattenResponse: true,
+			resourceEmail: null,
+			resourceKey: null,
+			appKey: null,
+		};
 	
-	  /**
-	   * Default config
-	   * @type {Object}
-	   */
-	  var config = {
-	    app: '',
-	    apiBaseUrl: 'https://api.timekit.io/',
-	    apiVersion: 'v2',
-	    convertResponseToCamelcase: false,
-	    convertRequestToSnakecase: true,
-	    autoFlattenResponse: true,
-	    resourceEmail: null,
-	    resourceKey: null,
-	    appKey: null,
-	  };
+		/**
+		 * Root Object that holds methods to expose for API consumption
+		 * @type {Object}
+		 */
+		var TK = {};
 	
-	  /**
-	   * Root Object that holds methods to expose for API consumption
-	   * @type {Object}
-	   */
-	  var TK = {};
+		/**
+		 * Prepare and make HTTP request to API
+		 * @type {Object}
+		 * @return {Promise}
+		 */
+		TK.makeRequest = function (args) {
+			// Handle chained payload data if applicable
+			args = utils.mergeNextPayload(args, nextPayload);
+			nextPayload = {};
 	
-	  /**
-	   * Prepare and make HTTP request to API
-	   * @type {Object}
-	   * @return {Promise}
-	   */
-	  TK.makeRequest = function(args) {
+			// construct URL with base, version and endpoint
+			args.url = utils.buildUrl(args.url, config);
 	
-	    // Handle chained payload data if applicable
-	    args = utils.mergeNextPayload(args, nextPayload)
-	    nextPayload = {};
+			// add http headers if applicable
+			args.headers = args.headers || headers || {};
 	
-	    // construct URL with base, version and endpoint
-	    args.url = utils.buildUrl(args.url, config);
+			if (config.headers) {
+				args.headers = merge(config.headers, args.headers);
+			}
+			if (!args.headers['Timekit-App'] && config.app) {
+				args.headers['Timekit-App'] = config.app;
+			}
+			if (config.inputTimestampFormat) {
+				args.headers['Timekit-InputTimestampFormat'] =
+					config.inputTimestampFormat;
+			}
+			if (config.outputTimestampFormat) {
+				args.headers['Timekit-OutputTimestampFormat'] =
+					config.outputTimestampFormat;
+			}
+			if (config.timezone) {
+				args.headers['Timekit-Timezone'] = config.timezone;
+			}
 	
-	    // add http headers if applicable
-	    args.headers = args.headers || headers || {};
+			// add auth headers (personal token) if not being overwritten by request/asUser
+			if (
+				!args.headers['Authorization'] &&
+				config.resourceEmail &&
+				config.resourceKey
+			) {
+				args.headers['Authorization'] =
+					'Basic ' +
+					utils.encodeAuthHeader(config.resourceEmail, config.resourceKey);
+			}
 	
-	    if (config.headers) {
-	      args.headers = merge(config.headers, args.headers)
-	    }
-	    if (!args.headers['Timekit-App'] && config.app) {
-	      args.headers['Timekit-App'] = config.app;
-	    }
-	    if (config.inputTimestampFormat) {
-	      args.headers['Timekit-InputTimestampFormat'] = config.inputTimestampFormat;
-	    }
-	    if (config.outputTimestampFormat) {
-	      args.headers['Timekit-OutputTimestampFormat'] = config.outputTimestampFormat;
-	    }
-	    if (config.timezone) {
-	      args.headers['Timekit-Timezone'] = config.timezone;
-	    }
+			// add auth headers (app token)
+			if (!args.headers['Authorization'] && config.appKey) {
+				args.headers['Authorization'] =
+					'Basic ' + utils.encodeAuthHeader('', config.appKey);
+			}
 	
-	    // add auth headers (personal token) if not being overwritten by request/asUser
-	    if (!args.headers['Authorization'] && config.resourceEmail && config.resourceKey) {
-	      args.headers['Authorization'] = 'Basic ' + utils.encodeAuthHeader(config.resourceEmail, config.resourceKey);
-	    }
+			// reset headers
+			if (Object.keys(headers).length > 0) {
+				headers = {};
+			}
 	
-	    // add auth headers (app token)
-	    if (!args.headers['Authorization'] && config.appKey) {
-	      args.headers['Authorization'] = 'Basic ' + utils.encodeAuthHeader('', config.appKey);
-	    }
+			// add dynamic includes if applicable
+			if (includes && includes.length > 0) {
+				if (args.params === undefined) {
+					args.params = {};
+				}
+				args.params.include = includes.join();
+				includes = [];
+			}
 	
-	    // reset headers
-	    if (Object.keys(headers).length > 0) {
-	      headers = {};
-	    }
+			// decamelize keys in data objects
+			if (args.data && config.convertRequestToSnakecase) {
+				args.data = humps.decamelizeKeys(args.data);
+			}
 	
-	    // add dynamic includes if applicable
-	    if (includes && includes.length > 0) {
-	      if (args.params === undefined) { args.params = {}; }
-	      args.params.include = includes.join();
-	      includes = [];
-	    }
+			// register response interceptor for data manipulation
+			var interceptor = axios.interceptors.response.use(
+				function (response) {
+					if (response.data && response.data.data) {
+						if (config.autoFlattenResponse) {
+							response = utils.copyResponseMetaData(response);
+						}
+						if (config.convertResponseToCamelcase) {
+							response.data = humps.camelizeKeys(response.data);
+						}
+					}
+					return response;
+				},
+				function (error) {
+					if (error.response) {
+						return Promise.reject(error.response);
+					} else if (error.request) {
+						return Promise.reject(error.request);
+					}
+					return Promise.reject(error);
+				}
+			);
 	
-	    // decamelize keys in data objects
-	    if (args.data && config.convertRequestToSnakecase) { args.data = humps.decamelizeKeys(args.data); }
+			// execute request!
+			var request = axios(args);
 	
-	    // register response interceptor for data manipulation
-	    var interceptor = axios.interceptors.response.use(function (response) {
-	      if (response.data && response.data.data) {
-	        if (config.autoFlattenResponse) {
-	          response = utils.copyResponseMetaData(response)
-	        }
-	        if (config.convertResponseToCamelcase) {
-	          response.data = humps.camelizeKeys(response.data);
-	        }
-	      }
-	      return response;
-	    }, function (error) {
-	      return Promise.reject(error);
-	    });
+			// deregister response interceptor
+			axios.interceptors.response.eject(interceptor);
 	
-	    // execute request!
-	    var request = axios(args);
+			return request;
+		};
 	
-	    // deregister response interceptor
-	    axios.interceptors.response.eject(interceptor);
+		/**
+		 * Overwrite default config with supplied settings
+		 * @type {Function}
+		 * @return {Object}
+		 */
+		TK.configure = function (custom) {
+			for (var attr in custom) {
+				config[attr] = custom[attr];
+			}
+			return config;
+		};
 	
-	    return request;
-	  };
+		/**
+		 * Returns the current config
+		 * @type {Function}
+		 * @return {Object}
+		 */
+		TK.getConfig = function () {
+			return config;
+		};
 	
-	  /**
-	   * Overwrite default config with supplied settings
-	   * @type {Function}
-	   * @return {Object}
-	   */
-	  TK.configure = function(custom) {
-	    for (var attr in custom) { config[attr] = custom[attr]; }
-	    return config;
-	  };
+		/**
+		 * Set the active user manually (happens automatically on timekit.auth())
+		 * @type {Function}
+		 */
+		TK.setUser = function (email, apiKey) {
+			config.resourceEmail = email;
+			config.resourceKey = apiKey;
+		};
 	
-	  /**
-	   * Returns the current config
-	   * @type {Function}
-	   * @return {Object}
-	   */
-	  TK.getConfig = function() {
-	    return config;
-	  };
+		/**
+		 * Returns the current active user
+		 * @type {Function}
+		 * @return {Object}
+		 */
+		TK.getUser = function () {
+			return {
+				email: config.resourceEmail,
+				apiToken: config.resourceKey,
+			};
+		};
 	
-	  /**
-	   * Set the active user manually (happens automatically on timekit.auth())
-	   * @type {Function}
-	   */
-	  TK.setUser = function(email, apiKey) {
-	    config.resourceEmail = email;
-	    config.resourceKey = apiKey;
-	  };
+		/**
+		 * Set app token (happens automatically on timekit.auth())
+		 * @type {Function}
+		 */
+		TK.setAppKey = function (apiKey) {
+			config.appKey = apiKey;
+		};
 	
-	  /**
-	   * Returns the current active user
-	   * @type {Function}
-	   * @return {Object}
-	   */
-	  TK.getUser = function() {
-	    return {
-	      email: config.resourceEmail,
-	      apiToken: config.resourceKey
-	    };
-	  };
+		/**
+		 * Returns the app token
+		 * @type {Function}
+		 * @return {Object}
+		 */
+		TK.getAppKey = function () {
+			return config.appKey;
+		};
 	
-	  /**
-	   * Set app token (happens automatically on timekit.auth())
-	   * @type {Function}
-	   */
-	  TK.setAppKey = function(apiKey) {
-	    config.appKey = apiKey;
-	  };
+		/**
+		 * Set the active user temporarily for the next request (fluent/chainable return)
+		 * @type {Function}
+		 */
+		TK.asUser = function (email, apiKey) {
+			headers['Authorization'] = 'Basic ' + utils.encodeAuthHeader(email, apiKey);
+			return this;
+		};
 	
-	  /**
-	   * Returns the app token
-	   * @type {Function}
-	   * @return {Object}
-	   */
-	  TK.getAppKey = function() {
-	    return config.appKey
-	  };
+		/**
+		 * Set the timekit app slug temporarily for the next request (fluent/chainable return)
+		 * @type {Function}
+		 */
+		TK.asApp = function (slug) {
+			headers['Timekit-App'] = slug;
+			return this;
+		};
 	
-	  /**
-	   * Set the active user temporarily for the next request (fluent/chainable return)
-	   * @type {Function}
-	   */
-	  TK.asUser = function(email, apiKey) {
-	    headers['Authorization'] = 'Basic ' + utils.encodeAuthHeader(email, apiKey);
-	    return this;
-	  };
+		/**
+		 * Add supplied dynamic includes to the next request (fluent/chainable return)
+		 * @type {Function}
+		 * @return {Object}
+		 */
+		TK.include = function (arg) {
+			if (Array.isArray(arg)) includes = arg;
+			else includes = Array.prototype.slice.call(arguments);
+			return this;
+		};
 	
-	  /**
-	  * Set the timekit app slug temporarily for the next request (fluent/chainable return)
-	  * @type {Function}
-	  */
-	  TK.asApp = function(slug) {
-	    headers['Timekit-App'] = slug;
-	    return this;
-	  };
+		/**
+		 * Add supplied headers to the next request (fluent/chainable return)
+		 * @type {Function}
+		 * @return {Object}
+		 */
+		TK.headers = function (data) {
+			headers = merge(headers, data);
+			return this;
+		};
 	
-	  /**
-	   * Add supplied dynamic includes to the next request (fluent/chainable return)
-	   * @type {Function}
-	   * @return {Object}
-	   */
-	  TK.include = function(arg) {
-	    if (Array.isArray(arg)) includes = arg
-	    else includes = Array.prototype.slice.call(arguments);
-	    return this;
-	  };
+		/**
+		 * Add supplied payload to the next request only
+		 * @type {Function}
+		 * @return {Object}
+		 */
+		TK.carry = function (data) {
+			nextPayload = merge(nextPayload, data);
+			return this;
+		};
 	
-	  /**
-	   * Add supplied headers to the next request (fluent/chainable return)
-	   * @type {Function}
-	   * @return {Object}
-	   */
-	  TK.headers = function(data) {
-	    headers = merge(headers, data)
-	    return this;
-	  };
+		/**
+		 * Return a new instance of the SDK
+		 * @type {Function}
+		 * @return {Object}
+		 */
+		TK.newInstance = function () {
+			return new Timekit();
+		};
 	
-	  /**
-	   * Add supplied payload to the next request only
-	   * @type {Function}
-	   * @return {Object}
-	   */
-	  TK.carry = function(data) {
-	    nextPayload = merge(nextPayload, data)
-	    return this;
-	  };
+		/**
+		 * Redirect to the Google signup/login page
+		 * Kept this in this file (not endpoints.js) because of internal dependencies to headers, config etc.
+		 * @type {Function}
+		 * @return {String}
+		 */
+		TK.accountGoogleSignup = function (data, shouldAutoRedirect) {
+			var app = config.app;
 	
-	  /**
-	   * Return a new instance of the SDK
-	   * @type {Function}
-	   * @return {Object}
-	   */
-	  TK.newInstance = function() {
-	    return new Timekit();
-	  };
+			// If app header exists (using .asApp() function), use that
+			if (headers['Timekit-App']) {
+				app = headers['Timekit-App'];
+			}
 	
-	  /**
-	   * Redirect to the Google signup/login page
-	   * Kept this in this file (not endpoints.js) because of internal dependencies to headers, config etc.
-	   * @type {Function}
-	   * @return {String}
-	   */
-	  TK.accountGoogleSignup = function(data, shouldAutoRedirect) {
+			var baseUrl = utils.buildUrl('/accounts/google/signup', config);
+			var finalUrl =
+				baseUrl +
+				'?Timekit-App=' +
+				app +
+				(data && data.callback ? '&callback=' + data.callback : '');
 	
-	    var app = config.app;
+			if (shouldAutoRedirect && window) {
+				window.location.href = finalUrl;
+			} else {
+				return finalUrl;
+			}
+		};
 	
-	    // If app header exists (using .asApp() function), use that
-	    if (headers['Timekit-App']) {
-	      app = headers['Timekit-App'];
-	    }
+		/**
+		 * Redirect to the Microsoft signup/login page
+		 * Kept this in this file (not endpoints.js) because of internal dependencies to headers, config etc.
+		 * @type {Function}
+		 * @return {String}
+		 */
+		TK.accountMicrosoftSignup = function (data, shouldAutoRedirect) {
+			var app = config.app;
 	
-	    var baseUrl = utils.buildUrl('/accounts/google/signup', config);
-	    var finalUrl = baseUrl + '?Timekit-App=' + app + (data && data.callback ? '&callback=' + data.callback : '')
+			// If app header exists (using .asApp() function), use that
+			if (headers['Timekit-App']) {
+				app = headers['Timekit-App'];
+			}
 	
-	    if(shouldAutoRedirect && window) {
-	      window.location.href = finalUrl;
-	    } else {
-	      return finalUrl;
-	    }
+			var baseUrl = utils.buildUrl('/accounts/microsoft/signup', config);
+			var finalUrl =
+				baseUrl +
+				'?Timekit-App=' +
+				app +
+				(data && data.callback ? '&callback=' + data.callback : '');
 	
-	  };
+			if (shouldAutoRedirect && window) {
+				window.location.href = finalUrl;
+			} else {
+				return finalUrl;
+			}
+		};
 	
-	  /**
-	   * Redirect to the Microsoft signup/login page
-	   * Kept this in this file (not endpoints.js) because of internal dependencies to headers, config etc.
-	   * @type {Function}
-	   * @return {String}
-	   */
-	  TK.accountMicrosoftSignup = function(data, shouldAutoRedirect) {
+		/**
+		 * Import endpoint defintions
+		 */
+		TK = endpoints(TK);
 	
-	    var app = config.app;
+		/**
+		 * Import deprecated endpoint defintions
+		 */
+		TK = deprecatedEndpoints(TK);
 	
-	    // If app header exists (using .asApp() function), use that
-	    if (headers['Timekit-App']) {
-	      app = headers['Timekit-App'];
-	    }
-	
-	    var baseUrl = utils.buildUrl('/accounts/microsoft/signup', config);
-	    var finalUrl = baseUrl + '?Timekit-App=' + app + (data && data.callback ? '&callback=' + data.callback : '')
-	
-	    if(shouldAutoRedirect && window) {
-	      window.location.href = finalUrl;
-	    } else {
-	      return finalUrl;
-	    }
-	
-	  };
-	
-	  /**
-	   * Import endpoint defintions
-	   */
-	  TK = endpoints(TK)
-	
-	  /**
-	   * Import deprecated endpoint defintions
-	   */
-	  TK = deprecatedEndpoints(TK)
-	
-	  return TK;
-	
+		return TK;
 	}
 	
 	module.exports = new Timekit();
@@ -1739,127 +1763,60 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(Promise) {'use strict';
 	
-	var defaults = __webpack_require__(6);
-	var utils = __webpack_require__(7);
-	var dispatchRequest = __webpack_require__(9);
-	var InterceptorManager = __webpack_require__(18);
-	var isAbsoluteURL = __webpack_require__(19);
-	var combineURLs = __webpack_require__(20);
-	var bind = __webpack_require__(21);
-	var transformData = __webpack_require__(13);
+	var utils = __webpack_require__(6);
+	var bind = __webpack_require__(7);
+	var Axios = __webpack_require__(8);
+	var mergeConfig = __webpack_require__(26);
+	var defaults = __webpack_require__(14);
 	
-	function Axios(defaultConfig) {
-	  this.defaults = utils.merge({}, defaultConfig);
-	  this.interceptors = {
-	    request: new InterceptorManager(),
-	    response: new InterceptorManager()
-	  };
+	/**
+	 * Create an instance of Axios
+	 *
+	 * @param {Object} defaultConfig The default config for the instance
+	 * @return {Axios} A new instance of Axios
+	 */
+	function createInstance(defaultConfig) {
+	  var context = new Axios(defaultConfig);
+	  var instance = bind(Axios.prototype.request, context);
+	
+	  // Copy axios.prototype to instance
+	  utils.extend(instance, Axios.prototype, context);
+	
+	  // Copy context to instance
+	  utils.extend(instance, context);
+	
+	  return instance;
 	}
 	
-	Axios.prototype.request = function request(config) {
-	  /*eslint no-param-reassign:0*/
-	  // Allow for axios('example/url'[, config]) a la fetch API
-	  if (typeof config === 'string') {
-	    config = utils.merge({
-	      url: arguments[0]
-	    }, arguments[1]);
-	  }
-	
-	  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
-	
-	  // Support baseURL config
-	  if (config.baseURL && !isAbsoluteURL(config.url)) {
-	    config.url = combineURLs(config.baseURL, config.url);
-	  }
-	
-	  // Don't allow overriding defaults.withCredentials
-	  config.withCredentials = config.withCredentials || this.defaults.withCredentials;
-	
-	  // Transform request data
-	  config.data = transformData(
-	    config.data,
-	    config.headers,
-	    config.transformRequest
-	  );
-	
-	  // Flatten headers
-	  config.headers = utils.merge(
-	    config.headers.common || {},
-	    config.headers[config.method] || {},
-	    config.headers || {}
-	  );
-	
-	  utils.forEach(
-	    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-	    function cleanHeaderConfig(method) {
-	      delete config.headers[method];
-	    }
-	  );
-	
-	  // Hook up interceptors middleware
-	  var chain = [dispatchRequest, undefined];
-	  var promise = Promise.resolve(config);
-	
-	  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-	    chain.unshift(interceptor.fulfilled, interceptor.rejected);
-	  });
-	
-	  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-	    chain.push(interceptor.fulfilled, interceptor.rejected);
-	  });
-	
-	  while (chain.length) {
-	    promise = promise.then(chain.shift(), chain.shift());
-	  }
-	
-	  return promise;
-	};
-	
-	var defaultInstance = new Axios(defaults);
-	var axios = module.exports = bind(Axios.prototype.request, defaultInstance);
-	axios.request = bind(Axios.prototype.request, defaultInstance);
+	// Create the default instance to be exported
+	var axios = createInstance(defaults);
 	
 	// Expose Axios class to allow class inheritance
 	axios.Axios = Axios;
 	
-	// Expose properties from defaultInstance
-	axios.defaults = defaultInstance.defaults;
-	axios.interceptors = defaultInstance.interceptors;
-	
 	// Factory for creating new instances
-	axios.create = function create(defaultConfig) {
-	  return new Axios(defaultConfig);
+	axios.create = function create(instanceConfig) {
+	  return createInstance(mergeConfig(axios.defaults, instanceConfig));
 	};
+	
+	// Expose Cancel & CancelToken
+	axios.Cancel = __webpack_require__(27);
+	axios.CancelToken = __webpack_require__(28);
+	axios.isCancel = __webpack_require__(13);
 	
 	// Expose all/spread
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(22);
+	axios.spread = __webpack_require__(29);
 	
-	// Provide aliases for supported request methods
-	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-	  /*eslint func-names:0*/
-	  Axios.prototype[method] = function(url, config) {
-	    return this.request(utils.merge(config || {}, {
-	      method: method,
-	      url: url
-	    }));
-	  };
-	  axios[method] = bind(Axios.prototype[method], defaultInstance);
-	});
+	// Expose isAxiosError
+	axios.isAxiosError = __webpack_require__(30);
 	
-	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-	  /*eslint func-names:0*/
-	  Axios.prototype[method] = function(url, data, config) {
-	    return this.request(utils.merge(config || {}, {
-	      method: method,
-	      url: url,
-	      data: data
-	    }));
-	  };
-	  axios[method] = bind(Axios.prototype[method], defaultInstance);
-	});
+	module.exports = axios;
+	
+	// Allow use of default import syntax in TypeScript
+	module.exports.default = axios;
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
@@ -1869,83 +1826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
-	var normalizeHeaderName = __webpack_require__(8);
-	
-	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
-	var DEFAULT_CONTENT_TYPE = {
-	  'Content-Type': 'application/x-www-form-urlencoded'
-	};
-	
-	function setContentTypeIfUnset(headers, value) {
-	  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-	    headers['Content-Type'] = value;
-	  }
-	}
-	
-	module.exports = {
-	  transformRequest: [function transformRequest(data, headers) {
-	    normalizeHeaderName(headers, 'Content-Type');
-	    if (utils.isFormData(data) ||
-	      utils.isArrayBuffer(data) ||
-	      utils.isStream(data) ||
-	      utils.isFile(data) ||
-	      utils.isBlob(data)
-	    ) {
-	      return data;
-	    }
-	    if (utils.isArrayBufferView(data)) {
-	      return data.buffer;
-	    }
-	    if (utils.isURLSearchParams(data)) {
-	      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-	      return data.toString();
-	    }
-	    if (utils.isObject(data)) {
-	      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-	      return JSON.stringify(data);
-	    }
-	    return data;
-	  }],
-	
-	  transformResponse: [function transformResponse(data) {
-	    /*eslint no-param-reassign:0*/
-	    if (typeof data === 'string') {
-	      data = data.replace(PROTECTION_PREFIX, '');
-	      try {
-	        data = JSON.parse(data);
-	      } catch (e) { /* Ignore */ }
-	    }
-	    return data;
-	  }],
-	
-	  headers: {
-	    common: {
-	      'Accept': 'application/json, text/plain, */*'
-	    },
-	    patch: utils.merge(DEFAULT_CONTENT_TYPE),
-	    post: utils.merge(DEFAULT_CONTENT_TYPE),
-	    put: utils.merge(DEFAULT_CONTENT_TYPE)
-	  },
-	
-	  timeout: 0,
-	
-	  xsrfCookieName: 'XSRF-TOKEN',
-	  xsrfHeaderName: 'X-XSRF-TOKEN',
-	
-	  maxContentLength: -1,
-	
-	  validateStatus: function validateStatus(status) {
-	    return status >= 200 && status < 300;
-	  }
-	};
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-	'use strict';
+	var bind = __webpack_require__(7);
 	
 	/*global toString:true*/
 	
@@ -1961,6 +1842,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function isArray(val) {
 	  return toString.call(val) === '[object Array]';
+	}
+	
+	/**
+	 * Determine if a value is undefined
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if the value is undefined, otherwise false
+	 */
+	function isUndefined(val) {
+	  return typeof val === 'undefined';
+	}
+	
+	/**
+	 * Determine if a value is a Buffer
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Buffer, otherwise false
+	 */
+	function isBuffer(val) {
+	  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
+	    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
 	}
 	
 	/**
@@ -2020,16 +1922,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Determine if a value is undefined
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if the value is undefined, otherwise false
-	 */
-	function isUndefined(val) {
-	  return typeof val === 'undefined';
-	}
-	
-	/**
 	 * Determine if a value is an Object
 	 *
 	 * @param {Object} val The value to test
@@ -2037,6 +1929,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function isObject(val) {
 	  return val !== null && typeof val === 'object';
+	}
+	
+	/**
+	 * Determine if a value is a plain Object
+	 *
+	 * @param {Object} val The value to test
+	 * @return {boolean} True if value is a plain Object, otherwise false
+	 */
+	function isPlainObject(val) {
+	  if (toString.call(val) !== '[object Object]') {
+	    return false;
+	  }
+	
+	  var prototype = Object.getPrototypeOf(val);
+	  return prototype === null || prototype === Object.prototype;
 	}
 	
 	/**
@@ -2120,13 +2027,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *  typeof document -> undefined
 	 *
 	 * react-native:
-	 *  typeof document.createElement -> undefined
+	 *  navigator.product -> 'ReactNative'
+	 * nativescript
+	 *  navigator.product -> 'NativeScript' or 'NS'
 	 */
 	function isStandardBrowserEnv() {
+	  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+	                                           navigator.product === 'NativeScript' ||
+	                                           navigator.product === 'NS')) {
+	    return false;
+	  }
 	  return (
 	    typeof window !== 'undefined' &&
-	    typeof document !== 'undefined' &&
-	    typeof document.createElement === 'function'
+	    typeof document !== 'undefined'
 	  );
 	}
 	
@@ -2149,7 +2062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  // Force an array if not already something iterable
-	  if (typeof obj !== 'object' && !isArray(obj)) {
+	  if (typeof obj !== 'object') {
 	    /*eslint no-param-reassign:0*/
 	    obj = [obj];
 	  }
@@ -2162,7 +2075,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    // Iterate over object keys
 	    for (var key in obj) {
-	      if (obj.hasOwnProperty(key)) {
+	      if (Object.prototype.hasOwnProperty.call(obj, key)) {
 	        fn.call(null, obj[key], key, obj);
 	      }
 	    }
@@ -2189,8 +2102,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	function merge(/* obj1, obj2, obj3, ... */) {
 	  var result = {};
 	  function assignValue(val, key) {
-	    if (typeof result[key] === 'object' && typeof val === 'object') {
+	    if (isPlainObject(result[key]) && isPlainObject(val)) {
 	      result[key] = merge(result[key], val);
+	    } else if (isPlainObject(val)) {
+	      result[key] = merge({}, val);
+	    } else if (isArray(val)) {
+	      result[key] = val.slice();
 	    } else {
 	      result[key] = val;
 	    }
@@ -2202,14 +2119,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return result;
 	}
 	
+	/**
+	 * Extends object a by mutably adding to it the properties of object b.
+	 *
+	 * @param {Object} a The object to be extended
+	 * @param {Object} b The object to copy properties from
+	 * @param {Object} thisArg The object to bind function to
+	 * @return {Object} The resulting value of object a
+	 */
+	function extend(a, b, thisArg) {
+	  forEach(b, function assignValue(val, key) {
+	    if (thisArg && typeof val === 'function') {
+	      a[key] = bind(val, thisArg);
+	    } else {
+	      a[key] = val;
+	    }
+	  });
+	  return a;
+	}
+	
+	/**
+	 * Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
+	 *
+	 * @param {string} content with BOM
+	 * @return {string} content value without BOM
+	 */
+	function stripBOM(content) {
+	  if (content.charCodeAt(0) === 0xFEFF) {
+	    content = content.slice(1);
+	  }
+	  return content;
+	}
+	
 	module.exports = {
 	  isArray: isArray,
 	  isArrayBuffer: isArrayBuffer,
+	  isBuffer: isBuffer,
 	  isFormData: isFormData,
 	  isArrayBufferView: isArrayBufferView,
 	  isString: isString,
 	  isNumber: isNumber,
 	  isObject: isObject,
+	  isPlainObject: isPlainObject,
 	  isUndefined: isUndefined,
 	  isDate: isDate,
 	  isFile: isFile,
@@ -2220,7 +2171,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  isStandardBrowserEnv: isStandardBrowserEnv,
 	  forEach: forEach,
 	  merge: merge,
-	  trim: trim
+	  extend: extend,
+	  trim: trim,
+	  stripBOM: stripBOM
+	};
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	module.exports = function bind(fn, thisArg) {
+	  return function wrap() {
+	    var args = new Array(arguments.length);
+	    for (var i = 0; i < args.length; i++) {
+	      args[i] = arguments[i];
+	    }
+	    return fn.apply(thisArg, args);
+	  };
 	};
 
 
@@ -2228,241 +2198,114 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(Promise) {'use strict';
 	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(6);
+	var buildURL = __webpack_require__(9);
+	var InterceptorManager = __webpack_require__(10);
+	var dispatchRequest = __webpack_require__(11);
+	var mergeConfig = __webpack_require__(26);
 	
-	module.exports = function normalizeHeaderName(headers, normalizedName) {
-	  utils.forEach(headers, function processHeader(value, name) {
-	    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-	      headers[normalizedName] = value;
-	      delete headers[name];
-	    }
+	/**
+	 * Create a new instance of Axios
+	 *
+	 * @param {Object} instanceConfig The default config for the instance
+	 */
+	function Axios(instanceConfig) {
+	  this.defaults = instanceConfig;
+	  this.interceptors = {
+	    request: new InterceptorManager(),
+	    response: new InterceptorManager()
+	  };
+	}
+	
+	/**
+	 * Dispatch a request
+	 *
+	 * @param {Object} config The config specific for this request (merged with this.defaults)
+	 */
+	Axios.prototype.request = function request(config) {
+	  /*eslint no-param-reassign:0*/
+	  // Allow for axios('example/url'[, config]) a la fetch API
+	  if (typeof config === 'string') {
+	    config = arguments[1] || {};
+	    config.url = arguments[0];
+	  } else {
+	    config = config || {};
+	  }
+	
+	  config = mergeConfig(this.defaults, config);
+	
+	  // Set config.method
+	  if (config.method) {
+	    config.method = config.method.toLowerCase();
+	  } else if (this.defaults.method) {
+	    config.method = this.defaults.method.toLowerCase();
+	  } else {
+	    config.method = 'get';
+	  }
+	
+	  // Hook up interceptors middleware
+	  var chain = [dispatchRequest, undefined];
+	  var promise = Promise.resolve(config);
+	
+	  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+	    chain.unshift(interceptor.fulfilled, interceptor.rejected);
 	  });
+	
+	  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+	    chain.push(interceptor.fulfilled, interceptor.rejected);
+	  });
+	
+	  while (chain.length) {
+	    promise = promise.then(chain.shift(), chain.shift());
+	  }
+	
+	  return promise;
 	};
-
+	
+	Axios.prototype.getUri = function getUri(config) {
+	  config = mergeConfig(this.defaults, config);
+	  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
+	};
+	
+	// Provide aliases for supported request methods
+	utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+	  /*eslint func-names:0*/
+	  Axios.prototype[method] = function(url, config) {
+	    return this.request(mergeConfig(config || {}, {
+	      method: method,
+	      url: url,
+	      data: (config || {}).data
+	    }));
+	  };
+	});
+	
+	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+	  /*eslint func-names:0*/
+	  Axios.prototype[method] = function(url, data, config) {
+	    return this.request(mergeConfig(config || {}, {
+	      method: method,
+	      url: url,
+	      data: data
+	    }));
+	  };
+	});
+	
+	module.exports = Axios;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(Promise, process) {'use strict';
-	
-	/**
-	 * Dispatch a request to the server using whichever adapter
-	 * is supported by the current environment.
-	 *
-	 * @param {object} config The config that is to be used for the request
-	 * @returns {Promise} The Promise to be fulfilled
-	 */
-	module.exports = function dispatchRequest(config) {
-	  return new Promise(function executor(resolve, reject) {
-	    try {
-	      var adapter;
-	
-	      if (typeof config.adapter === 'function') {
-	        // For custom adapter support
-	        adapter = config.adapter;
-	      } else if (typeof XMLHttpRequest !== 'undefined') {
-	        // For browsers use XHR adapter
-	        adapter = __webpack_require__(10);
-	      } else if (typeof process !== 'undefined') {
-	        // For node use HTTP adapter
-	        adapter = __webpack_require__(10);
-	      }
-	
-	      if (typeof adapter === 'function') {
-	        adapter(resolve, reject, config);
-	      }
-	    } catch (e) {
-	      reject(e);
-	    }
-	  });
-	};
-	
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
-	
-	var utils = __webpack_require__(7);
-	var buildURL = __webpack_require__(11);
-	var parseHeaders = __webpack_require__(12);
-	var transformData = __webpack_require__(13);
-	var isURLSameOrigin = __webpack_require__(14);
-	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(15);
-	var settle = __webpack_require__(16);
-	
-	module.exports = function xhrAdapter(resolve, reject, config) {
-	  var requestData = config.data;
-	  var requestHeaders = config.headers;
-	
-	  if (utils.isFormData(requestData)) {
-	    delete requestHeaders['Content-Type']; // Let the browser set it
-	  }
-	
-	  var request = new XMLHttpRequest();
-	  var loadEvent = 'onreadystatechange';
-	  var xDomain = false;
-	
-	  // For IE 8/9 CORS support
-	  // Only supports POST and GET calls and doesn't returns the response headers.
-	  // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-	  if (process.env.NODE_ENV !== 'test' && typeof window !== 'undefined' && window.XDomainRequest && !('withCredentials' in request) && !isURLSameOrigin(config.url)) {
-	    request = new window.XDomainRequest();
-	    loadEvent = 'onload';
-	    xDomain = true;
-	    request.onprogress = function handleProgress() {};
-	    request.ontimeout = function handleTimeout() {};
-	  }
-	
-	  // HTTP basic authentication
-	  if (config.auth) {
-	    var username = config.auth.username || '';
-	    var password = config.auth.password || '';
-	    requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-	  }
-	
-	  request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
-	
-	  // Set the request timeout in MS
-	  request.timeout = config.timeout;
-	
-	  // Listen for ready state
-	  request[loadEvent] = function handleLoad() {
-	    if (!request || (request.readyState !== 4 && !xDomain)) {
-	      return;
-	    }
-	
-	    // The request errored out and we didn't get a response, this will be
-	    // handled by onerror instead
-	    if (request.status === 0) {
-	      return;
-	    }
-	
-	    // Prepare the response
-	    var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-	    var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-	    var response = {
-	      data: transformData(
-	        responseData,
-	        responseHeaders,
-	        config.transformResponse
-	      ),
-	      // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
-	      status: request.status === 1223 ? 204 : request.status,
-	      statusText: request.status === 1223 ? 'No Content' : request.statusText,
-	      headers: responseHeaders,
-	      config: config,
-	      request: request
-	    };
-	
-	    settle(resolve, reject, response);
-	
-	    // Clean up request
-	    request = null;
-	  };
-	
-	  // Handle low level network errors
-	  request.onerror = function handleError() {
-	    // Real errors are hidden from us by the browser
-	    // onerror should only fire if it's a network error
-	    reject(new Error('Network Error'));
-	
-	    // Clean up request
-	    request = null;
-	  };
-	
-	  // Handle timeout
-	  request.ontimeout = function handleTimeout() {
-	    var err = new Error('timeout of ' + config.timeout + 'ms exceeded');
-	    err.timeout = config.timeout;
-	    err.code = 'ECONNABORTED';
-	    reject(err);
-	
-	    // Clean up request
-	    request = null;
-	  };
-	
-	  // Add xsrf header
-	  // This is only done if running in a standard browser environment.
-	  // Specifically not if we're in a web worker, or react-native.
-	  if (utils.isStandardBrowserEnv()) {
-	    var cookies = __webpack_require__(17);
-	
-	    // Add xsrf header
-	    var xsrfValue = config.withCredentials || isURLSameOrigin(config.url) ?
-	        cookies.read(config.xsrfCookieName) :
-	        undefined;
-	
-	    if (xsrfValue) {
-	      requestHeaders[config.xsrfHeaderName] = xsrfValue;
-	    }
-	  }
-	
-	  // Add headers to the request
-	  if ('setRequestHeader' in request) {
-	    utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-	      if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-	        // Remove Content-Type if data is undefined
-	        delete requestHeaders[key];
-	      } else {
-	        // Otherwise add header to the request
-	        request.setRequestHeader(key, val);
-	      }
-	    });
-	  }
-	
-	  // Add withCredentials to request if needed
-	  if (config.withCredentials) {
-	    request.withCredentials = true;
-	  }
-	
-	  // Add responseType to request if needed
-	  if (config.responseType) {
-	    try {
-	      request.responseType = config.responseType;
-	    } catch (e) {
-	      if (request.responseType !== 'json') {
-	        throw e;
-	      }
-	    }
-	  }
-	
-	  // Handle progress if needed
-	  if (config.progress) {
-	    if (config.method === 'post' || config.method === 'put') {
-	      request.upload.addEventListener('progress', config.progress);
-	    } else if (config.method === 'get') {
-	      request.addEventListener('progress', config.progress);
-	    }
-	  }
-	
-	  if (requestData === undefined) {
-	    requestData = null;
-	  }
-	
-	  // Send the request
-	  request.send(requestData);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
 	'use strict';
 	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(6);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
-	    replace(/%40/gi, '@').
 	    replace(/%3A/gi, ':').
 	    replace(/%24/g, '$').
 	    replace(/%2C/gi, ',').
@@ -2499,9 +2342,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      if (utils.isArray(val)) {
 	        key = key + '[]';
-	      }
-	
-	      if (!utils.isArray(val)) {
+	      } else {
 	        val = [val];
 	      }
 	
@@ -2519,6 +2360,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  if (serializedParams) {
+	    var hashmarkIndex = url.indexOf('#');
+	    if (hashmarkIndex !== -1) {
+	      url = url.slice(0, hashmarkIndex);
+	    }
+	
 	    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
 	  }
 	
@@ -2527,280 +2373,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 12 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
-	
-	/**
-	 * Parse headers into an object
-	 *
-	 * ```
-	 * Date: Wed, 27 Aug 2014 08:58:49 GMT
-	 * Content-Type: application/json
-	 * Connection: keep-alive
-	 * Transfer-Encoding: chunked
-	 * ```
-	 *
-	 * @param {String} headers Headers needing to be parsed
-	 * @returns {Object} Headers parsed into an object
-	 */
-	module.exports = function parseHeaders(headers) {
-	  var parsed = {};
-	  var key;
-	  var val;
-	  var i;
-	
-	  if (!headers) { return parsed; }
-	
-	  utils.forEach(headers.split('\n'), function parser(line) {
-	    i = line.indexOf(':');
-	    key = utils.trim(line.substr(0, i)).toLowerCase();
-	    val = utils.trim(line.substr(i + 1));
-	
-	    if (key) {
-	      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-	    }
-	  });
-	
-	  return parsed;
-	};
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(7);
-	
-	/**
-	 * Transform the data for a request or a response
-	 *
-	 * @param {Object|String} data The data to be transformed
-	 * @param {Array} headers The headers for the request or response
-	 * @param {Array|Function} fns A single function or Array of functions
-	 * @returns {*} The resulting transformed data
-	 */
-	module.exports = function transformData(data, headers, fns) {
-	  /*eslint no-param-reassign:0*/
-	  utils.forEach(fns, function transform(fn) {
-	    data = fn(data, headers);
-	  });
-	
-	  return data;
-	};
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(7);
-	
-	module.exports = (
-	  utils.isStandardBrowserEnv() ?
-	
-	  // Standard browser envs have full support of the APIs needed to test
-	  // whether the request URL is of the same origin as current location.
-	  (function standardBrowserEnv() {
-	    var msie = /(msie|trident)/i.test(navigator.userAgent);
-	    var urlParsingNode = document.createElement('a');
-	    var originURL;
-	
-	    /**
-	    * Parse a URL to discover it's components
-	    *
-	    * @param {String} url The URL to be parsed
-	    * @returns {Object}
-	    */
-	    function resolveURL(url) {
-	      var href = url;
-	
-	      if (msie) {
-	        // IE needs attribute set twice to normalize properties
-	        urlParsingNode.setAttribute('href', href);
-	        href = urlParsingNode.href;
-	      }
-	
-	      urlParsingNode.setAttribute('href', href);
-	
-	      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-	      return {
-	        href: urlParsingNode.href,
-	        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-	        host: urlParsingNode.host,
-	        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-	        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-	        hostname: urlParsingNode.hostname,
-	        port: urlParsingNode.port,
-	        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-	                  urlParsingNode.pathname :
-	                  '/' + urlParsingNode.pathname
-	      };
-	    }
-	
-	    originURL = resolveURL(window.location.href);
-	
-	    /**
-	    * Determine if a URL shares the same origin as the current location
-	    *
-	    * @param {String} requestURL The URL to test
-	    * @returns {boolean} True if URL shares the same origin, otherwise false
-	    */
-	    return function isURLSameOrigin(requestURL) {
-	      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-	      return (parsed.protocol === originURL.protocol &&
-	            parsed.host === originURL.host);
-	    };
-	  })() :
-	
-	  // Non standard browser envs (web workers, react-native) lack needed support.
-	  (function nonStandardBrowserEnv() {
-	    return function isURLSameOrigin() {
-	      return true;
-	    };
-	  })()
-	);
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
-	
-	var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-	
-	function E() {
-	  this.message = 'String contains an invalid character';
-	}
-	E.prototype = new Error;
-	E.prototype.code = 5;
-	E.prototype.name = 'InvalidCharacterError';
-	
-	function btoa(input) {
-	  var str = String(input);
-	  var output = '';
-	  for (
-	    // initialize result and counter
-	    var block, charCode, idx = 0, map = chars;
-	    // if the next str index does not exist:
-	    //   change the mapping table to "="
-	    //   check if d has no fractional digits
-	    str.charAt(idx | 0) || (map = '=', idx % 1);
-	    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
-	    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
-	  ) {
-	    charCode = str.charCodeAt(idx += 3 / 4);
-	    if (charCode > 0xFF) {
-	      throw new E();
-	    }
-	    block = block << 8 | charCode;
-	  }
-	  return output;
-	}
-	
-	module.exports = btoa;
-
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Resolve or reject a Promise based on response status.
-	 *
-	 * @param {Function} resolve A function that resolves the promise.
-	 * @param {Function} reject A function that rejects the promise.
-	 * @param {object} response The response.
-	 */
-	module.exports = function settle(resolve, reject, response) {
-	  var validateStatus = response.config.validateStatus;
-	  // Note: status is not exposed by XDomainRequest
-	  if (!response.status || !validateStatus || validateStatus(response.status)) {
-	    resolve(response);
-	  } else {
-	    reject(response);
-	  }
-	};
-
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(7);
-	
-	module.exports = (
-	  utils.isStandardBrowserEnv() ?
-	
-	  // Standard browser envs support document.cookie
-	  (function standardBrowserEnv() {
-	    return {
-	      write: function write(name, value, expires, path, domain, secure) {
-	        var cookie = [];
-	        cookie.push(name + '=' + encodeURIComponent(value));
-	
-	        if (utils.isNumber(expires)) {
-	          cookie.push('expires=' + new Date(expires).toGMTString());
-	        }
-	
-	        if (utils.isString(path)) {
-	          cookie.push('path=' + path);
-	        }
-	
-	        if (utils.isString(domain)) {
-	          cookie.push('domain=' + domain);
-	        }
-	
-	        if (secure === true) {
-	          cookie.push('secure');
-	        }
-	
-	        document.cookie = cookie.join('; ');
-	      },
-	
-	      read: function read(name) {
-	        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-	        return (match ? decodeURIComponent(match[3]) : null);
-	      },
-	
-	      remove: function remove(name) {
-	        this.write(name, '', Date.now() - 86400000);
-	      }
-	    };
-	  })() :
-	
-	  // Non standard browser env (web workers, react-native) lack needed support.
-	  (function nonStandardBrowserEnv() {
-	    return {
-	      write: function write() {},
-	      read: function read() { return null; },
-	      remove: function remove() {}
-	    };
-	  })()
-	);
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(6);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -2853,7 +2431,627 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Promise) {'use strict';
+	
+	var utils = __webpack_require__(6);
+	var transformData = __webpack_require__(12);
+	var isCancel = __webpack_require__(13);
+	var defaults = __webpack_require__(14);
+	
+	/**
+	 * Throws a `Cancel` if cancellation has been requested.
+	 */
+	function throwIfCancellationRequested(config) {
+	  if (config.cancelToken) {
+	    config.cancelToken.throwIfRequested();
+	  }
+	}
+	
+	/**
+	 * Dispatch a request to the server using the configured adapter.
+	 *
+	 * @param {object} config The config that is to be used for the request
+	 * @returns {Promise} The Promise to be fulfilled
+	 */
+	module.exports = function dispatchRequest(config) {
+	  throwIfCancellationRequested(config);
+	
+	  // Ensure headers exist
+	  config.headers = config.headers || {};
+	
+	  // Transform request data
+	  config.data = transformData(
+	    config.data,
+	    config.headers,
+	    config.transformRequest
+	  );
+	
+	  // Flatten headers
+	  config.headers = utils.merge(
+	    config.headers.common || {},
+	    config.headers[config.method] || {},
+	    config.headers
+	  );
+	
+	  utils.forEach(
+	    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+	    function cleanHeaderConfig(method) {
+	      delete config.headers[method];
+	    }
+	  );
+	
+	  var adapter = config.adapter || defaults.adapter;
+	
+	  return adapter(config).then(function onAdapterResolution(response) {
+	    throwIfCancellationRequested(config);
+	
+	    // Transform response data
+	    response.data = transformData(
+	      response.data,
+	      response.headers,
+	      config.transformResponse
+	    );
+	
+	    return response;
+	  }, function onAdapterRejection(reason) {
+	    if (!isCancel(reason)) {
+	      throwIfCancellationRequested(config);
+	
+	      // Transform response data
+	      if (reason && reason.response) {
+	        reason.response.data = transformData(
+	          reason.response.data,
+	          reason.response.headers,
+	          config.transformResponse
+	        );
+	      }
+	    }
+	
+	    return Promise.reject(reason);
+	  });
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(6);
+	
+	/**
+	 * Transform the data for a request or a response
+	 *
+	 * @param {Object|String} data The data to be transformed
+	 * @param {Array} headers The headers for the request or response
+	 * @param {Array|Function} fns A single function or Array of functions
+	 * @returns {*} The resulting transformed data
+	 */
+	module.exports = function transformData(data, headers, fns) {
+	  /*eslint no-param-reassign:0*/
+	  utils.forEach(fns, function transform(fn) {
+	    data = fn(data, headers);
+	  });
+	
+	  return data;
+	};
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	module.exports = function isCancel(value) {
+	  return !!(value && value.__CANCEL__);
+	};
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+	
+	var utils = __webpack_require__(6);
+	var normalizeHeaderName = __webpack_require__(15);
+	
+	var DEFAULT_CONTENT_TYPE = {
+	  'Content-Type': 'application/x-www-form-urlencoded'
+	};
+	
+	function setContentTypeIfUnset(headers, value) {
+	  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+	    headers['Content-Type'] = value;
+	  }
+	}
+	
+	function getDefaultAdapter() {
+	  var adapter;
+	  if (typeof XMLHttpRequest !== 'undefined') {
+	    // For browsers use XHR adapter
+	    adapter = __webpack_require__(16);
+	  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+	    // For node use HTTP adapter
+	    adapter = __webpack_require__(16);
+	  }
+	  return adapter;
+	}
+	
+	var defaults = {
+	  adapter: getDefaultAdapter(),
+	
+	  transformRequest: [function transformRequest(data, headers) {
+	    normalizeHeaderName(headers, 'Accept');
+	    normalizeHeaderName(headers, 'Content-Type');
+	    if (utils.isFormData(data) ||
+	      utils.isArrayBuffer(data) ||
+	      utils.isBuffer(data) ||
+	      utils.isStream(data) ||
+	      utils.isFile(data) ||
+	      utils.isBlob(data)
+	    ) {
+	      return data;
+	    }
+	    if (utils.isArrayBufferView(data)) {
+	      return data.buffer;
+	    }
+	    if (utils.isURLSearchParams(data)) {
+	      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+	      return data.toString();
+	    }
+	    if (utils.isObject(data)) {
+	      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+	      return JSON.stringify(data);
+	    }
+	    return data;
+	  }],
+	
+	  transformResponse: [function transformResponse(data) {
+	    /*eslint no-param-reassign:0*/
+	    if (typeof data === 'string') {
+	      try {
+	        data = JSON.parse(data);
+	      } catch (e) { /* Ignore */ }
+	    }
+	    return data;
+	  }],
+	
+	  /**
+	   * A timeout in milliseconds to abort a request. If set to 0 (default) a
+	   * timeout is not created.
+	   */
+	  timeout: 0,
+	
+	  xsrfCookieName: 'XSRF-TOKEN',
+	  xsrfHeaderName: 'X-XSRF-TOKEN',
+	
+	  maxContentLength: -1,
+	  maxBodyLength: -1,
+	
+	  validateStatus: function validateStatus(status) {
+	    return status >= 200 && status < 300;
+	  }
+	};
+	
+	defaults.headers = {
+	  common: {
+	    'Accept': 'application/json, text/plain, */*'
+	  }
+	};
+	
+	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+	  defaults.headers[method] = {};
+	});
+	
+	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+	  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+	});
+	
+	module.exports = defaults;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(6);
+	
+	module.exports = function normalizeHeaderName(headers, normalizedName) {
+	  utils.forEach(headers, function processHeader(value, name) {
+	    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+	      headers[normalizedName] = value;
+	      delete headers[name];
+	    }
+	  });
+	};
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Promise) {'use strict';
+	
+	var utils = __webpack_require__(6);
+	var settle = __webpack_require__(17);
+	var cookies = __webpack_require__(20);
+	var buildURL = __webpack_require__(9);
+	var buildFullPath = __webpack_require__(21);
+	var parseHeaders = __webpack_require__(24);
+	var isURLSameOrigin = __webpack_require__(25);
+	var createError = __webpack_require__(18);
+	
+	module.exports = function xhrAdapter(config) {
+	  return new Promise(function dispatchXhrRequest(resolve, reject) {
+	    var requestData = config.data;
+	    var requestHeaders = config.headers;
+	
+	    if (utils.isFormData(requestData)) {
+	      delete requestHeaders['Content-Type']; // Let the browser set it
+	    }
+	
+	    var request = new XMLHttpRequest();
+	
+	    // HTTP basic authentication
+	    if (config.auth) {
+	      var username = config.auth.username || '';
+	      var password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
+	      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+	    }
+	
+	    var fullPath = buildFullPath(config.baseURL, config.url);
+	    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
+	
+	    // Set the request timeout in MS
+	    request.timeout = config.timeout;
+	
+	    // Listen for ready state
+	    request.onreadystatechange = function handleLoad() {
+	      if (!request || request.readyState !== 4) {
+	        return;
+	      }
+	
+	      // The request errored out and we didn't get a response, this will be
+	      // handled by onerror instead
+	      // With one exception: request that using file: protocol, most browsers
+	      // will return status as 0 even though it's a successful request
+	      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+	        return;
+	      }
+	
+	      // Prepare the response
+	      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+	      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+	      var response = {
+	        data: responseData,
+	        status: request.status,
+	        statusText: request.statusText,
+	        headers: responseHeaders,
+	        config: config,
+	        request: request
+	      };
+	
+	      settle(resolve, reject, response);
+	
+	      // Clean up request
+	      request = null;
+	    };
+	
+	    // Handle browser request cancellation (as opposed to a manual cancellation)
+	    request.onabort = function handleAbort() {
+	      if (!request) {
+	        return;
+	      }
+	
+	      reject(createError('Request aborted', config, 'ECONNABORTED', request));
+	
+	      // Clean up request
+	      request = null;
+	    };
+	
+	    // Handle low level network errors
+	    request.onerror = function handleError() {
+	      // Real errors are hidden from us by the browser
+	      // onerror should only fire if it's a network error
+	      reject(createError('Network Error', config, null, request));
+	
+	      // Clean up request
+	      request = null;
+	    };
+	
+	    // Handle timeout
+	    request.ontimeout = function handleTimeout() {
+	      var timeoutErrorMessage = 'timeout of ' + config.timeout + 'ms exceeded';
+	      if (config.timeoutErrorMessage) {
+	        timeoutErrorMessage = config.timeoutErrorMessage;
+	      }
+	      reject(createError(timeoutErrorMessage, config, 'ECONNABORTED',
+	        request));
+	
+	      // Clean up request
+	      request = null;
+	    };
+	
+	    // Add xsrf header
+	    // This is only done if running in a standard browser environment.
+	    // Specifically not if we're in a web worker, or react-native.
+	    if (utils.isStandardBrowserEnv()) {
+	      // Add xsrf header
+	      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
+	        cookies.read(config.xsrfCookieName) :
+	        undefined;
+	
+	      if (xsrfValue) {
+	        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+	      }
+	    }
+	
+	    // Add headers to the request
+	    if ('setRequestHeader' in request) {
+	      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+	        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+	          // Remove Content-Type if data is undefined
+	          delete requestHeaders[key];
+	        } else {
+	          // Otherwise add header to the request
+	          request.setRequestHeader(key, val);
+	        }
+	      });
+	    }
+	
+	    // Add withCredentials to request if needed
+	    if (!utils.isUndefined(config.withCredentials)) {
+	      request.withCredentials = !!config.withCredentials;
+	    }
+	
+	    // Add responseType to request if needed
+	    if (config.responseType) {
+	      try {
+	        request.responseType = config.responseType;
+	      } catch (e) {
+	        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
+	        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
+	        if (config.responseType !== 'json') {
+	          throw e;
+	        }
+	      }
+	    }
+	
+	    // Handle progress if needed
+	    if (typeof config.onDownloadProgress === 'function') {
+	      request.addEventListener('progress', config.onDownloadProgress);
+	    }
+	
+	    // Not all browsers support upload events
+	    if (typeof config.onUploadProgress === 'function' && request.upload) {
+	      request.upload.addEventListener('progress', config.onUploadProgress);
+	    }
+	
+	    if (config.cancelToken) {
+	      // Handle cancellation
+	      config.cancelToken.promise.then(function onCanceled(cancel) {
+	        if (!request) {
+	          return;
+	        }
+	
+	        request.abort();
+	        reject(cancel);
+	        // Clean up request
+	        request = null;
+	      });
+	    }
+	
+	    if (!requestData) {
+	      requestData = null;
+	    }
+	
+	    // Send the request
+	    request.send(requestData);
+	  });
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var createError = __webpack_require__(18);
+	
+	/**
+	 * Resolve or reject a Promise based on response status.
+	 *
+	 * @param {Function} resolve A function that resolves the promise.
+	 * @param {Function} reject A function that rejects the promise.
+	 * @param {object} response The response.
+	 */
+	module.exports = function settle(resolve, reject, response) {
+	  var validateStatus = response.config.validateStatus;
+	  if (!response.status || !validateStatus || validateStatus(response.status)) {
+	    resolve(response);
+	  } else {
+	    reject(createError(
+	      'Request failed with status code ' + response.status,
+	      response.config,
+	      null,
+	      response.request,
+	      response
+	    ));
+	  }
+	};
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var enhanceError = __webpack_require__(19);
+	
+	/**
+	 * Create an Error with the specified message, config, error code, request and response.
+	 *
+	 * @param {string} message The error message.
+	 * @param {Object} config The config.
+	 * @param {string} [code] The error code (for example, 'ECONNABORTED').
+	 * @param {Object} [request] The request.
+	 * @param {Object} [response] The response.
+	 * @returns {Error} The created error.
+	 */
+	module.exports = function createError(message, config, code, request, response) {
+	  var error = new Error(message);
+	  return enhanceError(error, config, code, request, response);
+	};
+
+
+/***/ }),
 /* 19 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Update an Error with the specified config, error code, and response.
+	 *
+	 * @param {Error} error The error to update.
+	 * @param {Object} config The config.
+	 * @param {string} [code] The error code (for example, 'ECONNABORTED').
+	 * @param {Object} [request] The request.
+	 * @param {Object} [response] The response.
+	 * @returns {Error} The error.
+	 */
+	module.exports = function enhanceError(error, config, code, request, response) {
+	  error.config = config;
+	  if (code) {
+	    error.code = code;
+	  }
+	
+	  error.request = request;
+	  error.response = response;
+	  error.isAxiosError = true;
+	
+	  error.toJSON = function toJSON() {
+	    return {
+	      // Standard
+	      message: this.message,
+	      name: this.name,
+	      // Microsoft
+	      description: this.description,
+	      number: this.number,
+	      // Mozilla
+	      fileName: this.fileName,
+	      lineNumber: this.lineNumber,
+	      columnNumber: this.columnNumber,
+	      stack: this.stack,
+	      // Axios
+	      config: this.config,
+	      code: this.code
+	    };
+	  };
+	  return error;
+	};
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(6);
+	
+	module.exports = (
+	  utils.isStandardBrowserEnv() ?
+	
+	  // Standard browser envs support document.cookie
+	    (function standardBrowserEnv() {
+	      return {
+	        write: function write(name, value, expires, path, domain, secure) {
+	          var cookie = [];
+	          cookie.push(name + '=' + encodeURIComponent(value));
+	
+	          if (utils.isNumber(expires)) {
+	            cookie.push('expires=' + new Date(expires).toGMTString());
+	          }
+	
+	          if (utils.isString(path)) {
+	            cookie.push('path=' + path);
+	          }
+	
+	          if (utils.isString(domain)) {
+	            cookie.push('domain=' + domain);
+	          }
+	
+	          if (secure === true) {
+	            cookie.push('secure');
+	          }
+	
+	          document.cookie = cookie.join('; ');
+	        },
+	
+	        read: function read(name) {
+	          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+	          return (match ? decodeURIComponent(match[3]) : null);
+	        },
+	
+	        remove: function remove(name) {
+	          this.write(name, '', Date.now() - 86400000);
+	        }
+	      };
+	    })() :
+	
+	  // Non standard browser env (web workers, react-native) lack needed support.
+	    (function nonStandardBrowserEnv() {
+	      return {
+	        write: function write() {},
+	        read: function read() { return null; },
+	        remove: function remove() {}
+	      };
+	    })()
+	);
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var isAbsoluteURL = __webpack_require__(22);
+	var combineURLs = __webpack_require__(23);
+	
+	/**
+	 * Creates a new URL by combining the baseURL with the requestedURL,
+	 * only when the requestedURL is not already an absolute URL.
+	 * If the requestURL is absolute, this function returns the requestedURL untouched.
+	 *
+	 * @param {string} baseURL The base URL
+	 * @param {string} requestedURL Absolute or relative URL to combine
+	 * @returns {string} The combined full path
+	 */
+	module.exports = function buildFullPath(baseURL, requestedURL) {
+	  if (baseURL && !isAbsoluteURL(requestedURL)) {
+	    return combineURLs(baseURL, requestedURL);
+	  }
+	  return requestedURL;
+	};
+
+
+/***/ }),
+/* 22 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -2873,7 +3071,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 20 */
+/* 23 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -2886,29 +3084,329 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {string} The combined URL
 	 */
 	module.exports = function combineURLs(baseURL, relativeURL) {
-	  return baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '');
+	  return relativeURL
+	    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+	    : baseURL;
 	};
 
 
 /***/ }),
-/* 21 */
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(6);
+	
+	// Headers whose duplicates are ignored by node
+	// c.f. https://nodejs.org/api/http.html#http_message_headers
+	var ignoreDuplicateOf = [
+	  'age', 'authorization', 'content-length', 'content-type', 'etag',
+	  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
+	  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
+	  'referer', 'retry-after', 'user-agent'
+	];
+	
+	/**
+	 * Parse headers into an object
+	 *
+	 * ```
+	 * Date: Wed, 27 Aug 2014 08:58:49 GMT
+	 * Content-Type: application/json
+	 * Connection: keep-alive
+	 * Transfer-Encoding: chunked
+	 * ```
+	 *
+	 * @param {String} headers Headers needing to be parsed
+	 * @returns {Object} Headers parsed into an object
+	 */
+	module.exports = function parseHeaders(headers) {
+	  var parsed = {};
+	  var key;
+	  var val;
+	  var i;
+	
+	  if (!headers) { return parsed; }
+	
+	  utils.forEach(headers.split('\n'), function parser(line) {
+	    i = line.indexOf(':');
+	    key = utils.trim(line.substr(0, i)).toLowerCase();
+	    val = utils.trim(line.substr(i + 1));
+	
+	    if (key) {
+	      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
+	        return;
+	      }
+	      if (key === 'set-cookie') {
+	        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
+	      } else {
+	        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+	      }
+	    }
+	  });
+	
+	  return parsed;
+	};
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(6);
+	
+	module.exports = (
+	  utils.isStandardBrowserEnv() ?
+	
+	  // Standard browser envs have full support of the APIs needed to test
+	  // whether the request URL is of the same origin as current location.
+	    (function standardBrowserEnv() {
+	      var msie = /(msie|trident)/i.test(navigator.userAgent);
+	      var urlParsingNode = document.createElement('a');
+	      var originURL;
+	
+	      /**
+	    * Parse a URL to discover it's components
+	    *
+	    * @param {String} url The URL to be parsed
+	    * @returns {Object}
+	    */
+	      function resolveURL(url) {
+	        var href = url;
+	
+	        if (msie) {
+	        // IE needs attribute set twice to normalize properties
+	          urlParsingNode.setAttribute('href', href);
+	          href = urlParsingNode.href;
+	        }
+	
+	        urlParsingNode.setAttribute('href', href);
+	
+	        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+	        return {
+	          href: urlParsingNode.href,
+	          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+	          host: urlParsingNode.host,
+	          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+	          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+	          hostname: urlParsingNode.hostname,
+	          port: urlParsingNode.port,
+	          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+	            urlParsingNode.pathname :
+	            '/' + urlParsingNode.pathname
+	        };
+	      }
+	
+	      originURL = resolveURL(window.location.href);
+	
+	      /**
+	    * Determine if a URL shares the same origin as the current location
+	    *
+	    * @param {String} requestURL The URL to test
+	    * @returns {boolean} True if URL shares the same origin, otherwise false
+	    */
+	      return function isURLSameOrigin(requestURL) {
+	        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+	        return (parsed.protocol === originURL.protocol &&
+	            parsed.host === originURL.host);
+	      };
+	    })() :
+	
+	  // Non standard browser envs (web workers, react-native) lack needed support.
+	    (function nonStandardBrowserEnv() {
+	      return function isURLSameOrigin() {
+	        return true;
+	      };
+	    })()
+	);
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(6);
+	
+	/**
+	 * Config-specific merge-function which creates a new config-object
+	 * by merging two configuration objects together.
+	 *
+	 * @param {Object} config1
+	 * @param {Object} config2
+	 * @returns {Object} New object resulting from merging config2 to config1
+	 */
+	module.exports = function mergeConfig(config1, config2) {
+	  // eslint-disable-next-line no-param-reassign
+	  config2 = config2 || {};
+	  var config = {};
+	
+	  var valueFromConfig2Keys = ['url', 'method', 'data'];
+	  var mergeDeepPropertiesKeys = ['headers', 'auth', 'proxy', 'params'];
+	  var defaultToConfig2Keys = [
+	    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
+	    'timeout', 'timeoutMessage', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
+	    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'decompress',
+	    'maxContentLength', 'maxBodyLength', 'maxRedirects', 'transport', 'httpAgent',
+	    'httpsAgent', 'cancelToken', 'socketPath', 'responseEncoding'
+	  ];
+	  var directMergeKeys = ['validateStatus'];
+	
+	  function getMergedValue(target, source) {
+	    if (utils.isPlainObject(target) && utils.isPlainObject(source)) {
+	      return utils.merge(target, source);
+	    } else if (utils.isPlainObject(source)) {
+	      return utils.merge({}, source);
+	    } else if (utils.isArray(source)) {
+	      return source.slice();
+	    }
+	    return source;
+	  }
+	
+	  function mergeDeepProperties(prop) {
+	    if (!utils.isUndefined(config2[prop])) {
+	      config[prop] = getMergedValue(config1[prop], config2[prop]);
+	    } else if (!utils.isUndefined(config1[prop])) {
+	      config[prop] = getMergedValue(undefined, config1[prop]);
+	    }
+	  }
+	
+	  utils.forEach(valueFromConfig2Keys, function valueFromConfig2(prop) {
+	    if (!utils.isUndefined(config2[prop])) {
+	      config[prop] = getMergedValue(undefined, config2[prop]);
+	    }
+	  });
+	
+	  utils.forEach(mergeDeepPropertiesKeys, mergeDeepProperties);
+	
+	  utils.forEach(defaultToConfig2Keys, function defaultToConfig2(prop) {
+	    if (!utils.isUndefined(config2[prop])) {
+	      config[prop] = getMergedValue(undefined, config2[prop]);
+	    } else if (!utils.isUndefined(config1[prop])) {
+	      config[prop] = getMergedValue(undefined, config1[prop]);
+	    }
+	  });
+	
+	  utils.forEach(directMergeKeys, function merge(prop) {
+	    if (prop in config2) {
+	      config[prop] = getMergedValue(config1[prop], config2[prop]);
+	    } else if (prop in config1) {
+	      config[prop] = getMergedValue(undefined, config1[prop]);
+	    }
+	  });
+	
+	  var axiosKeys = valueFromConfig2Keys
+	    .concat(mergeDeepPropertiesKeys)
+	    .concat(defaultToConfig2Keys)
+	    .concat(directMergeKeys);
+	
+	  var otherKeys = Object
+	    .keys(config1)
+	    .concat(Object.keys(config2))
+	    .filter(function filterAxiosKeys(key) {
+	      return axiosKeys.indexOf(key) === -1;
+	    });
+	
+	  utils.forEach(otherKeys, mergeDeepProperties);
+	
+	  return config;
+	};
+
+
+/***/ }),
+/* 27 */
 /***/ (function(module, exports) {
 
 	'use strict';
 	
-	module.exports = function bind(fn, thisArg) {
-	  return function wrap() {
-	    var args = new Array(arguments.length);
-	    for (var i = 0; i < args.length; i++) {
-	      args[i] = arguments[i];
-	    }
-	    return fn.apply(thisArg, args);
-	  };
+	/**
+	 * A `Cancel` is an object that is thrown when an operation is canceled.
+	 *
+	 * @class
+	 * @param {string=} message The message.
+	 */
+	function Cancel(message) {
+	  this.message = message;
+	}
+	
+	Cancel.prototype.toString = function toString() {
+	  return 'Cancel' + (this.message ? ': ' + this.message : '');
 	};
+	
+	Cancel.prototype.__CANCEL__ = true;
+	
+	module.exports = Cancel;
 
 
 /***/ }),
-/* 22 */
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Promise) {'use strict';
+	
+	var Cancel = __webpack_require__(27);
+	
+	/**
+	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
+	 *
+	 * @class
+	 * @param {Function} executor The executor function.
+	 */
+	function CancelToken(executor) {
+	  if (typeof executor !== 'function') {
+	    throw new TypeError('executor must be a function.');
+	  }
+	
+	  var resolvePromise;
+	  this.promise = new Promise(function promiseExecutor(resolve) {
+	    resolvePromise = resolve;
+	  });
+	
+	  var token = this;
+	  executor(function cancel(message) {
+	    if (token.reason) {
+	      // Cancellation has already been requested
+	      return;
+	    }
+	
+	    token.reason = new Cancel(message);
+	    resolvePromise(token.reason);
+	  });
+	}
+	
+	/**
+	 * Throws a `Cancel` if cancellation has been requested.
+	 */
+	CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+	  if (this.reason) {
+	    throw this.reason;
+	  }
+	};
+	
+	/**
+	 * Returns an object that contains a new `CancelToken` and a function that, when called,
+	 * cancels the `CancelToken`.
+	 */
+	CancelToken.source = function source() {
+	  var cancel;
+	  var token = new CancelToken(function executor(c) {
+	    cancel = c;
+	  });
+	  return {
+	    token: token,
+	    cancel: cancel
+	  };
+	};
+	
+	module.exports = CancelToken;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 29 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -2941,7 +3439,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 23 */
+/* 30 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Determines whether the payload is an error thrown by Axios
+	 *
+	 * @param {*} payload The value to test
+	 * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
+	 */
+	module.exports = function isAxiosError(payload) {
+	  return (typeof payload === 'object') && (payload.isAxiosError === true);
+	};
+
+
+/***/ }),
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// =========
@@ -3088,7 +3603,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 24 */
+/* 32 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3227,73 +3742,73 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 25 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var base64 = __webpack_require__(26);
-	var merge = __webpack_require__(24);
+	var base64 = __webpack_require__(34);
+	var merge = __webpack_require__(32);
 	
 	module.exports = {
+		/**
+		 * Generate base64 string for basic auth purposes
+		 * @type {Function}
+		 * @return {String}
+		 */
+		encodeAuthHeader: function (email, token) {
+			return base64.encode(email + ':' + token);
+		},
 	
-	  /**
-	   * Generate base64 string for basic auth purposes
-	   * @type {Function}
-	   * @return {String}
-	   */
-	  encodeAuthHeader: function(email, token) {
-	    return base64.encode(email + ':' + token);
-	  },
+		/**
+		 * Retrieve metadata from response.data object and save it on response.metaData instead
+		 * @type {Function}
+		 * @return {String}
+		 */
+		copyResponseMetaData: function (response) {
+			if (Object.keys(response.data).length > 1) {
+				response.metaData = {};
+				Object.keys(response.data).forEach(function (key) {
+					if (key !== 'data') response.metaData[key] = response.data[key];
+				});
+			}
+			if (response.data.data) {
+				response.data = response.data.data;
+			}
+			return response;
+		},
 	
-	  /**
-	   * Retrieve metadata from response.data object and save it on response.metaData instead
-	   * @type {Function}
-	   * @return {String}
-	   */
-	  copyResponseMetaData: function(response) {
-	    if (Object.keys(response.data).length > 1) {
-	      response.metaData = {}
-	      Object.keys(response.data).forEach(function(key) {
-	        if (key !== 'data') response.metaData[key] = response.data[key]
-	      })
-	    }
-	    response.data = response.data.data;
-	    return response
-	  },
+		/**
+		 * Add the carried payload for next request to the actual payload
+		 * @type {Function}
+		 * @return {String}
+		 */
+		mergeNextPayload: function (args, nextPayload) {
+			if (Object.keys(nextPayload).length === 0) return args;
+			// Merge potential query string params manually
+			if (nextPayload.params && args.params) {
+				var nextParams = nextPayload.params;
+				for (var param in nextParams) {
+					if (typeof args.params[param] !== 'undefined') {
+						args.params[param] += ';' + nextParams[param];
+					}
+				}
+			}
+			args = merge(nextPayload, args);
+			return args;
+		},
 	
-	  /**
-	   * Add the carried payload for next request to the actual payload
-	   * @type {Function}
-	   * @return {String}
-	   */
-	  mergeNextPayload: function (args, nextPayload) {
-	    if (Object.keys(nextPayload).length === 0) return args
-	    // Merge potential query string params manually
-	    if (nextPayload.params && args.params) {
-	      var nextParams = nextPayload.params
-	      for (var param in nextParams) {
-	        if (typeof args.params[param] !== 'undefined') {
-	          args.params[param] += (';' + nextParams[param])
-	        }
-	      }
-	    }
-	    args = merge(nextPayload, args)
-	    return args
-	  },
-	
-	  /**
-	   * Build absolute URL for API call
-	   * @type {Function}
-	   * @return {String}
-	   */
-	  buildUrl: function(endpoint, config) {
-	    return config.apiBaseUrl + config.apiVersion + endpoint;
-	  }
-	
-	}
+		/**
+		 * Build absolute URL for API call
+		 * @type {Function}
+		 * @return {String}
+		 */
+		buildUrl: function (endpoint, config) {
+			return config.apiBaseUrl + config.apiVersion + endpoint;
+		},
+	};
 
 
 /***/ }),
-/* 26 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*! https://mths.be/base64 v1.0.0 by @mathias | MIT license */
@@ -3459,10 +3974,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	}(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(35)(module), (function() { return this; }())))
 
 /***/ }),
-/* 27 */
+/* 35 */
 /***/ (function(module, exports) {
 
 	module.exports = function(module) {
@@ -3478,831 +3993,721 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 28 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var utils = __webpack_require__(25)
+	var utils = __webpack_require__(33);
 	
 	module.exports = function (TK) {
-	
-	  /**
-	   * Get user's connected accounts
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getAccounts = function() {
-	
-	    return TK.makeRequest({
-	      url: '/accounts',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Initiate a Google account sync
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.accountGoogleSync = function() {
-	
-	    return TK.makeRequest({
-	      url: '/accounts/sync',
-	      method: 'post'
-	    });
-	
-	  };
-	
-	  /**
-	   * Initiate a Microsoft account sync
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.accountMicrosoftSync = function() {
-	
-	    return TK.makeRequest({
-	      url: '/accounts/microsoft/sync',
-	      method: 'post'
-	    });
-	
-	  };
-	
-	  /**
-	   * Authenticate a user to retrive API token for future calls
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.auth = function(data) {
-	
-	    var r = TK.makeRequest({
-	      url: '/auth',
-	      method: 'post',
-	      data: data
-	    });
-	
-	    r.then(function(response) {
-	
-	      var token = response.data.api_token || response.data.apiToken;
-	
-	      TK.setUser(response.data.email, token);
-	
-	    }).catch(function(){
-	      TK.setUser('','');
-	    });
-	
-	    return r;
-	
-	  };
-	
-	  /**
-	   * Get list of apps
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getApps = function() {
-	
-	    return TK.makeRequest({
-	      url: '/apps',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get settings for a specific app
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getApp = function() {
-	
-	    return TK.makeRequest({
-	      url: '/app',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Create a new Timekit app
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createApp = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/apps',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Update settings for a specific app
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.updateApp = function(data) {
-	
-	    var slug = data.slug;
-	    delete data.slug;
-	
-	    return TK.makeRequest({
-	      url: '/apps/' + slug,
-	      method: 'put',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Delete an app
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.deleteApp = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/apps/' + data.slug,
-	      method: 'delete'
-	    });
-	
-	  };
-	
-	  /**
-	   * Fetch current resource data from server
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getResources = function() {
-	
-	    return TK.makeRequest({
-	      url: '/resources',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Fetch current resource data from server
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getResource = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/resources/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Create a new resource with the given properties
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createResource = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/resources',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Fetch current resource data from server
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.updateResource = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/resources/' + id,
-	      method: 'put',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Delete a resource with the given properties
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.deleteResource = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/resources/' + data.id,
-	      method: 'delete',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Reset password for a resource
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.resetResourcePassword = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/resources/resetpassword',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a specific resource's timezone
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getResourceTimezone = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/resources/timezone/' + data.email,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get users calendars that are present on Timekit (synced from providers)
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getCalendars = function() {
-	
-	    return TK.makeRequest({
-	      url: '/calendars',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get users calendars that are present on Timekit (synced from providers)
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getCalendar = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/calendars/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Create a new calendar for current user
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createCalendar = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/calendars/',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Update a calendar for current user
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.updateCalendar = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/calendars/' + id,
-	      method: 'put',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Delete a calendar
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.deleteCalendar = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/calendars/' + data.id,
-	      method: 'delete'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get all user's events
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getEvents = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/events',
-	      method: 'get',
-	      params: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a user's event by ID
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getEvent = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/events/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Create a new event
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createEvent = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/events',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Update an existing event
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.updateEvent = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/events/' + id,
-	      method: 'put',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Delete a user's event by ID
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.deleteEvent = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/events/' + data.id,
-	      method: 'delete'
-	    });
-	
-	  };
-	
-	  /**
-	   * Find mutual availability across multiple users/calendars
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.findTime = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/findtime',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Find bulk availability across multiple users/calendars
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.findTimeBulk = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/findtime/bulk',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Find team availability across multiple users/calendars
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.findTimeTeam = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/findtime/team',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Fetch availability on the new availability endpoint (successor to findtime)
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.fetchAvailability = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/availability',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Get all user auth credentials
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getCredentials = function() {
-	
-	    return TK.makeRequest({
-	      url: '/credentials',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Create a new pair of auth credentials
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createCredential = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/credentials',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Delete a pair of auth credentials
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.deleteCredential = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/credentials/' + data.id,
-	      method: 'delete'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get all bookings
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getBookings = function() {
-	
-	    return TK.makeRequest({
-	      url: '/bookings',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get specific booking
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getBooking = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/bookings/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Create a new booking
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createBooking = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/bookings',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Create bookings in bulk
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createBookingsBulk = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/bookings/bulk',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Update an existing booking
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.updateBooking = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    var action = data.action;
-	    delete data.action;
-	
-	    return TK.makeRequest({
-	      url: '/bookings/' + id + '/' + action,
-	      method: 'put',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Delete specific booking
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.deleteBooking = function(data) {
-	    
-	    var id = data.id
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/bookings/' + id,
-	      method: 'delete'
-	    })
-	  };
-	
-	  /**
-	   * Update an bookings in bulk
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.updateBookingsBulk = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/bookings/bulk',
-	      method: 'put',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Get all bookings
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getGroupBookings = function() {
-	
-	    return TK.makeRequest({
-	      url: '/bookings/groups',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get specific booking
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getGroupBooking = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/bookings/groups/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get all projects
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getProjects = function() {
-	
-	    return TK.makeRequest({
-	      url: '/projects',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a project
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getProject = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/projects/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a project for public use on hosted page
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getHostedProject = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/projects/hosted/' + data.slug,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Get a project for embedding on website
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getEmbedProject = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/projects/embed/' + data.id,
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Create a new project
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.createProject = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/projects',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Update an existing project
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.updateProject = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/projects/' + id,
-	      method: 'put',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Delete a project
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.deleteProject = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/projects/' + data.id,
-	      method: 'delete'
-	    });
-	
-	  };
-	
-	  /**
-	   * Add a resource to a project
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.addProjectResource = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/projects/' + id + '/resources',
-	      method: 'post',
-	      data: data
-	    });
-	
-	  };
-	
-	  /**
-	   * Get resources for a project
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.getProjectResources = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/projects/' + id + '/resources',
-	      method: 'get'
-	    });
-	
-	  };
-	
-	  /**
-	   * Set resources for a project
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.setProjectResources = function(data) {
-	
-	    var id = data.id;
-	    delete data.id;
-	
-	    return TK.makeRequest({
-	      url: '/projects/' + id + '/resources',
-	      method: 'put',
-	      data: data.resources
-	    });
-	
-	  };
-	
-	  /**
-	   * Remove a resource from a project
-	   * @type {Function}
-	   * @return {Promise}
-	   */
-	  TK.removeProjectResource = function(data) {
-	
-	    return TK.makeRequest({
-	      url: '/projects/' + data.id + '/resources/' + data.resourceId,
-	      method: 'delete'
-	    });
-	
-	  };
-	
-	  return TK;
-	
-	}
+		/**
+		 * Get user's connected accounts
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getAccounts = function () {
+			return TK.makeRequest({
+				url: '/accounts',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Initiate a Google account sync
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.accountGoogleSync = function () {
+			return TK.makeRequest({
+				url: '/accounts/sync',
+				method: 'post',
+			});
+		};
+	
+		/**
+		 * Initiate a Microsoft account sync
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.accountMicrosoftSync = function () {
+			return TK.makeRequest({
+				url: '/accounts/microsoft/sync',
+				method: 'post',
+			});
+		};
+	
+		/**
+		 * Authenticate a user to retrive API token for future calls
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.auth = function (data) {
+			var r = TK.makeRequest({
+				data: data,
+				url: '/auth',
+				method: 'post',
+			});
+	
+			r.then(function (response) {
+				var token = response.data.api_token || response.data.apiToken;
+				TK.setUser(response.data.email, token);
+			}).catch(function (error) {
+				TK.setUser('', '');
+			});
+	
+			return r;
+		};
+	
+		/**
+		 * Get list of apps
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getApps = function () {
+			return TK.makeRequest({
+				url: '/apps',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Get settings for a specific app
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getApp = function () {
+			return TK.makeRequest({
+				url: '/app',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Create a new Timekit app
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.createApp = function (data) {
+			return TK.makeRequest({
+				url: '/apps',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Update settings for a specific app
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.updateApp = function (data) {
+			var slug = data.slug;
+			delete data.slug;
+	
+			return TK.makeRequest({
+				url: '/apps/' + slug,
+				method: 'put',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Delete an app
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.deleteApp = function (data) {
+			return TK.makeRequest({
+				url: '/apps/' + data.slug,
+				method: 'delete',
+			});
+		};
+	
+		/**
+		 * Fetch current resource data from server
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getResources = function () {
+			return TK.makeRequest({
+				url: '/resources',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Fetch current resource data from server
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getResource = function (data) {
+			return TK.makeRequest({
+				url: '/resources/' + data.id,
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Create a new resource with the given properties
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.createResource = function (data) {
+			return TK.makeRequest({
+				url: '/resources',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Fetch current resource data from server
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.updateResource = function (data) {
+			var id = data.id;
+			delete data.id;
+	
+			return TK.makeRequest({
+				url: '/resources/' + id,
+				method: 'put',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Delete a resource with the given properties
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.deleteResource = function (data) {
+			return TK.makeRequest({
+				url: '/resources/' + data.id,
+				method: 'delete',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Reset password for a resource
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.resetResourcePassword = function (data) {
+			return TK.makeRequest({
+				url: '/resources/resetpassword',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Get a specific resource's timezone
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getResourceTimezone = function (data) {
+			return TK.makeRequest({
+				url: '/resources/timezone/' + data.email,
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Get users calendars that are present on Timekit (synced from providers)
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getCalendars = function () {
+			return TK.makeRequest({
+				url: '/calendars',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Get users calendars that are present on Timekit (synced from providers)
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getCalendar = function (data) {
+			return TK.makeRequest({
+				url: '/calendars/' + data.id,
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Create a new calendar for current user
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.createCalendar = function (data) {
+			return TK.makeRequest({
+				url: '/calendars/',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Update a calendar for current user
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.updateCalendar = function (data) {
+			var id = data.id;
+			delete data.id;
+	
+			return TK.makeRequest({
+				url: '/calendars/' + id,
+				method: 'put',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Delete a calendar
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.deleteCalendar = function (data) {
+			return TK.makeRequest({
+				url: '/calendars/' + data.id,
+				method: 'delete',
+			});
+		};
+	
+		/**
+		 * Get all user's events
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getEvents = function (data) {
+			return TK.makeRequest({
+				url: '/events',
+				method: 'get',
+				params: data,
+			});
+		};
+	
+		/**
+		 * Get a user's event by ID
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getEvent = function (data) {
+			return TK.makeRequest({
+				url: '/events/' + data.id,
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Create a new event
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.createEvent = function (data) {
+			return TK.makeRequest({
+				url: '/events',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Update an existing event
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.updateEvent = function (data) {
+			var id = data.id;
+			delete data.id;
+	
+			return TK.makeRequest({
+				url: '/events/' + id,
+				method: 'put',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Delete a user's event by ID
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.deleteEvent = function (data) {
+			return TK.makeRequest({
+				url: '/events/' + data.id,
+				method: 'delete',
+			});
+		};
+	
+		/**
+		 * Find mutual availability across multiple users/calendars
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.findTime = function (data) {
+			return TK.makeRequest({
+				url: '/findtime',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Find bulk availability across multiple users/calendars
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.findTimeBulk = function (data) {
+			return TK.makeRequest({
+				url: '/findtime/bulk',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Find team availability across multiple users/calendars
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.findTimeTeam = function (data) {
+			return TK.makeRequest({
+				url: '/findtime/team',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Fetch availability on the new availability endpoint (successor to findtime)
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.fetchAvailability = function (data) {
+			return TK.makeRequest({
+				url: '/availability',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Get all user auth credentials
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getCredentials = function () {
+			return TK.makeRequest({
+				url: '/credentials',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Create a new pair of auth credentials
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.createCredential = function (data) {
+			return TK.makeRequest({
+				url: '/credentials',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Delete a pair of auth credentials
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.deleteCredential = function (data) {
+			return TK.makeRequest({
+				url: '/credentials/' + data.id,
+				method: 'delete',
+			});
+		};
+	
+		/**
+		 * Get all bookings
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getBookings = function () {
+			return TK.makeRequest({
+				url: '/bookings',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Get specific booking
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getBooking = function (data) {
+			return TK.makeRequest({
+				url: '/bookings/' + data.id,
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Create a new booking
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.createBooking = function (data) {
+			return TK.makeRequest({
+				url: '/bookings',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Create bookings in bulk
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.createBookingsBulk = function (data) {
+			return TK.makeRequest({
+				url: '/bookings/bulk',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Update an existing booking
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.updateBooking = function (data) {
+			var id = data.id;
+			delete data.id;
+	
+			var action = data.action;
+			delete data.action;
+	
+			return TK.makeRequest({
+				url: '/bookings/' + id + '/' + action,
+				method: 'put',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Delete specific booking
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.deleteBooking = function (data) {
+			var id = data.id;
+			delete data.id;
+	
+			return TK.makeRequest({
+				url: '/bookings/' + id,
+				method: 'delete',
+			});
+		};
+	
+		/**
+		 * Update an bookings in bulk
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.updateBookingsBulk = function (data) {
+			return TK.makeRequest({
+				url: '/bookings/bulk',
+				method: 'put',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Get all bookings
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getGroupBookings = function () {
+			return TK.makeRequest({
+				url: '/bookings/groups',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Get specific booking
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getGroupBooking = function (data) {
+			return TK.makeRequest({
+				url: '/bookings/groups/' + data.id,
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Get all projects
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getProjects = function () {
+			return TK.makeRequest({
+				url: '/projects',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Get a project
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getProject = function (data) {
+			return TK.makeRequest({
+				url: '/projects/' + data.id,
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Get a project for public use on hosted page
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getHostedProject = function (data) {
+			return TK.makeRequest({
+				url: '/projects/hosted/' + data.slug,
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Get a project for embedding on website
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getEmbedProject = function (data) {
+			return TK.makeRequest({
+				url: '/projects/embed/' + data.id,
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Create a new project
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.createProject = function (data) {
+			return TK.makeRequest({
+				url: '/projects',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Update an existing project
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.updateProject = function (data) {
+			var id = data.id;
+			delete data.id;
+	
+			return TK.makeRequest({
+				url: '/projects/' + id,
+				method: 'put',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Delete a project
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.deleteProject = function (data) {
+			return TK.makeRequest({
+				url: '/projects/' + data.id,
+				method: 'delete',
+			});
+		};
+	
+		/**
+		 * Add a resource to a project
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.addProjectResource = function (data) {
+			var id = data.id;
+			delete data.id;
+	
+			return TK.makeRequest({
+				url: '/projects/' + id + '/resources',
+				method: 'post',
+				data: data,
+			});
+		};
+	
+		/**
+		 * Get resources for a project
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.getProjectResources = function (data) {
+			var id = data.id;
+			delete data.id;
+	
+			return TK.makeRequest({
+				url: '/projects/' + id + '/resources',
+				method: 'get',
+			});
+		};
+	
+		/**
+		 * Set resources for a project
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.setProjectResources = function (data) {
+			var id = data.id;
+			delete data.id;
+	
+			return TK.makeRequest({
+				url: '/projects/' + id + '/resources',
+				method: 'put',
+				data: data.resources,
+			});
+		};
+	
+		/**
+		 * Remove a resource from a project
+		 * @type {Function}
+		 * @return {Promise}
+		 */
+		TK.removeProjectResource = function (data) {
+			return TK.makeRequest({
+				url: '/projects/' + data.id + '/resources/' + data.resourceId,
+				method: 'delete',
+			});
+		};
+	
+		return TK;
+	};
 
 
 /***/ }),
-/* 29 */
+/* 37 */
 /***/ (function(module, exports) {
 
 	module.exports = function (TK) {
