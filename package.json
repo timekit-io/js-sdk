@@ -1,59 +1,77 @@
 {
-  "name": "timekit-sdk",
-  "version": "1.19.0",
-  "description": "JavaScript SDK for the Timekit API (timekit.io)",
-  "main": "src/timekit.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/timekit-io/js-sdk.git"
-  },
-  "scripts": {
-    "build": "webpack && webpack --config webpack.config.min.js --bail",
-    "release:patch": "../flux/flux timekit:release patch js-sdk",
-    "release:minor": "../flux/flux timekit:release minor js-sdk",
-    "release:major": "../flux/flux timekit:release major js-sdk",
-    "deploy:prod": "../flux/flux timekit:deploy prod js-sdk",
-    "deploy:staging": "../flux/flux timekit:deploy staging js-sdk",
-    "test": "./node_modules/karma/bin/karma start"
-  },
-  "keywords": [
-    "Timekit",
-    "timekit.io",
-    "calendars",
-    "calendar",
-    "scheduling",
-    "schedule",
-    "book",
-    "booking",
-    "appointment",
-    "appointments"
-  ],
-  "author": "Timekit Inc.",
-  "license": "MIT",
-  "devDependencies": {
-    "istanbul-instrumenter-loader": "3.0.1",
-    "jasmine": "3.7.0",
-    "jasmine-core": "3.7.1",
-    "karma": "^0.13.0",
-    "karma-chrome-launcher": "3.1.0",
-    "karma-coverage": "^0.4.2",
-    "karma-jasmine": "^0.3.5",
-    "karma-jasmine-ajax": "^0.1.12",
-    "karma-jasmine-jquery": "^0.1.1",
-    "karma-phantomjs-launcher": "^1.0.0",
-    "karma-sourcemap-loader": "^0.3.5",
-    "karma-spec-reporter": "0.0.32",
-    "karma-webpack": "^1.7.0",
-    "moment": "^2.10.3",
-    "node-libs-browser": "2.2.1",
-    "phantomjs": "^2.1.3",
-    "webpack": "^1.11.0"
-  },
-  "dependencies": {
-    "axios": "^0.12.0",
-    "base-64": "1.0.0",
-    "deepmerge": "4.2.2",
-    "es6-promise-promise": "^1.0.0",
-    "humps": "^2.0.1"
-  }
+	"name": "timekit-sdk",
+	"version": "1.19.0",
+	"description": "JavaScript SDK for the Timekit API (timekit.io)",
+	"main": "src/timekit.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/timekit-io/js-sdk.git"
+	},
+	"scripts": {
+		"build": "webpack && webpack --config webpack.config.min.js --bail",
+		"release:patch": "../flux/flux timekit:release patch js-sdk",
+		"release:minor": "../flux/flux timekit:release minor js-sdk",
+		"release:major": "../flux/flux timekit:release major js-sdk",
+		"deploy:prod": "../flux/flux timekit:deploy prod js-sdk",
+		"deploy:staging": "../flux/flux timekit:deploy staging js-sdk",
+		"test": "./node_modules/karma/bin/karma start"
+	},
+	"keywords": [
+		"Timekit",
+		"timekit.io",
+		"calendars",
+		"calendar",
+		"scheduling",
+		"schedule",
+		"book",
+		"booking",
+		"appointment",
+		"appointments"
+	],
+	"author": "Timekit Inc.",
+	"license": "MIT",
+	"devDependencies": {
+		"istanbul-instrumenter-loader": "3.0.1",
+		"jasmine": "3.7.0",
+		"jasmine-core": "3.7.1",
+		"karma": "6.3.2",
+		"karma-chrome-launcher": "3.1.0",
+		"karma-coverage": "2.0.3",
+		"karma-jasmine": "4.0.1",
+		"karma-jasmine-ajax": "^0.1.12",
+		"karma-jasmine-jquery": "^0.1.1",
+		"karma-phantomjs-launcher": "^1.0.0",
+		"karma-sourcemap-loader": "^0.3.5",
+		"karma-spec-reporter": "0.0.32",
+		"karma-webpack": "^1.7.0",
+		"moment": "^2.10.3",
+		"node-libs-browser": "2.2.1",
+		"phantomjs": "^2.1.3",
+		"webpack": "^1.11.0"
+	},
+	"dependencies": {
+		"axios": "^0.12.0",
+		"base-64": "1.0.0",
+		"deepmerge": "4.2.2",
+		"es6-promise-promise": "^1.0.0",
+		"humps": "^2.0.1"
+	},
+	"resolutions": {
+		"**/**/bl": "^5.0.0",
+		"**/**/qs": "^6.3.2",
+		"**/**/hoek": "^6.1.3",
+		"**/**/bower": "^1.8.8",
+		"**/**/debug": "^4.3.1",
+		"**/**/braces": "^3.0.2",
+		"**/**/lodash": "^4.17.19",
+		"**/**/request": "^2.68.0",
+		"**/**/minimist": "^1.2.3",
+		"**/**/minimatch": "^3.0.2",
+		"**/**/cryptiles": "^4.1.2",
+		"**/**/deep-extend": "^0.6.0",
+		"**/**/tough-cookie": "^4.0.0",
+		"**/**/tunnel-agent": "^0.6.0",
+		"**/**/concat-stream": "^2.0.0",
+		"**/**/decompress-zip": "^0.3.2"
+	}
 }
