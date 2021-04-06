@@ -35,25 +35,25 @@
     "jasmine": "^2.3.1",
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.0",
-    "karma-chrome-launcher": "^0.1.12",
+    "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "^0.4.2",
     "karma-jasmine": "^0.3.5",
     "karma-jasmine-ajax": "^0.1.12",
     "karma-jasmine-jquery": "^0.1.1",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.5",
-    "karma-spec-reporter": "0.0.19",
+    "karma-spec-reporter": "0.0.32",
     "karma-webpack": "^1.7.0",
     "moment": "^2.10.3",
-    "node-libs-browser": "^0.5.2",
+    "node-libs-browser": "2.2.1",
     "phantomjs": "^2.1.3",
     "webpack": "^1.11.0"
   },
   "dependencies": {
     "axios": "^0.12.0",
-    "base-64": "^0.1.0",
-    "deepmerge": "^1.5.2",
+    "base-64": "1.0.0",
+    "deepmerge": "4.2.2",
     "es6-promise-promise": "^1.0.0",
-    "humps": "^0.7.0"
+    "humps": "^2.0.1"
   }
 }
