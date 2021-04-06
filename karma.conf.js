@@ -2,89 +2,87 @@
 
 var webpack = require('webpack');
 
-module.exports = function(config) {
+module.exports = function (config) {
+	config.set({
+		// base path that will be used to resolve all patterns (eg. files, exclude)
+		basePath: '',
 
-  config.set({
+		// frameworks to use
+		// available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+		frameworks: ['jasmine-ajax', 'jasmine'],
 
-    // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
+		// list of files / patterns to load in the browser
+		files: ['test/*.spec.js'],
 
-    // frameworks to use
-    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine-ajax', 'jasmine'],
+		// list of files to exclude
+		exclude: [],
 
-    // list of files / patterns to load in the browser
-    files: [
-      'test/*.spec.js'
-    ],
+		// preprocess matching files before serving them to the browser
+		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+		preprocessors: {
+			'test/*.spec.js': ['webpack', 'sourcemap'],
+		},
 
-    // list of files to exclude
-    exclude: [],
+		// optionally, configure the reporter
+		coverageReporter: {
+			type: 'html',
+			dir: 'test/coverage/',
+		},
 
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      'test/*.spec.js': ['webpack', 'sourcemap']
-    },
+		webpack: {
+			mode: 'development',
+			devtool: 'inline-source-map',
+			module: {
+				rules: [
+					{
+						test: /\.js$/,
+						use: 'istanbul-instrumenter-loader',
+						exclude: /(dist|test|node_modules|bower_components)\//,
+					},
+				],
+			},
+			plugins: [
+				new webpack.ProvidePlugin({
+					Promise: 'es6-promise-promise',
+				}),
+			],
+		},
 
-    // optionally, configure the reporter
-    coverageReporter: {
-      type : 'html',
-      dir : 'test/coverage/'
-    },
+		webpackServer: {
+			stats: {
+				colors: true,
+			},
+		},
 
-    webpack: {
-      devtool: 'inline-source-map',
-      module: {
-        postLoaders: [ {
-          test: /\.js$/,
-          exclude: /(dist|test|node_modules|bower_components)\//,
-          loader: 'istanbul-instrumenter'
-        } ]
-      },
-      plugins: [
-        new webpack.ProvidePlugin({
-          Promise: 'es6-promise-promise'
-        })
-      ]
-    },
+		// test results reporter to use
+		// possible values: 'dots', 'progress'
+		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
+		// reporters: ['coverage'],
+		reporters: ['spec', 'coverage'],
 
-    webpackServer: {
-      stats: {
-        colors: true
-      }
-    },
+		webpackMiddleware: {
+			noInfo: true,
+		},
 
-    // test results reporter to use
-    // possible values: 'dots', 'progress'
-    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    // reporters: ['coverage'],
-    reporters: ['spec', 'coverage'],
+		// web server port
+		port: 9876,
 
-    webpackMiddleware: {
-        noInfo: true
-    },
+		// enable / disable colors in the output (reporters and logs)
+		colors: true,
 
-    // web server port
-    port: 9876,
+		// level of logging
+		// possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+		logLevel: config.LOG_INFO,
 
-    // enable / disable colors in the output (reporters and logs)
-    colors: true,
+		// enable / disable watching file and executing tests whenever any file changes
+		autoWatch: true,
 
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
+		// start these browsers
+		// available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+		browsers: ['PhantomJS'],
 
-    // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
-
-    // start these browsers
-    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
-
-    // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
-
-  });
+		// Continuous Integration mode
+		// if true, Karma captures browsers, runs the tests and exits
+		singleRun: false,
+	});
 };
