@@ -1,6 +1,8 @@
 'use strict';
 
-var utils = {};
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+const utils = {};
 
 utils.randomNumberGenerator = function() {
     return Math.floor((Math.random() * 100000) + 1);

@@ -1,23 +1,18 @@
 'use strict';
 
-var timekit = require('../src/timekit.js');
-var utils = require('./helpers/utils');
-var base64 = require('base-64');
+var timekitSdk = require('../../src/timekit');
 
+var timekit = {};
 var fixtures = {
-  app:              'demo',
-  app2:             'demo2'
+  app: 'demo',
+  app2:'demo2'
 }
 
 describe('Multiple instances', function() {
 
-  beforeEach(function() {
-    jasmine.Ajax.install();
-  });
-
-  afterEach(function() {
-    jasmine.Ajax.uninstall();
-  });
+  beforeEach(function () {
+		timekit = timekitSdk.newInstance();
+	});
 
   it('should be able to create multiple isolated instances', function() {
 
