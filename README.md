@@ -191,6 +191,20 @@ timekit.createEvent({ ... })
 timekit.updateEvent({ id, ... })
 timekit.deleteEvent({ id })
 
+// Service endpoints
+timekit.getServices({ ... })
+timekit.getService({ id })
+timekit.createService({ ... })
+timekit.updateService({ id, ... })
+timekit.deleteService({ id })
+
+// Location endpoints
+timekit.getLocations({ ... })
+timekit.getLocation({ id })
+timekit.createLocation({ ... })
+timekit.updateLocation({ id, ... })
+timekit.deleteLocation({ id })
+
 // Auth endpoints (Note: only used to fetch a resource key)
 timekit.auth({ ... })
 

@@ -30,8 +30,8 @@ function Timekit() {
 	 */
 	var config = {
 		app: '',
-		apiBaseUrl: 'https://api.timekit.io/',
 		apiVersion: 'v2',
+		apiBaseUrl: 'https://api.timekit.io/',
 		convertResponseToCamelcase: false,
 		convertRequestToSnakecase: true,
 		autoFlattenResponse: true,

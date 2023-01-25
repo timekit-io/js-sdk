@@ -704,5 +704,136 @@ module.exports = function (TK) {
 		});
 	};
 
+	/**
+	 * Get all location services
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.getServices = function () {
+		return TK.makeRequest({
+			url: '/location/services',
+			method: 'get',
+		});
+	};
+
+	/**
+	 * Get all locations
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.getService = function () {
+		return TK.makeRequest({
+			url: '/location/services/' + data.id,
+			method: 'get',
+		});
+	};
+
+	/**
+	 * Create a new location
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.createService = function (data) {
+		return TK.makeRequest({
+			url: '/location/services',
+			method: 'post',
+			data: data,
+		});
+	};
+	
+
+	/**
+	 * Update an existing location
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.updateService = function (data) {
+		var id = data.id;
+		delete data.id;
+
+		return TK.makeRequest({
+			url: '/location/services/' + id,
+			method: 'put',
+			data: data,
+		});
+	};
+
+	/**
+	 * Delete a location
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.deleteService = function (data) {
+		return TK.makeRequest({
+			url: '/location/services/' + data.id,
+			method: 'delete',
+		});
+	};
+	
+	/**
+	 * Get all locations
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.getLocations = function () {
+		return TK.makeRequest({
+			url: '/location/services',
+			method: 'get',
+		});
+	};
+	
+	/**
+	 * Get a location
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.getLocation = function (data) {
+		return TK.makeRequest({
+			url: '/locations/' + data.id,
+			method: 'get',
+		});
+	};
+	
+	/**
+	 * Create a new location
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.createLocation = function (data) {
+		return TK.makeRequest({
+			url: '/locations',
+			method: 'post',
+			data: data,
+		});
+	};
+
+	/**
+	 * Update an existing location
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.updateLocation = function (data) {
+		var id = data.id;
+		delete data.id;
+
+		return TK.makeRequest({
+			url: '/locations/' + id,
+			method: 'put',
+			data: data,
+		});
+	};
+
+	/**
+	 * Delete a location
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.deleteLocation = function (data) {
+		return TK.makeRequest({
+			url: '/locations/' + data.id,
+			method: 'delete',
+		});
+	};
+
 	return TK;
 };

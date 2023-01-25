@@ -1,20 +1,21 @@
 {
+	"version": "1.19.5",
 	"name": "timekit-sdk",
-	"version": "1.19.3",
-	"main": "src/timekit.js",
+	"main": "./src/timekit.js",
 	"description": "JavaScript SDK for the Timekit API (timekit.io)",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/timekit-io/js-sdk.git"
+		"url": "https://git.internal.tulip.io/timekit/js-sdk.git"
 	},
 	"scripts": {
-		"build": "webpack && webpack --config webpack.config.min.js",
+		"test": "jasmine",
+		"build": "webpack --config webpack.prod.js",
+		"dev": "webpack serve --config webpack.dev.js",
+		"deploy:prod": "../flux/flux timekit:deploy prod js-sdk",
 		"release:patch": "../flux/flux timekit:release patch js-sdk",
 		"release:minor": "../flux/flux timekit:release minor js-sdk",
 		"release:major": "../flux/flux timekit:release major js-sdk",
-		"deploy:prod": "../flux/flux timekit:deploy prod js-sdk",
-		"deploy:staging": "../flux/flux timekit:deploy staging js-sdk",
-		"test": "./node_modules/karma/bin/karma start"
+		"deploy:staging": "../flux/flux timekit:deploy staging js-sdk"
 	},
 	"keywords": [
 		"Timekit",
@@ -30,49 +31,19 @@
 	],
 	"author": "Timekit Inc.",
 	"license": "MIT",
-	"devDependencies": {
-		"istanbul-instrumenter-loader": "^3.0.1",
-		"jasmine": "3.7.0",
-		"jasmine-core": "3.7.1",
-		"karma": "6.3.2",
-		"karma-chrome-launcher": "3.1.0",
-		"karma-coverage": "2.0.3",
-		"karma-jasmine": "4.0.1",
-		"karma-jasmine-ajax": "^0.1.12",
-		"karma-jasmine-jquery": "^0.1.1",
-		"karma-phantomjs-launcher": "^1.0.0",
-		"karma-sourcemap-loader": "^0.3.5",
-		"karma-spec-reporter": "0.0.32",
-		"karma-webpack": "4",
-		"moment": "^2.10.3",
-		"node-libs-browser": "2.2.1",
-		"phantomjs": "^2.1.3",
-		"webpack": "4",
-		"webpack-cli": "^4.6.0"
-	},
 	"dependencies": {
-		"axios": "0.21.1",
+		"axios": "^1.2.2",
 		"base-64": "1.0.0",
 		"deepmerge": "4.2.2",
-		"es6-promise-promise": "^1.0.0",
 		"humps": "^2.0.1"
 	},
-	"resolutions": {
-		"**/**/bl": "^5.0.0",
-		"**/**/qs": "^6.3.2",
-		"**/**/hoek": "^6.1.3",
-		"**/**/ssri": "^6.0.2",
-		"**/**/debug": "^4.3.1",
-		"**/**/bower": "^1.8.8",
-		"**/**/request": "^2.68.0",
-		"**/**/lodash": "^4.17.19",
-		"**/**/minimist": "^1.2.3",
-		"**/**/minimatch": "^3.0.2",
-		"**/**/cryptiles": "^4.1.2",
-		"**/**/deep-extend": "^0.6.0",
-		"**/**/tough-cookie": "^4.0.0",
-		"**/**/tunnel-agent": "^0.6.0",
-		"**/**/concat-stream": "^2.0.0",
-		"**/**/decompress-zip": "^0.3.2"
+	"devDependencies": {
+		"html-webpack-plugin": "^5.5.0",
+		"jasmine": "^4.5.0",
+		"terser-webpack-plugin": "^5.3.6",
+		"webpack": "^5.75.0",
+		"webpack-cli": "^5.0.1",
+		"webpack-dev-server": "^4.11.1",
+		"webpack-merge": "^5.8.0"
 	}
 }
