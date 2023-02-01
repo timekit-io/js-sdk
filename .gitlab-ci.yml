@@ -1,0 +1,35 @@
+# This folder is cached between builds
+# http://docs.gitlab.com/ce/ci/yaml/README.html#cache
+include:
+  - project: shared/ci-templates
+    file: gcs-upload-template-multi-image.yml
+
+cache:
+  paths:
+    - node_modules/
+    - dist/
+
+stages:
+  - build
+  - upload
+
+pages:
+  image: node:alpine
+  stage: build
+  script:
+    - apk add --no-cache yarn git python python-dev py-pip build-base
+    - pip install virtualenv
+    - rm -rf /var/cache/apk/*
+    - yarn install --pure-lockfile
+    - yarn build
+  artifacts:
+    paths:
+      - dist
+
+upload:
+  only:
+    - master
+  stage: upload
+  variables:
+    DIRECTORY: "dist"
+    GCS_BUCKET: "tulip-develop-timekit-statics"
