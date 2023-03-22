@@ -777,7 +777,7 @@ module.exports = function (TK) {
 	 */
 	TK.getLocations = function () {
 		return TK.makeRequest({
-			url: '/location/services',
+			url: '/locations',
 			method: 'get',
 		});
 	};

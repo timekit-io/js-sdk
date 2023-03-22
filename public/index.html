@@ -26,7 +26,45 @@
         <script type="text/javascript" src="https://requirejs.org/docs/release/2.3.6/r.js"></script>
         <script type="text/javascript">
           require(['timekit-sdk'], function(timekit) {
-              console.log(timekit);
+
+            timekit.configure({
+              apiBaseUrl: 'https://api.timekit.io/',
+              appKey: 'test_api_key_AzkHV8q7s1KArB70x7ZVgjAzHsBindVW',
+            });
+
+            // get list of locations
+            timekit
+                .getLocationServices()
+                .then((locations) => {
+                    console.log(locations.data.map(location => location.name));
+                })
+                .catch((error) => console.log(error));
+
+
+            // get list of services
+            timekit
+                .getServices()
+                .then((services) => {
+                    console.log(services.data.map(service => service.name));
+                })
+                .catch((error) => console.log(error));
+
+            const locationUuid = 'ac3ab119-28b7-4418-bae7-1c464ae8b9d8';
+            const serviceUuid = '62bbd381-b317-4dde-9a8a-27ebeec53d98';
+
+            // get list of locations
+            timekit
+                .carry({
+                  params: {
+                    search: "locations.uuid:" + locationUuid
+                  }
+                })
+                .getProjects()
+                .then(({ data }) => {
+                    const locationServicesProject = data.filter(location => location.meta.t_service_id === serviceUuid)[0];
+                    console.log(locationServicesProject);
+                })
+                .catch((error) => console.log(error));                
           });
         </script>
 
