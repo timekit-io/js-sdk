@@ -1,5 +1,5 @@
 {
-	"version": "1.19.6",
+	"version": "1.19.7",
 	"name": "timekit-sdk",
 	"main": "./src/timekit.js",
 	"description": "JavaScript SDK for the Timekit API (timekit.io)",
