@@ -23,23 +23,13 @@
         <h1>Timekit JS SDK AMD module (require.js) example</h1>
         <p>First we load require.js and then require timekit.js as a dependency - see the page source code. When loaded, we can perform calls using the SDK.</p>
   
-        <script type="text/javascript" src="https://requirejs.org/docs/release/2.3.6/r.js"></script>
-        <script type="text/javascript">
-          require(['timekit-sdk'], function(timekit) {
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+        <script>
+          require(['timekit-sdk'], function (timekit) {
             timekit.configure({
               apiBaseUrl: 'https://api.timekit.io/',
               appKey: 'test_api_key_AzkHV8q7s1KArB70x7ZVgjAzHsBindVW',
             });
-
-            // get list of locations
-            timekit
-                .getLocationServices()
-                .then((locations) => {
-                    console.log(locations.data.map(location => location.name));
-                })
-                .catch((error) => console.log(error));
-
 
             // get list of services
             timekit
@@ -47,25 +37,28 @@
                 .then((services) => {
                     console.log(services.data.map(service => service.name));
                 })
-                .catch((error) => console.log(error));
-
-            const locationUuid = 'ac3ab119-28b7-4418-bae7-1c464ae8b9d8';
-            const serviceUuid = '62bbd381-b317-4dde-9a8a-27ebeec53d98';
+                .catch((error) => console.log(error));         
 
             // get list of locations
             timekit
-                .carry({
-                  params: {
-                    search: "locations.uuid:" + locationUuid
-                  }
+                .getLocations()
+                .then((locations) => {
+                    console.log(locations.data.map(location => location.name));
                 })
-                .getProjects()
-                .then(({ data }) => {
-                    const locationServicesProject = data.filter(location => location.meta.t_service_id === serviceUuid)[0];
-                    console.log(locationServicesProject);
+                .catch((error) => console.log(error));                 
+
+            const serviceUuid = 'b180fcb5-0852-4fec-8746-08f9d24e6581';
+            const locationUuid = 'ac3ab119-28b7-4418-bae7-1c464ae8b9d8';
+
+            // get location service projects
+            timekit
+                .getLocationServiceProjects(locationUuid, serviceUuid)
+                .then((projects) => {
+                    console.log(projects);
                 })
-                .catch((error) => console.log(error));                
+                .catch((error) => console.log(error));               
           });
+          
         </script>
 
   </body>
