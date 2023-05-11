@@ -34,17 +34,13 @@
             // get list of services
             timekit
                 .getServices()
-                .then((services) => {
-                    console.log(services.data.map(service => service.name));
-                })
+                .then((services) => console.log(services.data.map(service => service.name)))
                 .catch((error) => console.log(error));         
 
             // get list of locations
             timekit
                 .getLocations()
-                .then((locations) => {
-                    console.log(locations.data.map(location => location.name));
-                })
+                .then((locations) => console.log(locations.data.map(location => location.name)))
                 .catch((error) => console.log(error));                 
 
             const serviceUuid = 'b180fcb5-0852-4fec-8746-08f9d24e6581';
@@ -53,9 +49,7 @@
             // get location service projects
             timekit
                 .getLocationServiceProjects(locationUuid, serviceUuid)
-                .then((projects) => {
-                    console.log(projects);
-                })
+                .then((projects) => console.log(projects.data))
                 .catch((error) => console.log(error));               
           });
           
