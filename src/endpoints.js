@@ -835,5 +835,189 @@ module.exports = function (TK) {
 		});
 	};
 
+	/**
+	 * Get a location projects
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.getLocationProjects = function (id) {
+		return TK
+		.carry({
+			params: {
+			  search: 'locations.uuid:' + id
+			}
+		}).makeRequest({
+			method: 'get',
+			url: '/projects',
+		});
+	};
+
+	/**
+	 * Get a service projects
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.getServiceProjects = function (id) {
+		return TK
+		.carry({
+			params: {
+				search: 'services.uuid:' + id
+			}
+		}).makeRequest({
+			method: 'get',
+			url: '/projects',
+		});
+	};
+
+	/**
+	 * Get a service projects
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.getLocationServiceProjects = function (locationUuid, serviceUuid) {
+		return TK
+		.carry({
+			params: {
+				search: 'locations.uuid:' + locationUuid + ';services.uuid:' + serviceUuid
+			}
+		}).makeRequest({
+			method: 'get',
+			url: '/projects',
+		});
+	};
+	
+	/**
+	 * Endpoint that returns all available dates for given resource.
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.fetchAvailabilityDates = function (data) {
+		return TK.makeRequest({
+			url: '/availability/dates',
+			method: 'post',
+			data: data,
+		});
+	};
+
+	/**
+	 * The ability to easily show a total number of available time slots.
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.fetchAvailabilityCounts = function (data) {
+		return TK.makeRequest({
+			url: '/availability/count',
+			method: 'post',
+			data: data,
+		});
+	};
+
+	/**
+	 * The ability to easily show a total number of available time slots.
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.fetchUnAvailableSlots = function (data) {
+		return TK.makeRequest({
+			url: '/unavailable/slots',
+			method: 'post',
+			data: data,
+		});
+	};
+
+	/**
+	 * Reserve a booking
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.reserveBooking = function (data) {
+		return TK.makeRequest({
+			url: '/bookings/reserve',
+			method: 'post',
+			data: data,
+		});
+	};
+
+	/**
+	 * Extend reserved booking
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.extendReservedBooking = function (data) {
+		return TK.makeRequest({
+			url: '/bookings/reserve/extend',
+			method: 'put',
+			data: data,
+		});
+	};
+
+	/**
+	 * List email templates
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.getEmailTemplates = function () {
+		return TK.makeRequest({
+			url: '/templates',
+			method: 'get',
+		});
+	};
+
+	/**
+	 * Get Specific email template
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.getEmailTemplate = function (slug) {
+		return TK.makeRequest({
+			method: 'get',
+			url: '/templates/' + slug,
+		});
+	};
+
+	/**
+	 * Update an existing email template
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.updateEmailTemplate = function (data) {
+		var slug = data.slug;
+		delete data.slug;
+
+		return TK.makeRequest({
+			url: '/templates/' + slug,
+			method: 'put',
+			data: data,
+		});
+	};
+
+	/**
+	 * Following endpoint will be used in order to reschedule a booking.
+	 * 
+	 * @type {Function}
+	 * @return {Promise}
+	 */
+	TK.rescheduleBooking = function (data) {
+		var id = data.id;
+		delete data.id;
+
+		return TK.makeRequest({
+			url: '/bookings/' + id + '/reschedule/',
+			method: 'post',
+			data: data,
+		});
+	};
+
 	return TK;
 };

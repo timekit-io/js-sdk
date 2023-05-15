@@ -32,18 +32,18 @@
 	"author": "Timekit Inc.",
 	"license": "MIT",
 	"dependencies": {
-		"axios": "^1.2.2",
+		"axios": "^1.4.0",
 		"base-64": "1.0.0",
-		"deepmerge": "4.2.2",
+		"deepmerge": "^4.3.1",
 		"humps": "^2.0.1"
 	},
 	"devDependencies": {
-		"html-webpack-plugin": "^5.5.0",
-		"jasmine": "^4.5.0",
-		"terser-webpack-plugin": "^5.3.6",
-		"webpack": "^5.75.0",
-		"webpack-cli": "^5.0.1",
-		"webpack-dev-server": "^4.11.1",
+		"html-webpack-plugin": "^5.5.1",
+		"jasmine": "^4.6.0",
+		"terser-webpack-plugin": "^5.3.8",
+		"webpack": "^5.82.1",
+		"webpack-cli": "^5.1.1",
+		"webpack-dev-server": "^4.15.0",
 		"webpack-merge": "^5.8.0"
 	}
 }

@@ -145,6 +145,9 @@ timekit.findTimeTeam({ ... })
 
 // Availability endpoints
 timekit.fetchAvailability({ ... })
+timekit.fetchUnAvailableSlots({ ... })
+timekit.fetchAvailabilityDates({ ... })
+timekit.fetchAvailabilityCounts({ ... })
 
 // Booking endpoints
 timekit.getBookings()
@@ -156,6 +159,7 @@ timekit.updateBookingsBulk({ ... })
 timekit.deleteBooking({ id })
 timekit.getGroupBookings()
 timekit.getGroupBooking({ id })
+timekit.rescheduleBooking({ id, ... })
 
 // Account endpoints
 timekit.getAccounts()
@@ -204,6 +208,20 @@ timekit.getLocation({ id })
 timekit.createLocation({ ... })
 timekit.updateLocation({ id, ... })
 timekit.deleteLocation({ id })
+
+// service location related endpoints
+timekit.getServiceProjects(id)
+timekit.getLocationProjects(id)
+timekit.getLocationServiceProjects(locationUuid, serviceUuid)
+
+// email template related endpoints
+timekit.getEmailTemplates()
+timekit.getEmailTemplate(slug)
+timekit.updateEmailTemplate({ slug, ... })
+
+// booking reservation
+timekit.reserveBooking({ ... })
+timekit.extendReservedBooking({ ... })
 
 // Auth endpoints (Note: only used to fetch a resource key)
 timekit.auth({ ... })
