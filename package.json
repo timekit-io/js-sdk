@@ -11,11 +11,12 @@
 		"test": "jasmine",
 		"build": "webpack --config webpack.prod.js",
 		"dev": "webpack serve --config webpack.dev.js",
-		"deploy:prod": "../flux/flux timekit:deploy prod js-sdk",
 		"release:patch": "../flux/flux timekit:release patch js-sdk",
 		"release:minor": "../flux/flux timekit:release minor js-sdk",
 		"release:major": "../flux/flux timekit:release major js-sdk",
-		"deploy:staging": "../flux/flux timekit:deploy staging js-sdk"
+		"deploy:staging": "../flux/flux timekit:deploy staging js-sdk",
+		"deploy:prod": "../flux/flux timekit:deploy prod js-sdk",
+		"flux:help": "../flux/flux --help"
 	},
 	"keywords": [
 		"Timekit",
