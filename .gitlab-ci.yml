@@ -2,9 +2,23 @@ image: node:alpine3.16
 
 stages:          # List of stages for jobs, and their order of execution
   - build
+  - test
 
-build-job:       # This job runs in the build stage, which runs first.
+build:       # This job runs in the build stage, which runs first.
   stage: build
   script:
     - yarn install
     - yarn build
+  artifacts:
+    paths:
+      - node_modules
+
+test:
+  stage: test
+  script:
+    - yarn test
+  artifacts:
+    paths:
+      - node_modules/
+
+
