@@ -1,5 +1,21 @@
 image: node:alpine3.16
 
+variables:
+  DEPLOY_VERSION:
+    value: "patch"
+    options:
+      - "major"
+      - "minor"
+      - "patch"
+    description: "The deployment version. Set to 'patch' by default."
+    
+  DEPLOY_ENVIRONMENT:
+    value: "staging"
+    options:
+      - "staging"
+      - "prod"
+    description: "The deployment environment. Set to 'staging' by default."
+
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
