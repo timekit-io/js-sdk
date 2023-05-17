@@ -3,6 +3,7 @@ image: node:alpine3.16
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
+  - deploy
 
 build:       # This job runs in the build stage, which runs first.
   stage: build
@@ -20,5 +21,11 @@ test:
   artifacts:
     paths:
       - node_modules/
+
+deploy:
+  stage: deploy
+  script:
+    - echo "This is a manual job which doesn't start automatically, and the pipeline can complete without it starting."
+  when: manual
 
 
