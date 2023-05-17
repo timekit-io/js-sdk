@@ -41,7 +41,7 @@ test:
 deploy:
   stage: deploy
   script:
-    - echo "This is a manual job which doesn't start automatically, and the pipeline can complete without it starting."
+    - echo "This is a manual job which doesn't start automatically, Value of variables for DEPLOY_VERSION '$DEPLOY_VERSION' and DEPLOY_ENVIRONMENT '$DEPLOY_ENVIRONMENT'."
   when: manual
 
 
