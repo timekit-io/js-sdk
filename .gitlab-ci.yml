@@ -1,3 +1,5 @@
+image: node:alpine3.16
+
 variables:
   DEPLOY_VERSION:
     value: "patch"
@@ -21,7 +23,6 @@ stages:          # List of stages for jobs, and their order of execution
 
 build:       # This job runs in the build stage, which runs first.
   stage: build
-  image: node:alpine3.16
   script:
     - yarn install
     - yarn build
@@ -31,7 +32,6 @@ build:       # This job runs in the build stage, which runs first.
 
 test:
   stage: test
-  image: node:alpine3.16
   script:
     - yarn test
   artifacts:
@@ -40,11 +40,8 @@ test:
 
 deploy:
   stage: deploy
-  variables:
-    DEPLOY_VERSION: "patch"
-    DEPLOY_ENVIRONMENT: "staging"
   script:
-    - echo "This is a manual job which doesn't start automatically, Value of variables for DEPLOY_VERSION => $DEPLOY_VERSION and DEPLOY_ENVIRONMENT => $DEPLOY_ENVIRONMENT."
+    - yarn flux:help
   when: manual
 
 
