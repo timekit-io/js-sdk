@@ -1,3 +1,5 @@
+image: node:alpine3.16
+
 stages:          # List of stages for jobs, and their order of execution
   - build
 
